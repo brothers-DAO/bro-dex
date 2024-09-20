@@ -53,9 +53,9 @@
 
   (defschema order-sch
     id:integer
-    is-ask:bool
-    state:integer ; Order states
-    partial:bool ; Is this a partial (split order) => This field is for info onmy (UX)
+    is-ask:bool ; Whether the order is an Ask (true) or a Bid (False)
+    state:integer ; Order state
+    partial:bool ; Is this a partial (split order) => This field is for info only (UX)
     o-p:integer ; Previous in the live list of orders
     o-n:integer ; Next in the live list of orders
     m-p:integer ; Previous in the live list for a specific maker
@@ -66,7 +66,7 @@
     price:decimal ; Price in QUOTE
     amount:decimal ; Amount price in BASE
     maker-acct:string ; Maker accounts
-    guard:guard ; Make guard : used for cancelling the order
+    guard:guard ; Make guard : used for canceling the order
   )
 
   (defun fail:bool ()
