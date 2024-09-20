@@ -1,0 +1,847 @@
+(load "init.repl")
+
+; --------------------ORDER-BOOK--------------------
+; <--- 0192872877885359610558 / 1.0 - 4.0
+; <--- 0896561851709965799993 / 1.0 - 5.0
+; <--- 1572796001557143547764 / 1.0 - 10.0
+; ---> 2054700195086858548866 / 1.0 - 20.0
+; ---> 1520416172771541360824 / 1.0 - 30.0
+; ---> 2441439105047490421929 / 1.0 - 40.0
+; ---> 2159448978217457141053 / 1.0 - 41.0
+; ---> 1135210929582361568944 / 1.0 - 42.0
+; ---> 2413392777850430677452 / 1.0 - 43.0
+; ---> 4598807734136380309870 / 1.0 - 44.0
+; ---> 2956396945510889601379 / 1.0 - 45.0
+; ---> 2560742498015077325666 / 1.0 - 46.0
+; ---> 1244204076515913926773 / 1.0 - 47.0
+; ---> 3749762571443237779708 / 1.0 - 48.0
+; ---> 3989432022929502080359 / 1.0 - 49.0
+; ---> 2475187638815994249335 / 1.0 - 50.0
+
+(begin-tx)
+; Do some basic checks
+(use bro-dex-core-KDA-ABC)
+(use bro-dex-view-KDA-ABC)
+(use test-helpers)
+;(print (all-orders-for "alice"))
+(expect-that "Orderbook should have a size of 16" (compose (length) (= 16)) (get-orderbook NIL 50))
+(expect-that "Alice Orderbook should have a size of 8" (compose (length) (= 8)) (get-orders-by-maker "alice" NIL  50))
+(expect-that "bob Orderbook should have a size of 8" (compose (length) (= 8)) (get-orders-by-maker "alice" NIL  50))
+
+(expect-that "First ASK ID" (compose (at 'id) (= 2054700195086858548866)) (first-ask))
+(expect-that "First BID ID" (compose (at 'id) (= 1572796001557143547764)) (first-bid))
+(commit-tx)
+
+; Try a BID create order
+(begin-tx)
+(use bro-dex-core-KDA-ABC)
+(use bro-dex-view-KDA-ABC)
+
+(env-data {'ks:["carol-key"]})
+(env-sigs [ {'key:"carol-key", 'caps:[(coin.TRANSFER "carol" (order-account (next-id)) 4.5)]}])
+
+(coin.transfer-create "carol" (order-account (next-id)) (order-account-guard (next-id)) 4.5)
+(create-order false "carol" (read-keyset 'ks) 1.0 4.5  0192872877885359610558)
+
+(expect-that "Orderbook should have a size of 17" (compose (length) (= 17)) (get-orderbook NIL 50))
+(expect-that "Carol Orderbook should have a size of 1" (compose (length) (= 1)) (get-orders-by-maker "carol" NIL 50))
+
+(rollback-tx)
+
+
+; Try with bad position
+(begin-tx)
+(use bro-dex-core-KDA-ABC)
+(use bro-dex-view-KDA-ABC)
+
+(env-data {'ks:["carol-key"]})
+(env-sigs [ {'key:"carol-key", 'caps:[(coin.TRANSFER "carol" (order-account (next-id)) 4.5)]}])
+
+(coin.transfer-create "carol" (order-account (next-id)) (order-account-guard (next-id)) 4.5)
+(expect-failure "Bad position" "Order insertion position error" (create-order false "carol" (read-keyset 'ks) 1.0 4.5  0896561851709965799993))
+(rollback-tx)
+
+
+; Try with bad position again
+(begin-tx)
+(use bro-dex-core-KDA-ABC)
+(use bro-dex-view-KDA-ABC)
+
+(env-data {'ks:["carol-key"]})
+(env-sigs [ {'key:"carol-key", 'caps:[(coin.TRANSFER "carol" (order-account (next-id)) 4.0)]}])
+
+(coin.transfer-create "carol" (order-account (next-id)) (order-account-guard (next-id)) 4.0)
+(expect-failure "Bad position" "Order insertion position error" (create-order false "carol" (read-keyset 'ks) 1.0 4.0  0896561851709965799993))
+(rollback-tx)
+
+; Try with bad position again
+(begin-tx)
+(use bro-dex-core-KDA-ABC)
+(use bro-dex-view-KDA-ABC)
+
+(env-data {'ks:["carol-key"]})
+(env-sigs [ {'key:"carol-key", 'caps:[(coin.TRANSFER "carol" (order-account (next-id)) 4.0)]}])
+
+(coin.transfer-create "carol" (order-account (next-id)) (order-account-guard (next-id)) 4.0)
+(expect-failure "Bad position" "Order insertion position error" (create-order false "carol" (read-keyset 'ks) 1.0 4.0  0192872877885359610558))
+(rollback-tx)
+
+
+; Try with bad position again
+(begin-tx)
+(use bro-dex-core-KDA-ABC)
+(use bro-dex-view-KDA-ABC)
+
+(env-data {'ks:["carol-key"]})
+(env-sigs [ {'key:"carol-key", 'caps:[(coin.TRANSFER "carol" (order-account (next-id)) 4.0)]}])
+
+(coin.transfer-create "carol" (order-account (next-id)) (order-account-guard (next-id)) 4.0)
+(expect-failure "Bad position" "Order insertion position error" (create-order false "carol" (read-keyset 'ks) 1.0 4.0  0192872877885359610558))
+(rollback-tx)
+
+
+; Try with bad position again
+(begin-tx)
+(use bro-dex-core-KDA-ABC)
+(use bro-dex-view-KDA-ABC)
+
+(env-data {'ks:["carol-key"]})
+(env-sigs [ {'key:"carol-key", 'caps:[(coin.TRANSFER "carol" (order-account (next-id)) 35.0)]}])
+
+(coin.transfer-create "carol" (order-account (next-id)) (order-account-guard (next-id)) 35.0)
+(expect-failure "Bad position" "Order insertion position error" (create-order false "carol" (read-keyset 'ks) 1.0 35.0  1520416172771541360824))
+(rollback-tx)
+
+
+; Try without paying
+(begin-tx)
+(use bro-dex-core-KDA-ABC)
+(use bro-dex-view-KDA-ABC)
+
+(expect-failure "Not payed" "Order account not funded" (create-order false "carol" (read-keyset 'ks) 1.0 4.5  0192872877885359610558))
+(rollback-tx)
+
+; Try with paying less than expected
+(begin-tx)
+(use bro-dex-core-KDA-ABC)
+(use bro-dex-view-KDA-ABC)
+
+(env-data {'ks:["carol-key"]})
+(env-sigs [ {'key:"carol-key", 'caps:[(coin.TRANSFER "carol" (order-account (next-id)) 4.5)]}])
+
+(coin.transfer-create "carol" (order-account (next-id)) (order-account-guard (next-id)) 4.4999999)
+(expect-failure "Not payed" "Order account not funded" (create-order false "carol" (read-keyset 'ks) 1.0 4.5  0192872877885359610558))
+(rollback-tx)
+
+
+; Try a ASK create order
+(begin-tx)
+(use bro-dex-core-KDA-ABC)
+(use bro-dex-view-KDA-ABC)
+
+(env-data {'ks:["carol-key"]})
+(env-sigs [ {'key:"carol-key", 'caps:[(ABC_NS.abc.TRANSFER "carol" (order-account (next-id)) 1.0)]}])
+
+(ABC_NS.abc.transfer-create "carol" (order-account (next-id)) (order-account-guard (next-id)) 1.0)
+(create-order true "carol" (read-keyset 'ks) 1.0 42.5  1135210929582361568944)
+
+(expect-that "Orderbook should have a size of 17" (compose (length) (= 17)) (get-orderbook NIL 50))
+(expect-that "Carol Orderbook should have a size of 1" (compose (length) (= 1)) (get-orders-by-maker "carol" NIL 50))
+(rollback-tx)
+
+
+; Try another ASK create order
+(begin-tx)
+(use bro-dex-core-KDA-ABC)
+(use bro-dex-view-KDA-ABC)
+
+(env-data {'ks:["carol-key"]})
+(env-sigs [ {'key:"carol-key", 'caps:[(ABC_NS.abc.TRANSFER "carol" (order-account (next-id)) 1.0)]}])
+
+(ABC_NS.abc.transfer-create "carol" (order-account (next-id)) (order-account-guard (next-id)) 1.0)
+(create-order true "carol" (read-keyset 'ks) 1.0 43.0  2413392777850430677452)
+
+(expect-that "Orderbook should have a size of 17" (compose (length) (= 17)) (get-orderbook NIL 50))
+(expect-that "Carol Orderbook should have a size of 1" (compose (length) (= 1)) (get-orders-by-maker "carol" NIL  50))
+(rollback-tx)
+
+
+; Try with bad position
+(begin-tx)
+(use bro-dex-core-KDA-ABC)
+(use bro-dex-view-KDA-ABC)
+
+(env-data {'ks:["carol-key"]})
+(env-sigs [ {'key:"carol-key", 'caps:[(ABC_NS.abc.TRANSFER "carol" (order-account (next-id)) 1.0)]}])
+
+(ABC_NS.abc.transfer-create "carol" (order-account (next-id)) (order-account-guard (next-id)) 1.0)
+(expect-failure "Bad position" "Order insertion position error" (create-order true "carol" (read-keyset 'ks) 1.0 42.5  2159448978217457141053))
+
+(rollback-tx)
+
+; Try with bad position
+(begin-tx)
+(use bro-dex-core-KDA-ABC)
+(use bro-dex-view-KDA-ABC)
+
+(env-data {'ks:["carol-key"]})
+(env-sigs [ {'key:"carol-key", 'caps:[(ABC_NS.abc.TRANSFER "carol" (order-account (next-id)) 1.0)]}])
+
+(ABC_NS.abc.transfer-create "carol" (order-account (next-id)) (order-account-guard (next-id)) 1.0)
+(expect-failure "Bad position" "Order insertion position error" (create-order true "carol" (read-keyset 'ks) 1.0 42.5  2413392777850430677452))
+
+(rollback-tx)
+
+
+; Try with bad position
+(begin-tx)
+(use bro-dex-core-KDA-ABC)
+(use bro-dex-view-KDA-ABC)
+
+(env-data {'ks:["carol-key"]})
+(env-sigs [ {'key:"carol-key", 'caps:[(ABC_NS.abc.TRANSFER "carol" (order-account (next-id)) 1.0)]}])
+
+(ABC_NS.abc.transfer-create "carol" (order-account (next-id)) (order-account-guard (next-id)) 1.0)
+(expect-failure "Bad position" "Order insertion position error" (create-order true "carol" (read-keyset 'ks) 1.0 5.5  0896561851709965799993))
+
+(rollback-tx)
+
+
+; Try without paying
+(begin-tx)
+(use bro-dex-core-KDA-ABC)
+(use bro-dex-view-KDA-ABC)
+
+(expect-failure "Not payed" "Order account not funded"  (create-order true "carol" (read-keyset 'ks) 1.0 42.5  1135210929582361568944))
+(rollback-tx)
+
+; Try with paying less than  expected
+(begin-tx)
+(use bro-dex-core-KDA-ABC)
+(use bro-dex-view-KDA-ABC)
+
+(env-data {'ks:["carol-key"]})
+(env-sigs [ {'key:"carol-key", 'caps:[(ABC_NS.abc.TRANSFER "carol" (order-account (next-id)) 1.0)]}])
+
+(ABC_NS.abc.transfer-create "carol" (order-account (next-id)) (order-account-guard (next-id)) 1.0)
+(create-order true "carol" (read-keyset 'ks) 1.0 42.5  1135210929582361568944)
+
+(expect-that "Orderbook should have a size of 17" (compose (length) (= 17)) (get-orderbook NIL 50))
+(expect-that "Carol Orderbook should have a size of 1" (compose (length) (= 1)) (get-orders-by-maker "carol" NIL  50))
+(rollback-tx)
+
+
+
+;;; CANCELLING ORDERS
+; Cancel a bid
+(begin-tx)
+(use bro-dex-core-KDA-ABC)
+(use bro-dex-view-KDA-ABC)
+(use free.util-lists)
+; Sanity check
+(expect "Initial Coin Balance" 995.0 (coin.get-balance "alice"))
+
+(env-sigs [ {'key:"alice-key", 'caps:[(CANCEL-ORDER 0896561851709965799993)]}])
+(cancel-order 0896561851709965799993)
+
+; Check that we got refunded
+(expect "After Coin Balance" 1000.0 (coin.get-balance "alice"))
+
+(expect-that "Orderbook should have a size of 15" (compose (length) (= 15)) (get-orderbook NIL 50))
+(expect-that "Alice Orderbook should have a size of 7" (compose (length) (= 7)) (get-orders-by-maker "alice" NIL  50))
+(expect-that "Alice history should contain 1 element" (compose (length) (= 1)) (get-orders-in-account-history "alice" NIL 50))
+(expect-that "Alice first history element should have the right ID"  (compose (at 'id) (= 0896561851709965799993)) (first (get-orders-in-account-history "alice" NIL 1)))
+(expect-that "Alice first history element must bee in canceled state"  (compose (at 'state) (= STATE-CANCELED)) (first (get-orders-in-account-history "alice" NIL 1)))
+
+; Try to cancel the order again
+(expect-failure "Already canceled" "Order not in active state" (cancel-order 0896561851709965799993))
+
+; Try to take the order
+(env-data {'ks:["carol-key"]})
+(env-sigs [ {'key:"carol-key", 'caps:[(coin.TRANSFER "carol" (order-account 0896561851709965799993) 5.0)]}])
+
+(coin.transfer-create "carol" (order-account 0896561851709965799993) (order-account-guard 0896561851709965799993) 5.0)
+(expect-failure "Already canceled" "Order not in active state"  (take-order 0896561851709965799993 "carol" 1.0))
+(rollback-tx)
+
+; Cancel first bid
+(use bro-dex-core-KDA-ABC)
+(use bro-dex-view-KDA-ABC)
+(use free.util-lists)
+
+
+(env-sigs [ {'key:"bob-key", 'caps:[(CANCEL-ORDER 0192872877885359610558)]}])
+(cancel-order 0192872877885359610558)
+(expect-that "Orderbook should have a size of 15" (compose (length) (= 15)) (get-orderbook NIL 50))
+(expect-that "Bob Orderbook should have a size of 7" (compose (length) (= 7)) (get-orders-by-maker "bob" NIL  50))
+
+(expect-that "Bob first history element should have the right ID"  (compose (at 'id) (= 0192872877885359610558)) (first (get-orders-in-account-history "bob" NIL 1)))
+(expect-that "Bob  first history element must bee in canceled state"  (compose (at 'state) (= STATE-CANCELED)) (first (get-orders-in-account-history "bob" NIL 1)))
+(expect-that "First orderbook element should be "  (compose (at 'id) (= 0896561851709965799993)) (first (get-orderbook NIL 1)))
+(expect-that "First Bob orderbook element should be "  (compose (at 'id) (= 1572796001557143547764)) (first (get-orders-by-maker "bob" NIL  1)))
+(rollback-tx)
+
+
+; Cancel last bid
+(use bro-dex-core-KDA-ABC)
+(use bro-dex-view-KDA-ABC)
+(use free.util-lists)
+(env-sigs [ {'key:"bob-key", 'caps:[(CANCEL-ORDER 1572796001557143547764)]}])
+(cancel-order 1572796001557143547764)
+(expect-that "Orderbook should have a size of 15" (compose (length) (= 15)) (get-orderbook NIL 50))
+(expect-that "Bob Orderbook should have a size of 7" (compose (length) (= 7)) (get-orders-by-maker "bob" NIL  50))
+
+(expect-that "Bob first history element should have the right ID"  (compose (at 'id) (= 1572796001557143547764)) (first (get-orders-in-account-history "bob" NIL 1)))
+(expect-that "Bob  first history element must bee in canceled state"  (compose (at 'state) (= STATE-CANCELED)) (first (get-orders-in-account-history "bob" NIL 1)))
+(expect-that "First bid updated" (compose (at 'id) (= 0896561851709965799993)) (first-bid))
+(expect-that "First ask updated" (compose (at 'id) (= 2054700195086858548866)) (first-ask))
+(rollback-tx)
+
+; Try to cancel a bid without proper signature
+(begin-tx)
+(use bro-dex-core-KDA-ABC)
+(use bro-dex-view-KDA-ABC)
+(use free.util-lists)
+; Sanity check
+(expect "Initial Coin Balance" 995.0 (coin.get-balance "alice"))
+
+(env-sigs [ {'key:"bob-key", 'caps:[(CANCEL-ORDER 0896561851709965799993)]}])
+(expect-failure "Bad sigfnature" " Keyset failure" (cancel-order 0896561851709965799993))
+(rollback-tx)
+
+
+
+; Cancel an ask
+(begin-tx)
+(use bro-dex-core-KDA-ABC)
+(use bro-dex-view-KDA-ABC)
+(use free.util-lists)
+; Sanity check
+(expect "Initial ABC Balance" 93.0 (ABC_NS.abc.get-balance "alice"))
+
+(env-sigs [ {'key:"alice-key", 'caps:[(CANCEL-ORDER 4598807734136380309870)]}])
+(cancel-order 4598807734136380309870)
+
+; Check that we got refunded
+(expect "After ABC Balance" 94.0 (ABC_NS.abc.get-balance "alice"))
+
+(expect-that "Orderbook should have a size of 15" (compose (length) (= 15)) (get-orderbook NIL 50))
+(expect-that "Alice Orderbook should have a size of 7" (compose (length) (= 7)) (get-orders-by-maker "alice" NIL  50))
+(expect-that "Alice history should contain 1 element" (compose (length) (= 1)) (get-orders-in-account-history "alice" NIL 50))
+(expect-that "Alice first history element should have the right ID"  (compose (at 'id) (= 4598807734136380309870)) (first (get-orders-in-account-history "alice" NIL 1)))
+(expect-that "Alice first history element must bee in canceled state"  (compose (at 'state) (= STATE-CANCELED)) (first (get-orders-in-account-history "alice" NIL 1)))
+; Try to take the order
+(env-data {'ks:["carol-key"]})
+(env-sigs [ {'key:"carol-key", 'caps:[(ABC_NS.abc.TRANSFER "carol" (order-account 4598807734136380309870) 1.0)]}])
+
+(ABC_NS.abc.transfer-create "carol" (order-account 4598807734136380309870) (order-account-guard 4598807734136380309870) 1.0)
+(expect-failure "Already canceled" "Order not in active state"  (take-order 4598807734136380309870 "carol" 1.0))
+(rollback-tx)
+
+
+; Cancel first ask
+(begin-tx)
+(use bro-dex-core-KDA-ABC)
+(use bro-dex-view-KDA-ABC)
+(use free.util-lists)
+
+(env-sigs [ {'key:"alice-key", 'caps:[(CANCEL-ORDER 2054700195086858548866)]}])
+(cancel-order 2054700195086858548866)
+(expect-that "Orderbook should have a size of 15" (compose (length) (= 15)) (get-orderbook NIL 50))
+(expect-that "Alice Orderbook should have a size of 7" (compose (length) (= 7)) (get-orders-by-maker "alice" NIL  50))
+
+(expect-that "Alice first history element should have the right ID"  (compose (at 'id) (= 2054700195086858548866)) (first (get-orders-in-account-history "alice" NIL 1)))
+(expect-that "Alice  first history element must bee in canceled state"  (compose (at 'state) (= STATE-CANCELED)) (first (get-orders-in-account-history "alice" NIL 1)))
+
+
+(expect-that "First bid updated" (compose (at 'id) (= 1572796001557143547764)) (first-bid))
+(expect-that "First ask updated" (compose (at 'id) (= 1520416172771541360824)) (first-ask))
+
+(rollback-tx)
+
+; Cancel last ask
+(begin-tx)
+(use bro-dex-core-KDA-ABC)
+(use bro-dex-view-KDA-ABC)
+(use free.util-lists)
+
+(env-sigs [ {'key:"alice-key", 'caps:[(CANCEL-ORDER 2475187638815994249335)]}])
+(cancel-order 2475187638815994249335)
+(expect-that "Orderbook should have a size of 15" (compose (length) (= 15)) (get-orderbook NIL 50))
+(expect-that "Alice Orderbook should have a size of 7" (compose (length) (= 7)) (get-orders-by-maker "alice" NIL  50))
+
+(expect-that "Alice first history element should have the right ID"  (compose (at 'id) (= 2475187638815994249335)) (first (get-orders-in-account-history "alice" NIL 1)))
+(expect-that "Alice  first history element must bee in canceled state"  (compose (at 'state) (= STATE-CANCELED)) (first (get-orders-in-account-history "alice" NIL 1)))
+
+(expect-that "Last orderbook element"  (compose (at 'id) (= 3989432022929502080359)) (last (get-orderbook NIL 50)))
+(rollback-tx)
+
+;;; TAKING ORDERS
+
+; Take a Bid order in FULL
+(begin-tx)
+(use bro-dex-core-KDA-ABC)
+(use bro-dex-view-KDA-ABC)
+(use free.util-lists)
+
+; Sanity check
+(expect "Initial ABC Balance of Maker" 93.0 (ABC_NS.abc.get-balance "alice"))
+(expect "Initial ABC Balance of Taker" 100.0 (ABC_NS.abc.get-balance "carol"))
+(expect "Initial coin Balance of Taker" 1000.0 (coin.get-balance "carol"))
+(expect "Initial ABC Balance of fee" 0.0 (ABC_NS.abc.get-balance "fee-receiver"))
+
+(env-sigs [ {'key:"carol-key", 'caps:[(ABC_NS.abc.TRANSFER "carol" (order-account 0896561851709965799993) 1.001)]}])
+(ABC_NS.abc.transfer-create "carol" (order-account 0896561851709965799993) (order-account-guard 0896561851709965799993) 1.001)
+(take-order 0896561851709965799993 "carol" 1.0)
+
+(expect "After ABC Balance of Maker" 94.0 (ABC_NS.abc.get-balance "alice"))
+(expect "After ABC Balance of Taker" 98.999 (ABC_NS.abc.get-balance "carol"))
+(expect "After ABC Balance of fee" 0.001 (ABC_NS.abc.get-balance "fee-receiver"))
+(expect "After coin Balance of Taker" 1005.0 (coin.get-balance "carol"))
+
+(expect-that "Orderbook should have a size of 15" (compose (length) (= 15)) (get-orderbook NIL 50))
+(expect-that "Alice Orderbook should have a size of 7" (compose (length) (= 7)) (get-orders-by-maker "alice" NIL  50))
+
+(expect-that "Alice history should contain 1 element" (compose (length) (= 1)) (get-orders-in-account-history "alice" NIL 50))
+(expect-that "Alice first history element should have the right ID"  (compose (at 'id) (= 0896561851709965799993)) (first (get-orders-in-account-history "alice" NIL 1)))
+(expect-that "Alice  first history element must bee in taken state"  (compose (at 'state) (= STATE-TAKEN)) (first (get-orders-in-account-history "alice" NIL 1)))
+
+
+(expect-that "Carol history should contain 1 element" (compose (length) (= 1)) (get-orders-in-account-history "carol" NIL 50))
+(expect-that "Carol first history element should have the right ID"  (compose (at 'id) (= 0896561851709965799993)) (first (get-orders-in-account-history "carol" NIL 1)))
+
+(expect-that "Global history should contain 1 element" (compose (length) (= 1)) (get-orders-in-history NIL 50))
+(rollback-tx)
+
+
+; Take a Bid order in THREE steps
+(begin-tx)
+(use bro-dex-core-KDA-ABC)
+(use bro-dex-view-KDA-ABC)
+(use free.util-lists)
+
+; Sanity check
+(expect "Initial ABC Balance of Maker" 93.0 (ABC_NS.abc.get-balance "alice"))
+(expect "Initial ABC Balance of Taker" 100.0 (ABC_NS.abc.get-balance "carol"))
+(expect "Initial coin Balance of Taker" 1000.0 (coin.get-balance "carol"))
+(expect "Initial ABC Balance of fee" 0.0 (ABC_NS.abc.get-balance "fee-receiver"))
+
+(env-sigs [ {'key:"carol-key", 'caps:[(ABC_NS.abc.TRANSFER "carol" (order-account 0896561851709965799993)  0.25025)]}])
+(ABC_NS.abc.transfer-create "carol" (order-account 0896561851709965799993) (order-account-guard 0896561851709965799993) 0.25025)
+(take-order 0896561851709965799993 "carol" 0.25)
+
+(expect "After ABC Balance of Maker" 93.25 (ABC_NS.abc.get-balance "alice"))
+(expect "After ABC Balance of Taker" 99.74975 (ABC_NS.abc.get-balance "carol"))
+(expect "After ABC Balance of fee" 0.00025 (ABC_NS.abc.get-balance "fee-receiver"))
+(expect "After coin Balance of Taker" 1001.25 (coin.get-balance "carol"))
+
+(expect-that "Orderbook should have a size of 16" (compose (length) (= 16)) (get-orderbook NIL 50))
+(expect-that "Alice Orderbook should have a size of 8" (compose (length) (= 8)) (get-orders-by-maker "alice" NIL  50))
+
+(expect-that "Alice history should contain 1 element" (compose (length) (= 1)) (get-orders-in-account-history "alice" NIL 50))
+(expect-that "Alice first history element should have the right ID"  (compose (at 'id) (!= 0896561851709965799993)) (first (get-orders-in-account-history "alice" NIL 1)))
+(expect-that "Alice  first history element should have the right amount"  (compose (at 'amount) (= 0.25)) (first (get-orders-in-account-history "alice" NIL 1)))
+(expect-that "Alice  first history element must be in taken state"  (compose (at 'state) (= STATE-TAKEN)) (first (get-orders-in-account-history "alice" NIL 1)))
+(expect-that "Alice  first history element must be in partial state"  (compose (at 'partial) (= true)) (first (get-orders-in-account-history "alice" NIL 1)))
+(expect-that "Carol history should contain 1 element" (compose (length) (= 1)) (get-orders-in-account-history "carol" NIL 50))
+(expect-that "Carol first history element should have the right ID"  (compose (at 'id) (!= 0896561851709965799993)) (first (get-orders-in-account-history "carol" NIL 1)))
+(expect-that "Global history should contain 1 element" (compose (length) (= 1)) (get-orders-in-history NIL 50))
+
+
+; Check that the element is still in the Orderbook
+(expect-that "In OB ha sthe remaining amount"  (compose (at 'amount) (= 0.75)) (get-order 0896561851709965799993))
+(expect-that "In OB is still acitve" (compose (at 'state) (= STATE-ACTIVE)) (get-order 0896561851709965799993))
+(expect-that "In OB is partial" (compose (at 'partial) (= true)) (get-order 0896561851709965799993))
+(commit-tx)
+
+
+; Time now to take a second part
+(begin-tx)
+(use bro-dex-core-KDA-ABC)
+(use bro-dex-view-KDA-ABC)
+(use free.util-lists)
+
+(env-sigs [ {'key:"carol-key", 'caps:[(ABC_NS.abc.TRANSFER "carol" (order-account 0896561851709965799993)  0.25025)]}])
+(ABC_NS.abc.transfer-create "carol" (order-account 0896561851709965799993) (order-account-guard 0896561851709965799993) 0.25025)
+(take-order 0896561851709965799993 "carol" 0.25)
+
+(expect "After ABC Balance of Maker" 93.5 (ABC_NS.abc.get-balance "alice"))
+(expect "After ABC Balance of Taker" 99.4995 (ABC_NS.abc.get-balance "carol"))
+(expect "After ABC Balance of fee" 0.0005 (ABC_NS.abc.get-balance "fee-receiver"))
+(expect "After coin Balance of Taker" 1002.5 (coin.get-balance "carol"))
+
+(expect-that "Orderbook should have a size of 16" (compose (length) (= 16)) (get-orderbook NIL 50))
+(expect-that "Alice Orderbook should have a size of 8" (compose (length) (= 8)) (get-orders-by-maker "alice" NIL  50))
+
+(expect-that "Alice history should contain 2 elements" (compose (length) (= 2)) (get-orders-in-account-history "alice" NIL 50))
+(expect-that "Alice first history element should have the right ID"  (compose (at 'id) (!= 0896561851709965799993)) (first (get-orders-in-account-history "alice" NIL 1)))
+(expect-that "Alice  first history element should have the right amount"  (compose (at 'amount) (= 0.25)) (first (get-orders-in-account-history "alice" NIL 1)))
+(expect-that "Alice  first history element must be in taken state"  (compose (at 'state) (= STATE-TAKEN)) (first (get-orders-in-account-history "alice" NIL 1)))
+(expect-that "Alice  first history element must be in partial state"  (compose (at 'partial) (= true)) (first (get-orders-in-account-history "alice" NIL 1)))
+(expect-that "Carol history should contain 2 elements" (compose (length) (= 2)) (get-orders-in-account-history "carol" NIL 50))
+(expect-that "Carol first history element should have the right ID"  (compose (at 'id) (!= 0896561851709965799993)) (first (get-orders-in-account-history "carol" NIL 1)))
+(expect-that "Global history should contain 2 elements" (compose (length) (= 2)) (get-orders-in-history NIL 50))
+
+
+; Check that the element is still in the Orderbook
+(expect-that "In OB ha sthe remaining amount"  (compose (at 'amount) (= 0.5)) (get-order 0896561851709965799993))
+(expect-that "In OB is still acitve" (compose (at 'state) (= STATE-ACTIVE)) (get-order 0896561851709965799993))
+(expect-that "In OB is partial" (compose (at 'partial) (= true)) (get-order 0896561851709965799993))
+(commit-tx)
+
+
+; Now take the last part
+(begin-tx)
+(use bro-dex-core-KDA-ABC)
+(use bro-dex-view-KDA-ABC)
+(use free.util-lists)
+
+(env-sigs [ {'key:"carol-key", 'caps:[(ABC_NS.abc.TRANSFER "carol" (order-account 0896561851709965799993)  0.5005)]}])
+(ABC_NS.abc.transfer-create "carol" (order-account 0896561851709965799993) (order-account-guard 0896561851709965799993) 0.5005)
+(take-order 0896561851709965799993 "carol" 0.5)
+
+(expect "After ABC Balance of Maker" 94.0 (ABC_NS.abc.get-balance "alice"))
+(expect "After ABC Balance of Taker" 98.999 (ABC_NS.abc.get-balance "carol"))
+(expect "After ABC Balance of fee" 0.001 (ABC_NS.abc.get-balance "fee-receiver"))
+(expect "After coin Balance of Taker" 1005.0 (coin.get-balance "carol"))
+
+(expect-that "Orderbook should have a size of 15" (compose (length) (= 15)) (get-orderbook NIL 50))
+(expect-that "Alice Orderbook should have a size of 7" (compose (length) (= 7)) (get-orders-by-maker "alice" NIL  50))
+
+(expect-that "Alice history should contain 3 elements" (compose (length) (= 3)) (get-orders-in-account-history "alice" NIL 50))
+(expect-that "Alice first history element should have the right ID"  (compose (at 'id) (= 0896561851709965799993)) (first (get-orders-in-account-history "alice" NIL 1)))
+(expect-that "Alice  first history element should have the right amount"  (compose (at 'amount) (= 0.5)) (first (get-orders-in-account-history "alice" NIL 1)))
+(expect-that "Alice  first history element must be in taken state"  (compose (at 'state) (= STATE-TAKEN)) (first (get-orders-in-account-history "alice" NIL 1)))
+(expect-that "Alice  first history element must be in partial state"  (compose (at 'partial) (= true)) (first (get-orders-in-account-history "alice" NIL 1)))
+(expect-that "Carol history should contain 3 elements" (compose (length) (= 3)) (get-orders-in-account-history "carol" NIL 50))
+(expect-that "Carol first history element should have the right ID"  (compose (at 'id) (= 0896561851709965799993)) (first (get-orders-in-account-history "carol" NIL 1)))
+(expect-that "Global history should contain 3 elements" (compose (length) (= 3)) (get-orders-in-history NIL 50))
+
+(rollback-tx)
+
+
+(begin-tx)
+(use test-helpers)
+(print (format-all-orders))
+(commit-tx)
+
+; Take the lowest BID
+(begin-tx)
+(use bro-dex-core-KDA-ABC)
+(use bro-dex-view-KDA-ABC)
+(use free.util-lists)
+
+; Sanity check
+(expect "Init ABC Balance of Maker" 94.0 (ABC_NS.abc.get-balance "bob"))
+(expect "Init ABC Balance of Taker" 99.4995 (ABC_NS.abc.get-balance "carol"))
+(expect "Init ABC Balance of fee" 0.0005 (ABC_NS.abc.get-balance "fee-receiver"))
+(expect "Init coin Balance of Taker" 1002.5 (coin.get-balance "carol"))
+
+(env-sigs [ {'key:"carol-key", 'caps:[(ABC_NS.abc.TRANSFER "carol" (order-account 0192872877885359610558) 1.001)]}])
+(ABC_NS.abc.transfer-create "carol" (order-account 0192872877885359610558) (order-account-guard 0192872877885359610558) 1.001)
+(take-order 0192872877885359610558 "carol" 1.0)
+
+(expect "After ABC Balance of Maker" 95.0 (ABC_NS.abc.get-balance "bob"))
+(expect "After ABC Balance of Taker" 98.4985 (ABC_NS.abc.get-balance "carol"))
+(expect "After ABC Balance of fee" 0.0015 (ABC_NS.abc.get-balance "fee-receiver"))
+(expect "After coin Balance of Taker" 1006.5 (coin.get-balance "carol"))
+
+(expect-that "Orderbook should have a size of 15" (compose (length) (= 15)) (get-orderbook NIL 50))
+(expect-that "First element of the orderbook should be the next"  (compose (at 'id) (= 0896561851709965799993))  (first (get-orderbook NIL 50)))
+(expect-that "Bob Orderbook should have a size of 7" (compose (length) (= 7)) (get-orders-by-maker "bob" NIL  50))
+
+(expect-that "Bob history should contain 1 element" (compose (length) (= 1)) (get-orders-in-account-history "bob" NIL 50))
+(expect-that "Bob first history element should have the right ID"  (compose (at 'id) (= 0192872877885359610558)) (first (get-orders-in-account-history "bob" NIL 1)))
+(expect-that "Bobe  first history element must bee in taken state"  (compose (at 'state) (= STATE-TAKEN)) (first (get-orders-in-account-history "bob" NIL 1)))
+
+
+(expect-that "Carol history should contain 3 elements" (compose (length) (= 3)) (get-orders-in-account-history "carol" NIL 50))
+(expect-that "Carol first history element should have the right ID"  (compose (at 'id) (= 0192872877885359610558)) (first (get-orders-in-account-history "carol" NIL 1)))
+
+(expect-that "Global history should contain 3 elements" (compose (length) (= 3)) (get-orders-in-history NIL 50))
+
+(rollback-tx)
+
+
+; Take the lowest BID
+(begin-tx)
+(use bro-dex-core-KDA-ABC)
+(use bro-dex-view-KDA-ABC)
+(use free.util-lists)
+
+; Sanity check
+(expect "Init ABC Balance of Maker" 94.0 (ABC_NS.abc.get-balance "bob"))
+(expect "Init ABC Balance of Taker" 99.4995 (ABC_NS.abc.get-balance "carol"))
+(expect "Init ABC Balance of fee" 0.0005 (ABC_NS.abc.get-balance "fee-receiver"))
+(expect "Init coin Balance of Taker" 1002.5 (coin.get-balance "carol"))
+
+(env-sigs [ {'key:"carol-key", 'caps:[(ABC_NS.abc.TRANSFER "carol" (order-account 0192872877885359610558) 1.001)]}])
+(ABC_NS.abc.transfer-create "carol" (order-account 0192872877885359610558) (order-account-guard 0192872877885359610558) 1.001)
+(take-order 0192872877885359610558 "carol" 1.0)
+
+(expect "After ABC Balance of Maker" 95.0 (ABC_NS.abc.get-balance "bob"))
+(expect "After ABC Balance of Taker" 98.4985 (ABC_NS.abc.get-balance "carol"))
+(expect "After ABC Balance of fee" 0.0015 (ABC_NS.abc.get-balance "fee-receiver"))
+(expect "After coin Balance of Taker" 1006.5 (coin.get-balance "carol"))
+
+(expect-that "Orderbook should have a size of 15" (compose (length) (= 15)) (get-orderbook NIL 50))
+(expect-that "First element of the orderbook should be the next"  (compose (at 'id) (= 0896561851709965799993))  (first (get-orderbook NIL 50)))
+(expect-that "Bob Orderbook should have a size of 7" (compose (length) (= 7)) (get-orders-by-maker "bob" NIL  50))
+
+(expect-that "Bob history should contain 1 element" (compose (length) (= 1)) (get-orders-in-account-history "bob" NIL 50))
+(expect-that "Bob first history element should have the right ID"  (compose (at 'id) (= 0192872877885359610558)) (first (get-orders-in-account-history "bob" NIL 1)))
+(expect-that "Bobe  first history element must bee in taken state"  (compose (at 'state) (= STATE-TAKEN)) (first (get-orders-in-account-history "bob" NIL 1)))
+
+
+(expect-that "Carol history should contain 3 elements" (compose (length) (= 3)) (get-orders-in-account-history "carol" NIL 50))
+(expect-that "Carol first history element should have the right ID"  (compose (at 'id) (= 0192872877885359610558)) (first (get-orders-in-account-history "carol" NIL 1)))
+
+(expect-that "Global history should contain 3 elements" (compose (length) (= 3)) (get-orders-in-history NIL 50))
+
+(rollback-tx)
+
+; Take the highest BID
+(begin-tx)
+(use bro-dex-core-KDA-ABC)
+(use bro-dex-view-KDA-ABC)
+(use free.util-lists)
+
+; Sanity check
+(expect "Init ABC Balance of Maker" 94.0 (ABC_NS.abc.get-balance "bob"))
+(expect "Init ABC Balance of Taker" 99.4995 (ABC_NS.abc.get-balance "carol"))
+(expect "Init ABC Balance of fee" 0.0005 (ABC_NS.abc.get-balance "fee-receiver"))
+(expect "Init coin Balance of Taker" 1002.5 (coin.get-balance "carol"))
+
+(env-sigs [ {'key:"carol-key", 'caps:[(ABC_NS.abc.TRANSFER "carol" (order-account 1572796001557143547764) 1.001)]}])
+(ABC_NS.abc.transfer-create "carol" (order-account 1572796001557143547764) (order-account-guard 1572796001557143547764) 1.001)
+(take-order 1572796001557143547764 "carol" 1.0)
+
+(expect "After ABC Balance of Maker" 95.0 (ABC_NS.abc.get-balance "bob"))
+(expect "After ABC Balance of Taker" 98.4985 (ABC_NS.abc.get-balance "carol"))
+(expect "After ABC Balance of fee" 0.0015 (ABC_NS.abc.get-balance "fee-receiver"))
+(expect "After coin Balance of Taker" 1012.5 (coin.get-balance "carol"))
+
+(expect-that "Orderbook should have a size of 15" (compose (length) (= 15)) (get-orderbook NIL 50))
+
+(expect-that "First Bid of the orderbook should be the previous"  (compose (at 'id) (= 0896561851709965799993)) (first-bid))
+(expect-that "First Ask of the orderbook should be the same "  (compose (at 'id) (= 2054700195086858548866)) (first-ask))
+(expect-that "Bob Orderbook should have a size of 7" (compose (length) (= 7)) (get-orders-by-maker "bob" NIL  50))
+
+(expect-that "Bob history should contain 1 element" (compose (length) (= 1)) (get-orders-in-account-history "bob" NIL 50))
+(expect-that "Bob first history element should have the right ID"  (compose (at 'id) (= 1572796001557143547764)) (first (get-orders-in-account-history "bob" NIL 1)))
+(expect-that "Bobe  first history element must bee in taken state"  (compose (at 'state) (= STATE-TAKEN)) (first (get-orders-in-account-history "bob" NIL 1)))
+
+
+(expect-that "Carol history should contain 3 elements" (compose (length) (= 3)) (get-orders-in-account-history "carol" NIL 50))
+(expect-that "Carol first history element should have the right ID"  (compose (at 'id) (= 1572796001557143547764)) (first (get-orders-in-account-history "carol" NIL 1)))
+
+(expect-that "Global history should contain 3 elements" (compose (length) (= 3)) (get-orders-in-history NIL 50))
+(rollback-tx)
+
+; Take the lowaest ASK
+(begin-tx)
+(use bro-dex-core-KDA-ABC)
+(use bro-dex-view-KDA-ABC)
+(use free.util-lists)
+
+; Sanity check
+(expect "Init ABC Balance of Maker" 93.5 (ABC_NS.abc.get-balance "alice"))
+(expect "Init ABC Balance of Taker" 99.4995 (ABC_NS.abc.get-balance "carol"))
+(expect "Init ABC Balance of fee" 0.0 (coin.get-balance "fee-receiver"))
+(expect "Init coin Balance of Taker" 1002.5 (coin.get-balance "carol"))
+(expect "Init coin Balance of Maker" 995.0 (coin.get-balance "alice"))
+
+(env-sigs [ {'key:"carol-key", 'caps:[(coin.TRANSFER "carol" (order-account 2054700195086858548866) 20.02)]}])
+(coin.transfer-create "carol" (order-account 2054700195086858548866) (order-account-guard 2054700195086858548866) 20.02)
+(take-order 2054700195086858548866 "carol" 1.0)
+
+(expect "After ABC Balance of Maker" 93.5 (ABC_NS.abc.get-balance "alice"))
+(expect "After ABC Balance of Taker" 100.4995 (ABC_NS.abc.get-balance "carol"))
+(expect "After ABC Balance of fee" 0.02 (coin.get-balance "fee-receiver"))
+(expect "After coin Balance of Taker" 982.48 (coin.get-balance "carol"))
+(expect "After coin Balance of Maker" 1015.0 (coin.get-balance "alice"))
+
+(expect-that "Orderbook should have a size of 15" (compose (length) (= 15)) (get-orderbook NIL 50))
+
+(expect-that "First Bid of the orderbook should be the same"  (compose (at 'id) (= 1572796001557143547764)) (first-bid))
+(expect-that "First Ask of the orderbook should be the next "  (compose (at 'id) (= 1520416172771541360824)) (first-ask))
+(expect-that "Alice Orderbook should have a size of 7" (compose (length) (= 7)) (get-orders-by-maker "alice" NIL  50))
+
+(expect-that "Alice history should contain 3 elements" (compose (length) (= 3)) (get-orders-in-account-history "alice" NIL 50))
+(expect-that "Alice first history element should have the right ID"  (compose (at 'id) (= 2054700195086858548866)) (first (get-orders-in-account-history "alice" NIL 1)))
+(expect-that "Alice  first history element must bee in taken state"  (compose (at 'state) (= STATE-TAKEN)) (first (get-orders-in-account-history "alice" NIL 1)))
+
+
+(expect-that "Carol history should contain 3 elements" (compose (length) (= 3)) (get-orders-in-account-history "carol" NIL 50))
+(expect-that "Carol first history element should have the right ID"  (compose (at 'id) (= 2054700195086858548866)) (first (get-orders-in-account-history "carol" NIL 1)))
+
+(expect-that "Global history should contain 3 elements" (compose (length) (= 3)) (get-orders-in-history NIL 50))
+(rollback-tx)
+
+
+; Take the highest ASK
+(begin-tx)
+(use bro-dex-core-KDA-ABC)
+(use bro-dex-view-KDA-ABC)
+(use free.util-lists)
+
+; Sanity check
+(expect "Init ABC Balance of Maker" 93.5 (ABC_NS.abc.get-balance "alice"))
+(expect "Init ABC Balance of Taker" 99.4995 (ABC_NS.abc.get-balance "carol"))
+(expect "Init coin Balance of fee" 0.0 (coin.get-balance "fee-receiver"))
+(expect "Init coin Balance of Taker" 1002.5 (coin.get-balance "carol"))
+(expect "Init coin Balance of Maker" 995.0 (coin.get-balance "alice"))
+
+(env-sigs [ {'key:"carol-key", 'caps:[(coin.TRANSFER "carol" (order-account 2475187638815994249335) 50.05)]}])
+(coin.transfer-create "carol" (order-account 2475187638815994249335) (order-account-guard 2475187638815994249335) 50.05)
+(take-order 2475187638815994249335 "carol" 1.0)
+
+(expect "After ABC Balance of Maker" 93.5 (ABC_NS.abc.get-balance "alice"))
+(expect "After ABC Balance of Taker" 100.4995 (ABC_NS.abc.get-balance "carol"))
+(expect "After ABC Balance of fee" 0.05 (coin.get-balance "fee-receiver"))
+(expect "After coin Balance of Taker" 952.45 (coin.get-balance "carol"))
+(expect "After coin Balance of Maker" 1045.0 (coin.get-balance "alice"))
+
+(expect-that "Orderbook should have a size of 15" (compose (length) (= 15)) (get-orderbook NIL 50))
+(expect-that "Last element of the orderbook should be the previous"  (compose (at 'id) (= 3989432022929502080359))  (last (get-orderbook NIL 50)))
+
+(expect-that "Alice Orderbook should have a size of 7" (compose (length) (= 7)) (get-orders-by-maker "alice" NIL  50))
+
+(expect-that "Alice history should contain 3 elements" (compose (length) (= 3)) (get-orders-in-account-history "alice" NIL 50))
+(expect-that "Alice first history element should have the right ID"  (compose (at 'id) (= 2475187638815994249335)) (first (get-orders-in-account-history "alice" NIL 1)))
+(expect-that "Alice  first history element must bee in taken state"  (compose (at 'state) (= STATE-TAKEN)) (first (get-orders-in-account-history "alice" NIL 1)))
+
+
+(expect-that "Carol history should contain 3 elements" (compose (length) (= 3)) (get-orders-in-account-history "carol" NIL 50))
+(expect-that "Carol first history element should have the right ID"  (compose (at 'id) (= 2475187638815994249335)) (first (get-orders-in-account-history "carol" NIL 1)))
+
+(expect-that "Global history should contain 3 elements" (compose (length) (= 3)) (get-orders-in-history NIL 50))
+(rollback-tx)
+
+
+; Take all orders
+(begin-tx)
+(use bro-dex-core-KDA-ABC)
+(use bro-dex-view-KDA-ABC)
+(use free.util-lists)
+(use free.util-math)
+
+; Sanity check
+(expect "Init ABC Balance of Maker Alice" 93.5 (ABC_NS.abc.get-balance "alice"))
+(expect "Init ABC Balance of Maker Bob" 94.0 (ABC_NS.abc.get-balance "bob"))
+(expect "Init ABC Balance of Taker" 99.4995 (ABC_NS.abc.get-balance "carol"))
+(expect "Init ABC Balance of fee" 0.0005 (ABC_NS.abc.get-balance "fee-receiver"))
+(expect "Init coin Balance of fee" 0.0 (coin.get-balance "fee-receiver"))
+(expect "Init coin Balance of Taker" 1002.5 (coin.get-balance "carol"))
+(expect "Init coin Balance of Maker Alice" 995.0 (coin.get-balance "alice"))
+(expect "Init coin Balance of Maker Bob" 986.0 (coin.get-balance "bob"))
+
+(env-sigs [ {'key:"carol-key", 'caps:[(ABC_NS.abc.TRANSFER "carol" (order-account 0192872877885359610558) (base-with-fee 1.0)),
+                                      (ABC_NS.abc.TRANSFER "carol" (order-account 0896561851709965799993) (base-with-fee 0.5)),
+                                      (ABC_NS.abc.TRANSFER "carol" (order-account 1572796001557143547764) (base-with-fee 1.0)),
+                                      (coin.TRANSFER "carol" (order-account 2054700195086858548866) (total-quote-with-fee 1.0 20.0)),
+                                      (coin.TRANSFER "carol" (order-account 1520416172771541360824) (total-quote-with-fee 1.0 30.0)),
+                                      (coin.TRANSFER "carol" (order-account 2441439105047490421929) (total-quote-with-fee 1.0 40.0)),
+                                      (coin.TRANSFER "carol" (order-account 2159448978217457141053) (total-quote-with-fee 1.0 41.0)),
+                                      (coin.TRANSFER "carol" (order-account 1135210929582361568944) (total-quote-with-fee 1.0 42.0)),
+                                      (coin.TRANSFER "carol" (order-account 2413392777850430677452) (total-quote-with-fee 1.0 43.0)),
+                                      (coin.TRANSFER "carol" (order-account 4598807734136380309870) (total-quote-with-fee 1.0 44.0)),
+                                      (coin.TRANSFER "carol" (order-account 2956396945510889601379) (total-quote-with-fee 1.0 45.0)),
+                                      (coin.TRANSFER "carol" (order-account 2560742498015077325666) (total-quote-with-fee 1.0 46.0)),
+                                      (coin.TRANSFER "carol" (order-account 1244204076515913926773) (total-quote-with-fee 1.0 47.0)),
+                                      (coin.TRANSFER "carol" (order-account 3749762571443237779708) (total-quote-with-fee 1.0 48.0)),
+                                      (coin.TRANSFER "carol" (order-account 3989432022929502080359) (total-quote-with-fee 1.0 49.0)),
+                                      (coin.TRANSFER "carol" (order-account 2475187638815994249335) (total-quote-with-fee 1.0 50.0))
+
+          ]}])
+
+
+(ABC_NS.abc.transfer-create "carol" (order-account 0192872877885359610558) (order-account-guard 0192872877885359610558) (base-with-fee 1.0))
+(ABC_NS.abc.transfer-create "carol" (order-account 0896561851709965799993) (order-account-guard 0896561851709965799993) (base-with-fee 0.5))
+(ABC_NS.abc.transfer-create "carol" (order-account 1572796001557143547764) (order-account-guard 1572796001557143547764) (base-with-fee 1.0))
+(coin.transfer-create "carol" (order-account 2054700195086858548866) (order-account-guard 2054700195086858548866) (total-quote-with-fee 1.0 20.0))
+(coin.transfer-create "carol" (order-account 1520416172771541360824) (order-account-guard 1520416172771541360824) (total-quote-with-fee 1.0 30.0))
+(coin.transfer-create "carol" (order-account 2441439105047490421929) (order-account-guard 2441439105047490421929) (total-quote-with-fee 1.0 40.0))
+(coin.transfer-create "carol" (order-account 2159448978217457141053) (order-account-guard 2159448978217457141053) (total-quote-with-fee 1.0 41.0))
+(coin.transfer-create "carol" (order-account 1135210929582361568944) (order-account-guard 1135210929582361568944) (total-quote-with-fee 1.0 42.0))
+(coin.transfer-create "carol" (order-account 2413392777850430677452) (order-account-guard 2413392777850430677452) (total-quote-with-fee 1.0 43.0))
+(coin.transfer-create "carol" (order-account 4598807734136380309870) (order-account-guard 4598807734136380309870) (total-quote-with-fee 1.0 44.0))
+(coin.transfer-create "carol" (order-account 2956396945510889601379) (order-account-guard 2956396945510889601379) (total-quote-with-fee 1.0 45.0))
+(coin.transfer-create "carol" (order-account 2560742498015077325666) (order-account-guard 2560742498015077325666) (total-quote-with-fee 1.0 46.0))
+(coin.transfer-create "carol" (order-account 1244204076515913926773) (order-account-guard 1244204076515913926773) (total-quote-with-fee 1.0 47.0))
+(coin.transfer-create "carol" (order-account 3749762571443237779708) (order-account-guard 3749762571443237779708) (total-quote-with-fee 1.0 48.0))
+(coin.transfer-create "carol" (order-account 3989432022929502080359) (order-account-guard 3989432022929502080359) (total-quote-with-fee 1.0 49.0))
+(coin.transfer-create "carol" (order-account 2475187638815994249335) (order-account-guard 2475187638815994249335) (total-quote-with-fee 1.0 50.0))
+
+(take-order 0192872877885359610558 "carol" 1.0)
+(take-order 0896561851709965799993 "carol" 0.5)
+(take-order 1572796001557143547764 "carol" 1.0)
+(take-order 2054700195086858548866 "carol" 1.0)
+(take-order 1520416172771541360824 "carol" 1.0)
+(take-order 2441439105047490421929 "carol" 1.0)
+(take-order 2159448978217457141053 "carol" 1.0)
+(take-order 1135210929582361568944 "carol" 1.0)
+(take-order 2413392777850430677452 "carol" 1.0)
+(take-order 4598807734136380309870 "carol" 1.0)
+(take-order 2956396945510889601379 "carol" 1.0)
+(take-order 2560742498015077325666 "carol" 1.0)
+(take-order 1244204076515913926773 "carol" 1.0)
+(take-order 3749762571443237779708 "carol" 1.0)
+(take-order 3989432022929502080359 "carol" 1.0)
+(take-order 2475187638815994249335 "carol" 1.0)
+
+
+(expect "After ABC Balance of Maker Alice " (+ 93.5 0.5) (ABC_NS.abc.get-balance "alice"))
+(expect "After ABC Balance of Maker Bob " (+ 94.0 2.0) (ABC_NS.abc.get-balance "bob"))
+
+(expect "After ABC Balance of Taker" (+ (- 99.4995 (* 2.5 1.001)) 13.0) (ABC_NS.abc.get-balance "carol"))
+(expect "After ABC Balance of fee" (+ 0.0005 0.0025) (ABC_NS.abc.get-balance "fee-receiver"))
+
+(expect "After coin Balance of Taker" (- (+ 1002.5 (sum [4.0, 2.5, 10.0]))
+                                         (* 1.001 (sum [20.0, 30.0, 40.0, 41.0, 42.0, 43.0, 44.0, 45.0, 46.0, 47.0, 48.0, 49.0, 50.0])))
+                                      (coin.get-balance "carol"))
+
+
+(expect "After coin Balance of Maker Alice" (+ 995.0 (sum [50.0, 48.0, 46.0, 44.0, 42.0, 40.0, 20.0])) (coin.get-balance "alice"))
+(expect "After coin Balance of Maker Bob" (+ 986.0 (sum [49.0, 47.0, 45.0, 43.0, 41.0, 30.0])) (coin.get-balance "bob"))
+
+(expect-that "Orderbook should have a size of 0" (compose (length) (= 0)) (get-orderbook NIL 50))
+
+(expect-that "Alice Orderbook should have a size of 0" (compose (length) (= 0)) (get-orders-by-maker "alice" NIL  50))
+(expect-that "Bob Orderbook should have a size of 0" (compose (length) (= 0)) (get-orders-by-maker "bob" NIL  50))
+
+(expect-that "Alice history should contain 10 elements" (compose (length) (= 10)) (get-orders-in-account-history "alice" NIL 50))
+(expect-that "Alice first history element should have the right ID"  (compose (at 'id) (= 2475187638815994249335)) (first (get-orders-in-account-history "alice" NIL 1)))
+(expect-that "Alice  first history element must bee in taken state"  (compose (at 'state) (= STATE-TAKEN)) (first (get-orders-in-account-history "alice" NIL 1)))
+
+(expect-that "Bob history should contain 8 elements" (compose (length) (= 8)) (get-orders-in-account-history "bob" NIL 50))
+(expect-that "Bob first history element should have the right ID"  (compose (at 'id) (= 3989432022929502080359)) (first (get-orders-in-account-history "bob" NIL 1)))
+(expect-that "Bob  first history element must bee in taken state"  (compose (at 'state) (= STATE-TAKEN)) (first (get-orders-in-account-history "bob" NIL 1)))
+
+
+(expect-that "Carol history should contain 18 elements" (compose (length) (= 18)) (get-orders-in-account-history "carol" NIL 50))
+(expect-that "Carol first history element should have the right ID"  (compose (at 'id) (= 2475187638815994249335)) (first (get-orders-in-account-history "carol" NIL 1)))
+
+(expect-that "Global history should contain 18 elements" (compose (length) (= 18)) (get-orders-in-history NIL 50))
+(commit-tx)
+
+
+; Try now to restore the Orderbook
+(load "create-test-orders.repl")
+(begin-tx)
+; Do some basic checks
+(use bro-dex-core-KDA-ABC)
+(use bro-dex-view-KDA-ABC)
+(use free.util-lists)
+(use test-helpers)
+;(print (all-orders-for "alice"))
+(expect-that "Orderbook should have a size of 16" (compose (length) (= 16)) (get-orderbook NIL 50))
+(expect-that "Alice Orderbook should have a size of 8" (compose (length) (= 8)) (get-orders-by-maker "alice" NIL  50))
+(expect-that "bob Orderbook should have a size of 8" (compose (length) (= 8)) (get-orders-by-maker "alice" NIL  50))
+
+(expect-that "First ASK ID" (compose (at 'price) (= 20.0)) (first-ask))
+(expect-that "First BID ID" (compose (at 'price) (= 10.0)) (first-bid))
+
+(expect-that "First orderbook element"  (compose (at 'price) (= 4.0))  (first (get-orderbook NIL 50)))
+(expect-that "Last orderbook element"  (compose (at 'price) (= 50.0))  (last (get-orderbook NIL 50)))
+(commit-tx)

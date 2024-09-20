@@ -1,0 +1,245 @@
+(load "init.repl")
+
+(begin-tx)
+(namespace "")
+(load ".gen/bro-dex-wrapper-KDA-ABC.pact")
+(commit-tx)
+
+; <--- 0192872877885359610558 / 1.0 - 4.0
+; <--- 0896561851709965799993 / 1.0 - 5.0
+; <--- 1572796001557143547764 / 1.0 - 10.0
+; ---> 2054700195086858548866 / 1.0 - 20.0
+; ---> 1520416172771541360824 / 1.0 - 30.0
+; ---> 2441439105047490421929 / 1.0 - 40.0
+; ---> 2159448978217457141053 / 1.0 - 41.0
+; ---> 1135210929582361568944 / 1.0 - 42.0
+; ---> 2413392777850430677452 / 1.0 - 43.0
+; ---> 4598807734136380309870 / 1.0 - 44.0
+; ---> 2956396945510889601379 / 1.0 - 45.0
+; ---> 2560742498015077325666 / 1.0 - 46.0
+; ---> 1244204076515913926773 / 1.0 - 47.0
+; ---> 3749762571443237779708 / 1.0 - 48.0
+; ---> 3989432022929502080359 / 1.0 - 49.0
+; ---> 2475187638815994249335 / 1.0 - 50.0
+
+; Now do the the buying using a FOK scheme
+;------------------------------------------------------------
+
+; Buy IOC first order only
+(begin-tx)
+(use bro-dex-core-KDA-ABC)
+(use bro-dex-wrapper-KDA-ABC)
+(use bro-dex-view-KDA-ABC)
+(use free.util-strings)
+(use free.util-math)
+(use free.util-lists)
+(use test-helpers)
+
+(expect-that "Orderbook should have a size of 16" (compose (length) (= 16)) (get-orderbook NIL 50))
+(expect "Initial ABC Balance of Carol" 100.0 (ABC_NS.abc.get-balance "carol"))
+(expect "Initial coin Balance of Taker" 1000.0 (coin.get-balance "carol"))
+
+(env-sigs [ {'key:"carol-key", 'caps:[(coin.TRANSFER "carol" DEPOSIT-ACCOUNT 45.045 )]}])
+; We buy 20547 in Full and 15204 in partial
+(buy-fok "carol" 1.0 25.0)
+
+(expect "Final ABC Balance of Carol" 101.0 (ABC_NS.abc.get-balance "carol"))
+(expect "Final coin Balance of Taker" (- 1000.0 (* 1.001 (sum [(* 1.0 20.0)]))) (coin.get-balance "carol"))
+(expect-that "Carol history should contain 1 element" (is-singleton) (get-orders-in-account-history "carol" NIL 50))
+(expect-that "Orderbook should have a size of 15" (compose (length) (= 15)) (get-orderbook NIL 50))
+(rollback-tx)
+
+; Buy FOK first order + 2nd in partial
+(begin-tx)
+(use bro-dex-core-KDA-ABC)
+(use bro-dex-wrapper-KDA-ABC)
+(use bro-dex-view-KDA-ABC)
+(use free.util-strings)
+(use free.util-math)
+(use test-helpers)
+
+(expect-that "Orderbook should have a size of 16" (compose (length) (= 16)) (get-orderbook NIL 50))
+(expect "Initial ABC Balance of Carol" 100.0 (ABC_NS.abc.get-balance "carol"))
+(expect "Initial coin Balance of Taker" 1000.0 (coin.get-balance "carol"))
+
+(env-sigs [ {'key:"carol-key", 'caps:[(coin.TRANSFER "carol" DEPOSIT-ACCOUNT 45.045 )]}])
+; We buy 20547 in Full and 15204 in partial
+(buy-fok "carol" 1.5 30.0)
+
+(expect "Final ABC Balance of Carol" 101.5 (ABC_NS.abc.get-balance "carol"))
+(expect "Final coin Balance of Taker" (- 1000.0 (* 1.001 (sum [(* 1.0 20.0),(* 0.5 30.0)]))) (coin.get-balance "carol"))
+(expect-that "Carol history should contain 2 elements" (compose (length) (= 2)) (get-orders-in-account-history "carol" NIL 50))
+(expect-that "Orderbook should have a size of 15" (compose (length) (= 15)) (get-orderbook NIL 50))
+(rollback-tx)
+
+; Buy FOK first order only but not filled will fail
+(begin-tx)
+(use bro-dex-core-KDA-ABC)
+(use bro-dex-wrapper-KDA-ABC)
+(use bro-dex-view-KDA-ABC)
+(use free.util-strings)
+(use free.util-math)
+(use test-helpers)
+
+(expect-that "Orderbook should have a size of 16" (compose (length) (= 16)) (get-orderbook NIL 50))
+(expect "Initial ABC Balance of Carol" 100.0 (ABC_NS.abc.get-balance "carol"))
+(expect "Initial coin Balance of Taker" 1000.0 (coin.get-balance "carol"))
+
+(env-sigs [ {'key:"carol-key", 'caps:[(coin.TRANSFER "carol" DEPOSIT-ACCOUNT 45.045 )]}])
+(expect-failure "Not filled" "Order not immediately filled" (buy-fok "carol" 1.5 25.0))
+
+(rollback-tx)
+
+
+; Buy FOK Empty will fail
+(begin-tx)
+(use bro-dex-core-KDA-ABC)
+(use bro-dex-wrapper-KDA-ABC)
+(use bro-dex-view-KDA-ABC)
+(use free.util-strings)
+(use free.util-math)
+(use test-helpers)
+
+(expect-that "Orderbook should have a size of 16" (compose (length) (= 16)) (get-orderbook NIL 50))
+(expect "Initial ABC Balance of Carol" 100.0 (ABC_NS.abc.get-balance "carol"))
+(expect "Initial coin Balance of Taker" 1000.0 (coin.get-balance "carol"))
+
+(env-sigs [ {'key:"carol-key", 'caps:[(coin.TRANSFER "carol" DEPOSIT-ACCOUNT 45.045 )]}])
+; We buy nothing
+(expect-failure "Not filled" "Order not immediately filled" (buy-fok "carol" 1.5 25.0))
+(rollback-tx)
+
+; Sell FOK first order only
+(begin-tx)
+(use bro-dex-core-KDA-ABC)
+(use bro-dex-wrapper-KDA-ABC)
+(use bro-dex-view-KDA-ABC)
+(use free.util-strings)
+(use free.util-math)
+(use free.util-lists)
+(use test-helpers)
+
+(expect-that "Orderbook should have a size of 16" (compose (length) (= 16)) (get-orderbook NIL 50))
+(expect "Initial ABC Balance of Carol" 100.0 (ABC_NS.abc.get-balance "carol"))
+(expect "Initial coin Balance of Taker" 1000.0 (coin.get-balance "carol"))
+
+(env-sigs [ {'key:"carol-key", 'caps:[(ABC_NS.abc.TRANSFER "carol" DEPOSIT-ACCOUNT 1.001 )]}])
+(sell-fok "carol" 1.0 9.0)
+
+(expect "Final ABC Balance of Carol" 98.999 (ABC_NS.abc.get-balance "carol"))
+(expect "Final coin Balance of Taker" 1010.0 (coin.get-balance "carol"))
+(expect-that "Carol history should contain 1 element" (is-singleton) (get-orders-in-account-history "carol" NIL 50))
+(expect-that "Orderbook should have a size of 15" (compose (length) (= 15)) (get-orderbook NIL 50))
+(rollback-tx)
+
+; Sell FOK first order only with a close limit
+(begin-tx)
+(use bro-dex-core-KDA-ABC)
+(use bro-dex-wrapper-KDA-ABC)
+(use bro-dex-view-KDA-ABC)
+(use free.util-strings)
+(use free.util-math)
+(use free.util-lists)
+(use test-helpers)
+
+(expect-that "Orderbook should have a size of 16" (compose (length) (= 16)) (get-orderbook NIL 50))
+(expect "Initial ABC Balance of Carol" 100.0 (ABC_NS.abc.get-balance "carol"))
+(expect "Initial coin Balance of Taker" 1000.0 (coin.get-balance "carol"))
+
+(env-sigs [ {'key:"carol-key", 'caps:[(ABC_NS.abc.TRANSFER "carol" DEPOSIT-ACCOUNT 1.001 )]}])
+(sell-fok "carol" 1.0 10.0)
+
+(expect "Final ABC Balance of Carol" 98.999 (ABC_NS.abc.get-balance "carol"))
+(expect "Final coin Balance of Taker" 1010.0 (coin.get-balance "carol"))
+(expect-that "Carol history should contain 1 element" (is-singleton) (get-orders-in-account-history "carol" NIL 50))
+(expect-that "Orderbook should have a size of 15" (compose (length) (= 15)) (get-orderbook NIL 50))
+(rollback-tx)
+
+
+; Sell FOK first order + 2nd in partial
+(begin-tx)
+(use bro-dex-core-KDA-ABC)
+(use bro-dex-wrapper-KDA-ABC)
+(use bro-dex-view-KDA-ABC)
+(use free.util-strings)
+(use free.util-math)
+(use test-helpers)
+
+(expect-that "Orderbook should have a size of 16" (compose (length) (= 16)) (get-orderbook NIL 50))
+(expect "Initial ABC Balance of Carol" 100.0 (ABC_NS.abc.get-balance "carol"))
+(expect "Initial coin Balance of Taker" 1000.0 (coin.get-balance "carol"))
+
+(env-sigs [ {'key:"carol-key", 'caps:[(ABC_NS.abc.TRANSFER "carol" DEPOSIT-ACCOUNT 1.5015 )]}])
+(sell-fok "carol" 1.5 5.0)
+
+(expect "Final ABC Balance of Carol" 98.4985 (ABC_NS.abc.get-balance "carol"))
+(expect "Final coin Balance of Taker" 1012.5 (coin.get-balance "carol"))
+(expect-that "Carol history should contain 2 element" (compose (length) (= 2)) (get-orders-in-account-history "carol" NIL 50))
+(expect-that "Orderbook should have a size of 15" (compose (length) (= 15)) (get-orderbook NIL 50))
+(rollback-tx)
+
+
+; Sell incomplete FOK first order only => Should fail
+(begin-tx)
+(use bro-dex-core-KDA-ABC)
+(use bro-dex-wrapper-KDA-ABC)
+(use bro-dex-view-KDA-ABC)
+(use free.util-strings)
+(use free.util-math)
+(use test-helpers)
+
+(expect-that "Orderbook should have a size of 16" (compose (length) (= 16)) (get-orderbook NIL 50))
+(expect "Initial ABC Balance of Carol" 100.0 (ABC_NS.abc.get-balance "carol"))
+(expect "Initial coin Balance of Taker" 1000.0 (coin.get-balance "carol"))
+
+(env-sigs [ {'key:"carol-key", 'caps:[(ABC_NS.abc.TRANSFER "carol" DEPOSIT-ACCOUNT 1.5015 )]}])
+(expect-failure "Not filled" "Order not immediately filled" (sell-fok "carol" 1.5 7.5))
+
+(rollback-tx)
+
+; Sell FOK Empty Shoudl fail
+(begin-tx)
+(use bro-dex-core-KDA-ABC)
+(use bro-dex-wrapper-KDA-ABC)
+(use bro-dex-view-KDA-ABC)
+(use free.util-strings)
+(use free.util-lists)
+(use free.util-math)
+(use test-helpers)
+
+(expect-that "Orderbook should have a size of 16" (compose (length) (= 16)) (get-orderbook NIL 50))
+(expect "Initial ABC Balance of Carol" 100.0 (ABC_NS.abc.get-balance "carol"))
+(expect "Initial coin Balance of Taker" 1000.0 (coin.get-balance "carol"))
+
+(env-sigs [ {'key:"carol-key", 'caps:[(ABC_NS.abc.TRANSFER "carol" DEPOSIT-ACCOUNT 1.5015 )]}])
+(expect-failure "Not filled" "Order not immediately filled" (sell-fok "carol" 1.5 11.0))
+
+(rollback-tx)
+
+
+
+
+
+;(begin-tx)
+;(use bro-dex-core-KDA-ABC)
+;(use bro-dex-wrapper-KDA-ABC)
+;(use bro-dex-view-KDA-ABC)
+;(use free.util-strings)
+;(use test-helpers)
+;(print (search-order-prev-id false 5.0))
+;(env-data {'k:["bbo-key"]})
+;(env-sigs [ {'key:"bob-key", 'caps:[(coin.TRANSFER "bob" DEPOSIT-ACCOUNT 45.045 )]}])
+;(buy-post-only "bob" (read-keyset 'k) 1.5 12.0)
+;(commit-tx)
+;
+;(begin-tx)
+;(use bro-dex-core-KDA-ABC)
+;(use bro-dex-view-KDA-ABC)
+;(use bro-dex-wrapper-KDA-ABC)
+;(use free.util-strings)
+;(use test-helpers)
+;
+;(print (format-all-orders))
+;(print (format-orders-history))
+;(rollback-tx)
+;

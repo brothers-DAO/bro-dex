@@ -1,0 +1,237 @@
+(load "init.repl")
+
+(begin-tx)
+(namespace "")
+(load ".gen/bro-dex-wrapper-KDA-ABC.pact")
+(commit-tx)
+; <--- 0192872877885359610558 / 1.0 - 4.0
+; <--- 0896561851709965799993 / 1.0 - 5.0
+; <--- 1572796001557143547764 / 1.0 - 10.0
+; ---> 2054700195086858548866 / 1.0 - 20.0
+; ---> 1520416172771541360824 / 1.0 - 30.0
+; ---> 2441439105047490421929 / 1.0 - 40.0
+; ---> 2159448978217457141053 / 1.0 - 41.0
+; ---> 1135210929582361568944 / 1.0 - 42.0
+; ---> 2413392777850430677452 / 1.0 - 43.0
+; ---> 4598807734136380309870 / 1.0 - 44.0
+; ---> 2956396945510889601379 / 1.0 - 45.0
+; ---> 2560742498015077325666 / 1.0 - 46.0
+; ---> 1244204076515913926773 / 1.0 - 47.0
+; ---> 3749762571443237779708 / 1.0 - 48.0
+; ---> 3989432022929502080359 / 1.0 - 49.0
+; ---> 2475187638815994249335 / 1.0 - 50.0
+
+; Buy Post Only order (Bid)
+(begin-tx)
+(use bro-dex-core-KDA-ABC)
+(use bro-dex-wrapper-KDA-ABC)
+(use bro-dex-view-KDA-ABC)
+(use free.util-strings)
+(use free.util-math)
+(use free.util-lists)
+(use test-helpers)
+
+(expect-that "Orderbook should have a size of 16" (compose (length) (= 16)) (get-orderbook NIL 50))
+(expect "Initial ABC Balance of Carol" 100.0 (ABC_NS.abc.get-balance "carol"))
+(expect "Initial coin Balance of Taker" 1000.0 (coin.get-balance "carol"))
+
+(env-data {'ks:["carol-key"]})
+(env-sigs [ {'key:"carol-key", 'caps:[(coin.TRANSFER "carol" DEPOSIT-ACCOUNT 20.0)]}])
+(buy-post-only "carol" (read-keyset 'ks) 2.0 10.0)
+
+(expect "Final ABC Balance of Carol" 100.0 (ABC_NS.abc.get-balance "carol"))
+(expect "Final coin Balance of Taker" 980.0 (coin.get-balance "carol"))
+(expect-that "Carol history should contain 0 element" (is-empty) (get-orders-in-account-history "carol" NIL 50))
+(expect-that "Orderbook should have a size of 17" (compose (length) (= 17)) (get-orderbook NIL 50))
+(expect-that "Carol new order should be a bid" (compose (at 'is-ask) (not)) (first (get-orders-by-maker "carol" NIL 50)))
+(expect-that "Carol new order should be have a price of 20.0" (compose (at 'price) (= 10.0)) (first (get-orders-by-maker "carol" NIL 50)))
+(expect-that "Carol new order should be have an amount of 2.0" (compose (at 'amount) (= 2.0)) (first (get-orders-by-maker "carol" NIL 50)))
+(expect-that "Carol new order should be have a Maker account of carol" (compose (at 'maker-acct) (= "carol")) (first (get-orders-by-maker "carol" NIL 50)))
+(expect-that "Carol new order should be have the right guard" (compose (at 'guard) (= (read-keyset 'ks))) (first (get-orders-by-maker "carol" NIL 50)))
+(rollback-tx)
+
+; Buy Post Only order (Bid)
+(begin-tx)
+(use bro-dex-core-KDA-ABC)
+(use bro-dex-wrapper-KDA-ABC)
+(use bro-dex-view-KDA-ABC)
+(use free.util-strings)
+(use free.util-math)
+(use free.util-lists)
+(use test-helpers)
+
+(expect-that "Orderbook should have a size of 16" (compose (length) (= 16)) (get-orderbook NIL 50))
+(expect "Initial ABC Balance of Carol" 100.0 (ABC_NS.abc.get-balance "carol"))
+(expect "Initial coin Balance of Taker" 1000.0 (coin.get-balance "carol"))
+
+(env-data {'ks:["carol-key"]})
+(env-sigs [ {'key:"carol-key", 'caps:[(coin.TRANSFER "carol" DEPOSIT-ACCOUNT 15.0)]}])
+(buy-post-only "carol" (read-keyset 'ks) 2.0 7.5)
+
+(expect "Final ABC Balance of Carol" 100.0 (ABC_NS.abc.get-balance "carol"))
+(expect "Final coin Balance of Taker" 985.0 (coin.get-balance "carol"))
+(expect-that "Carol history should contain 0 element" (is-empty) (get-orders-in-account-history "carol" NIL 50))
+(expect-that "Orderbook should have a size of 17" (compose (length) (= 17)) (get-orderbook NIL 50))
+(expect-that "Carol new order should be a bid" (compose (at 'is-ask) (not)) (first (get-orders-by-maker "carol" NIL 50)))
+(expect-that "Carol new order should be have a price of 7.5" (compose (at 'price) (= 7.5)) (first (get-orders-by-maker "carol" NIL 50)))
+(expect-that "Carol new order should be have an amount of 2.0" (compose (at 'amount) (= 2.0)) (first (get-orders-by-maker "carol" NIL 50)))
+(expect-that "Carol new order should be have a Maker account of carol" (compose (at 'maker-acct) (= "carol")) (first (get-orders-by-maker "carol" NIL 50)))
+(expect-that "Carol new order should be have the right guard" (compose (at 'guard) (= (read-keyset 'ks))) (first (get-orders-by-maker "carol" NIL 50)))
+(rollback-tx)
+
+; Buy Post Only order (Bid)
+(begin-tx)
+(use bro-dex-core-KDA-ABC)
+(use bro-dex-wrapper-KDA-ABC)
+(use bro-dex-view-KDA-ABC)
+(use free.util-strings)
+(use free.util-math)
+(use free.util-lists)
+(use test-helpers)
+
+(expect-that "Orderbook should have a size of 16" (compose (length) (= 16)) (get-orderbook NIL 50))
+(expect "Initial ABC Balance of Carol" 100.0 (ABC_NS.abc.get-balance "carol"))
+(expect "Initial coin Balance of Taker" 1000.0 (coin.get-balance "carol"))
+
+(env-data {'ks:["carol-key"]})
+(env-sigs [ {'key:"carol-key", 'caps:[(coin.TRANSFER "carol" DEPOSIT-ACCOUNT 25.0)]}])
+(buy-post-only "carol" (read-keyset 'ks) 2.0 12.5)
+
+(expect "Final ABC Balance of Carol" 100.0 (ABC_NS.abc.get-balance "carol"))
+(expect "Final coin Balance of Taker" 975.0 (coin.get-balance "carol"))
+(expect-that "Carol history should contain 0 element" (is-empty) (get-orders-in-account-history "carol" NIL 50))
+(expect-that "Orderbook should have a size of 17" (compose (length) (= 17)) (get-orderbook NIL 50))
+(expect-that "Carol new order should be a bid" (compose (at 'is-ask) (not)) (first (get-orders-by-maker "carol" NIL 50)))
+(expect-that "Carol new order should be have a price of 12.5" (compose (at 'price) (= 12.5)) (first (get-orders-by-maker "carol" NIL 50)))
+(expect-that "Carol new order should be have an amount of 2.0" (compose (at 'amount) (= 2.0)) (first (get-orders-by-maker "carol" NIL 50)))
+(expect-that "Carol new order should be have a Maker account of carol" (compose (at 'maker-acct) (= "carol")) (first (get-orders-by-maker "carol" NIL 50)))
+(expect-that "Carol new order should be have a Maker account of carol" (compose (at 'maker-acct) (= "carol")) (first-bid))
+(expect-that "Carol new order should be have the right guard" (compose (at 'guard) (= (read-keyset 'ks))) (first (get-orders-by-maker "carol" NIL 50)))
+(rollback-tx)
+
+; Buy Post Only order (Bid) with bad amount => Should fail
+(begin-tx)
+(use bro-dex-core-KDA-ABC)
+(use bro-dex-wrapper-KDA-ABC)
+(use bro-dex-view-KDA-ABC)
+(use free.util-strings)
+(use free.util-math)
+(use free.util-lists)
+(use test-helpers)
+
+(expect-that "Orderbook should have a size of 16" (compose (length) (= 16)) (get-orderbook NIL 50))
+(expect "Initial ABC Balance of Carol" 100.0 (ABC_NS.abc.get-balance "carol"))
+(expect "Initial coin Balance of Taker" 1000.0 (coin.get-balance "carol"))
+
+(env-data {'ks:["carol-key"]})
+(env-sigs [ {'key:"carol-key", 'caps:[(coin.TRANSFER "carol" DEPOSIT-ACCOUNT 50.0)]}])
+(expect-failure "Bad price" "Order insertion position error" (buy-post-only "carol" (read-keyset 'ks) 2.0 25.0))
+(rollback-tx)
+
+
+; Sell Post Only order (Bid)
+(begin-tx)
+(use bro-dex-core-KDA-ABC)
+(use bro-dex-wrapper-KDA-ABC)
+(use bro-dex-view-KDA-ABC)
+(use free.util-strings)
+(use free.util-math)
+(use free.util-lists)
+(use test-helpers)
+
+(expect-that "Orderbook should have a size of 16" (compose (length) (= 16)) (get-orderbook NIL 50))
+(expect "Initial ABC Balance of Carol" 100.0 (ABC_NS.abc.get-balance "carol"))
+(expect "Initial coin Balance of Taker" 1000.0 (coin.get-balance "carol"))
+
+(env-data {'ks:["carol-key"], 'hint:"2413392777850430677452"})
+(env-sigs [ {'key:"carol-key", 'caps:[(ABC_NS.abc.TRANSFER "carol" DEPOSIT-ACCOUNT 2.0)]}])
+(sell-post-only "carol" (read-keyset 'ks) 2.0 20.0)
+
+(expect "Final ABC Balance of Carol" 98.0 (ABC_NS.abc.get-balance "carol"))
+(expect "Final coin Balance of Taker" 1000.0 (coin.get-balance "carol"))
+(expect-that "Carol history should contain 0 element" (is-empty) (get-orders-in-account-history "carol" NIL 50))
+(expect-that "Orderbook should have a size of 17" (compose (length) (= 17)) (get-orderbook NIL 50))
+(expect-that "Carol new order should be an ask" (compose (at 'is-ask) (= true)) (first (get-orders-by-maker "carol" NIL 50)))
+(expect-that "Carol new order should be have a price of 20.0" (compose (at 'price) (= 20.0)) (first (get-orders-by-maker "carol" NIL 50)))
+(expect-that "Carol new order should be have an amount of 2.0" (compose (at 'amount) (= 2.0)) (first (get-orders-by-maker "carol" NIL 50)))
+(expect-that "Carol new order should be have a Maker account of carol" (compose (at 'maker-acct) (= "carol")) (first (get-orders-by-maker "carol" NIL 50)))
+(expect-that "Carol new order should be have the right guard" (compose (at 'guard) (= (read-keyset 'ks))) (first (get-orders-by-maker "carol" NIL 50)))
+(rollback-tx)
+
+; Sell Post Only order (Bid)
+(begin-tx)
+(use bro-dex-core-KDA-ABC)
+(use bro-dex-wrapper-KDA-ABC)
+(use bro-dex-view-KDA-ABC)
+(use free.util-strings)
+(use free.util-math)
+(use free.util-lists)
+(use test-helpers)
+
+(expect-that "Orderbook should have a size of 16" (compose (length) (= 16)) (get-orderbook NIL 50))
+(expect "Initial ABC Balance of Carol" 100.0 (ABC_NS.abc.get-balance "carol"))
+(expect "Initial coin Balance of Taker" 1000.0 (coin.get-balance "carol"))
+
+(env-data {'ks:["carol-key"], 'hint:"2413392777850430677452"})
+(env-sigs [ {'key:"carol-key", 'caps:[(ABC_NS.abc.TRANSFER "carol" DEPOSIT-ACCOUNT 2.0)]}])
+(sell-post-only "carol" (read-keyset 'ks) 2.0 25.0)
+
+(expect "Final ABC Balance of Carol" 98.0 (ABC_NS.abc.get-balance "carol"))
+(expect "Final coin Balance of Taker" 1000.0 (coin.get-balance "carol"))
+(expect-that "Carol history should contain 0 element" (is-empty) (get-orders-in-account-history "carol" NIL 50))
+(expect-that "Orderbook should have a size of 17" (compose (length) (= 17)) (get-orderbook NIL 50))
+(expect-that "Carol new order should be an ask" (compose (at 'is-ask) (= true)) (first (get-orders-by-maker "carol" NIL 50)))
+(expect-that "Carol new order should be have a price of 25.0" (compose (at 'price) (= 25.0)) (first (get-orders-by-maker "carol" NIL 50)))
+(expect-that "Carol new order should be have an amount of 2.0" (compose (at 'amount) (= 2.0)) (first (get-orders-by-maker "carol" NIL 50)))
+(expect-that "Carol new order should be have a Maker account of carol" (compose (at 'maker-acct) (= "carol")) (first (get-orders-by-maker "carol" NIL 50)))
+(expect-that "Carol new order should be have the right guard" (compose (at 'guard) (= (read-keyset 'ks))) (first (get-orders-by-maker "carol" NIL 50)))
+(rollback-tx)
+
+; Sell Post Only order (Bid)
+(begin-tx)
+(use bro-dex-core-KDA-ABC)
+(use bro-dex-wrapper-KDA-ABC)
+(use bro-dex-view-KDA-ABC)
+(use free.util-strings)
+(use free.util-math)
+(use free.util-lists)
+(use test-helpers)
+
+(expect-that "Orderbook should have a size of 16" (compose (length) (= 16)) (get-orderbook NIL 50))
+(expect "Initial ABC Balance of Carol" 100.0 (ABC_NS.abc.get-balance "carol"))
+(expect "Initial coin Balance of Taker" 1000.0 (coin.get-balance "carol"))
+
+(env-data {'ks:["carol-key"], 'hint:"2413392777850430677452"})
+(env-sigs [ {'key:"carol-key", 'caps:[(ABC_NS.abc.TRANSFER "carol" DEPOSIT-ACCOUNT 2.0)]}])
+(sell-post-only "carol" (read-keyset 'ks) 2.0 15.0)
+
+(expect "Final ABC Balance of Carol" 98.0 (ABC_NS.abc.get-balance "carol"))
+(expect "Final coin Balance of Taker" 1000.0 (coin.get-balance "carol"))
+(expect-that "Carol history should contain 0 element" (is-empty) (get-orders-in-account-history "carol" NIL 50))
+(expect-that "Orderbook should have a size of 17" (compose (length) (= 17)) (get-orderbook NIL 50))
+(expect-that "Carol new order should be an ask" (compose (at 'is-ask) (= true)) (first (get-orders-by-maker "carol" NIL 50)))
+(expect-that "Carol new order should be have a price of 15.0" (compose (at 'price) (= 15.0)) (first (get-orders-by-maker "carol" NIL 50)))
+(expect-that "Carol new order should be have an amount of 2.0" (compose (at 'amount) (= 2.0)) (first (get-orders-by-maker "carol" NIL 50)))
+(expect-that "Carol new order should be have a Maker account of carol" (compose (at 'maker-acct) (= "carol")) (first (get-orders-by-maker "carol" NIL 50)))
+(expect-that "Carol new order should be have the right guard" (compose (at 'guard) (= (read-keyset 'ks))) (first (get-orders-by-maker "carol" NIL 50)))
+(rollback-tx)
+
+
+; Sell Post Only order (Bid) with bad amount => Should fail
+(begin-tx)
+(use bro-dex-core-KDA-ABC)
+(use bro-dex-wrapper-KDA-ABC)
+(use bro-dex-view-KDA-ABC)
+(use free.util-strings)
+(use free.util-math)
+(use free.util-lists)
+(use test-helpers)
+
+(expect-that "Orderbook should have a size of 16" (compose (length) (= 16)) (get-orderbook NIL 50))
+(expect "Initial ABC Balance of Carol" 100.0 (ABC_NS.abc.get-balance "carol"))
+(expect "Initial coin Balance of Taker" 1000.0 (coin.get-balance "carol"))
+
+(env-data {'ks:["carol-key"], 'hint:"2413392777850430677452"})
+(env-sigs [ {'key:"carol-key", 'caps:[(ABC_NS.abc.TRANSFER "carol" DEPOSIT-ACCOUNT 2.002)]}])
+(expect-failure "Bad price" "Order insertion position error" (sell-post-only "carol" (read-keyset 'ks) 2.0 5.0))
+(rollback-tx)

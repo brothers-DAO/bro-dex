@@ -1,0 +1,31 @@
+(load "kadena_repl_sandbox/kda-env/init.repl")
+
+(begin-tx)
+(define-namespace "ABC_NS" basic-guards.GUARD_SUCCESS basic-guards.GUARD_SUCCESS)
+(namespace "ABC_NS")
+(load "stubs/abc.pact")
+(create-table user-accounts-table)
+(create-table init-table)
+(commit-tx)
+
+(load "fund-abc-accounts.repl")
+
+(env-gasmodel "table")
+(env-gaslimit 100000000000000)
+
+(begin-tx)
+(namespace "")
+(env-data {'ks:["fee-key"]})
+(load ".gen/bro-dex-core-KDA-ABC.pact")
+(create-table seed-table)
+(create-table order-table)
+(create-table pointer-table)
+(init)
+(coin.create-account "fee-receiver" (read-keyset 'ks))
+(ABC_NS.abc.create-account "fee-receiver" (read-keyset 'ks))
+(load ".gen/bro-dex-view-KDA-ABC.pact")
+(load "helpers/test-helpers.pact")
+(commit-tx)
+
+
+(load "create-test-orders.repl")

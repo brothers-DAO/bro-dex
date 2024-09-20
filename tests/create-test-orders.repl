@@ -1,0 +1,89 @@
+(begin-tx)
+(use bro-dex-core-KDA-ABC)
+(use bro-dex-view-KDA-ABC)
+(use free.util-strings)
+(use test-helpers)
+
+(env-data {'ks:["alice-key"]})
+(env-sigs [ {'key:"alice-key", 'caps:[(ABC_NS.abc.TRANSFER "alice" (order-account (next-id)) 1.0)]}])
+(ABC_NS.abc.transfer-create "alice" (order-account (next-id)) (order-account-guard (next-id)) 1.0)
+(create-order true "alice" (read-keyset 'ks) 1.0 50.0 ORDERBOOK-HEAD)
+
+(env-data {'ks:["bob-key"]})
+(env-sigs [ {'key:"bob-key", 'caps:[(ABC_NS.abc.TRANSFER "bob" (order-account (next-id)) 1.0)]}])
+(ABC_NS.abc.transfer-create "bob" (order-account (next-id)) (order-account-guard (next-id)) 1.0)
+(create-order true "bob" (read-keyset 'ks) 1.0 49.0 ORDERBOOK-HEAD)
+
+(env-data {'ks:["alice-key"]})
+(env-sigs [ {'key:"alice-key", 'caps:[(ABC_NS.abc.TRANSFER "alice" (order-account (next-id)) 1.0)]}])
+(ABC_NS.abc.transfer-create "alice" (order-account (next-id)) (order-account-guard (next-id)) 1.0)
+(create-order true "alice" (read-keyset 'ks) 1.0 48.0 ORDERBOOK-HEAD)
+
+(env-data {'ks:["bob-key"]})
+(env-sigs [ {'key:"bob-key", 'caps:[(ABC_NS.abc.TRANSFER "bob" (order-account (next-id)) 1.0)]}])
+(ABC_NS.abc.transfer-create "bob" (order-account (next-id)) (order-account-guard (next-id)) 1.0)
+(create-order true "bob" (read-keyset 'ks) 1.0 47.0 ORDERBOOK-HEAD)
+
+(env-data {'ks:["alice-key"]})
+(env-sigs [ {'key:"alice-key", 'caps:[(ABC_NS.abc.TRANSFER "alice" (order-account (next-id)) 1.0)]}])
+(ABC_NS.abc.transfer-create "alice" (order-account (next-id)) (order-account-guard (next-id)) 1.0)
+(create-order true "alice" (read-keyset 'ks) 1.0 46.0 ORDERBOOK-HEAD)
+
+(env-data {'ks:["bob-key"]})
+(env-sigs [ {'key:"bob-key", 'caps:[(ABC_NS.abc.TRANSFER "bob" (order-account (next-id)) 1.0)]}])
+(ABC_NS.abc.transfer-create "bob" (order-account (next-id)) (order-account-guard (next-id)) 1.0)
+(create-order true "bob" (read-keyset 'ks) 1.0 45.0 ORDERBOOK-HEAD)
+
+(env-data {'ks:["alice-key"]})
+(env-sigs [ {'key:"alice-key", 'caps:[(ABC_NS.abc.TRANSFER "alice" (order-account (next-id)) 1.0)]}])
+(ABC_NS.abc.transfer-create "alice" (order-account (next-id)) (order-account-guard (next-id)) 1.0)
+(create-order true "alice" (read-keyset 'ks) 1.0 44.0 ORDERBOOK-HEAD)
+
+(env-data {'ks:["bob-key"]})
+(env-sigs [ {'key:"bob-key", 'caps:[(ABC_NS.abc.TRANSFER "bob" (order-account (next-id)) 1.0)]}])
+(ABC_NS.abc.transfer-create "bob" (order-account (next-id)) (order-account-guard (next-id)) 1.0)
+(create-order true "bob" (read-keyset 'ks) 1.0 43.0 ORDERBOOK-HEAD)
+
+(env-data {'ks:["alice-key"]})
+(env-sigs [ {'key:"alice-key", 'caps:[(ABC_NS.abc.TRANSFER "alice" (order-account (next-id)) 1.0)]}])
+(ABC_NS.abc.transfer-create "alice" (order-account (next-id)) (order-account-guard (next-id)) 1.0)
+(create-order true "alice" (read-keyset 'ks) 1.0 42.0 ORDERBOOK-HEAD)
+
+(env-data {'ks:["bob-key"]})
+(env-sigs [ {'key:"bob-key", 'caps:[(ABC_NS.abc.TRANSFER "bob" (order-account (next-id)) 1.0)]}])
+(ABC_NS.abc.transfer-create "bob" (order-account (next-id)) (order-account-guard (next-id)) 1.0)
+(create-order true "bob" (read-keyset 'ks) 1.0 41.0 ORDERBOOK-HEAD)
+
+(env-data {'ks:["alice-key"]})
+(env-sigs [ {'key:"alice-key", 'caps:[(ABC_NS.abc.TRANSFER "alice" (order-account (next-id)) 1.0)]}])
+(ABC_NS.abc.transfer-create "alice" (order-account (next-id)) (order-account-guard (next-id)) 1.0)
+(create-order true "alice" (read-keyset 'ks) 1.0 40.0 ORDERBOOK-HEAD)
+
+(env-data {'ks:["bob-key"]})
+(env-sigs [ {'key:"bob-key", 'caps:[(ABC_NS.abc.TRANSFER "bob" (order-account (next-id)) 1.0)]}])
+(ABC_NS.abc.transfer-create "bob" (order-account (next-id)) (order-account-guard (next-id)) 1.0)
+(create-order true "bob" (read-keyset 'ks) 1.0 30.0 ORDERBOOK-HEAD)
+
+(env-data {'ks:["alice-key"]})
+(env-sigs [ {'key:"alice-key", 'caps:[(ABC_NS.abc.TRANSFER "alice" (order-account (next-id)) 1.0)]}])
+(ABC_NS.abc.transfer-create "alice" (order-account (next-id)) (order-account-guard (next-id)) 1.0)
+(create-order true "alice" (read-keyset 'ks) 1.0 20.0 ORDERBOOK-HEAD)
+
+(env-data {'ks:["bob-key"]})
+(env-sigs [ {'key:"bob-key", 'caps:[(coin.TRANSFER "bob" (order-account (next-id)) 10.0)]}])
+(coin.transfer-create "bob" (order-account (next-id)) (order-account-guard (next-id)) 10.0)
+(create-order false "bob" (read-keyset 'ks) 1.0 10.0 ORDERBOOK-HEAD)
+
+(env-data {'ks:["alice-key"]})
+(env-sigs [ {'key:"alice-key", 'caps:[(coin.TRANSFER "alice" (order-account (next-id)) 5.0)]}])
+(coin.transfer-create "alice" (order-account (next-id)) (order-account-guard (next-id)) 5.0)
+(create-order false "alice" (read-keyset 'ks) 1.0 5.0 ORDERBOOK-HEAD)
+
+(env-data {'ks:["bob-key"]})
+(env-sigs [ {'key:"bob-key", 'caps:[(coin.TRANSFER "bob" (order-account (next-id)) 4.0)]}])
+(coin.transfer-create "bob" (order-account (next-id)) (order-account-guard (next-id)) 4.0)
+(create-order false "bob" (read-keyset 'ks) 1.0 4.0 ORDERBOOK-HEAD)
+
+
+(print (format-all-orders))
+(commit-tx)
