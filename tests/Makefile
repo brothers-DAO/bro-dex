@@ -1,4 +1,4 @@
-MACROS=-DPAIR=KDA-ABC -D__QUOTE_MOD__=coin -D__BASE_MOD__=ABC_NS.abc -D__MIN_AMOUNT__=0.001
+MACROS=-DPAIR=KDA-ABC -D__QUOTE_MOD__=coin -D__BASE_MOD__=ABC_NS.abc -D__MIN_AMOUNT__=0.001 -D__FEE_ACOUNT__=fee-receiver
 
 all: .gen/bro-dex-core-KDA-ABC.pact .gen/bro-dex-wrapper-KDA-ABC.pact .gen/bro-dex-view-KDA-ABC.pact
 

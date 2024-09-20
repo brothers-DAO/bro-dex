@@ -161,7 +161,7 @@
   (defun order-account:string (id:integer)
     (create-principal (order-account-guard id)))
 
-  (defconst FEE-ACCOUNT "fee-receiver")
+  (defconst FEE-ACCOUNT "__FEE_ACOUNT__")
 
   ; -----------------FINANCIAL RELATED FUNCTIONS -------------------------------
   ; ----------------------------------------------------------------------------
@@ -239,6 +239,9 @@
     (insert pointer-table ASKS {'pt:ORDERBOOK-TAIL})
     (insert order-table (key ORDERBOOK-HEAD) (+ {'id:ORDERBOOK-HEAD, 'is-ask:false, 'o-n:ORDERBOOK-TAIL, 'price:MIN-PRICE} NIL-ORDER))
     (insert order-table (key ORDERBOOK-TAIL) (+ {'id:ORDERBOOK-TAIL, 'is-ask:true , 'o-p:ORDERBOOK-HEAD, 'price:MAX-PRICE} NIL-ORDER))
+    ; Check that the fee account exists
+    (__BASE_MOD__.get-balance FEE-ACCOUNT)
+    (__BASE_MOD__.get-balance FEE-ACCOUNT)
     true
   )
 
