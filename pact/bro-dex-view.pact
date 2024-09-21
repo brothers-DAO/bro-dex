@@ -5,7 +5,7 @@
   (use bro-dex-core-PAIR)
 
   (defcap GOVERNANCE ()
-    true)
+    (enforce-keyset "__NAMESPACE__.bro-dex-admin"))
 
   (defconst NIL bro-dex-core-PAIR.NIL)
 

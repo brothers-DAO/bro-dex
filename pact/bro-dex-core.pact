@@ -4,7 +4,7 @@
   (use free.util-math)
 
   (defcap GOVERNANCE ()
-    true)
+    (enforce-keyset "__NAMESPACE__.bro-dex-admin"))
 
   ; --------------------------- CAPABILITIES -----------------------------------
   ; ----------------------------------------------------------------------------

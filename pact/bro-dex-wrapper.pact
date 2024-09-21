@@ -5,7 +5,7 @@
   (use bro-dex-view-PAIR)
 
   (defcap GOVERNANCE ()
-    true)
+    (enforce-keyset "__NAMESPACE__.bro-dex-admin"))
 
   ; ------------------------ DEPOSIT ACCOUNT -----------------------------------
   ; ----------------------------------------------------------------------------
