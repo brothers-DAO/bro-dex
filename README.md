@@ -25,7 +25,7 @@ When the order is a Bid:
 #### Modules generation
 Modules composing a pair can be generated using M4 macros.
 
-## Fees
+### Fees
 This DEX works with ZERO maker fees. Only the maker pays fees. The fees have to be paid using the "paying currency" by transferring a higher amount than requested by the maker.
 
 ### Modules Overview
