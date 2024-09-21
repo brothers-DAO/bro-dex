@@ -1,5 +1,6 @@
-;SPDX-License-Identifier: BUSL-1.1
 (module bro-dex-wrapper-PAIR GOVERNANCE
+  ;SPDX-License-Identifier: BUSL-1.1
+  ; => https://github.com/brothers-DAO/bro-dex/blob/main/LICENSE
   (use free.util-math)
   (use bro-dex-core-PAIR)
   (use bro-dex-view-PAIR)
