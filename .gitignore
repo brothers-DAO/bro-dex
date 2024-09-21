@@ -1,2 +1,6 @@
 .gen
 .pact-history
+.pact
+tx*.yaml
+tx*.json
+*.key

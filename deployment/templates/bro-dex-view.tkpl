@@ -1,0 +1,17 @@
+codeFile: .pact/bro-dex-view-{{pair}}.pact
+publicMeta:
+  chainId: "{{chain}}"
+  sender: {{gas-payer}}
+  gasLimit: 120000
+  gasPrice: 0.000000011
+  ttl: 86400
+networkId: {{network}}
+
+signers:
+  - public: {{ns-key}}
+  - public: {{admin-key}}
+  - public: {{gas-payer-key}}
+    caps:
+      - name: coin.GAS
+        args: []
+type: exec
