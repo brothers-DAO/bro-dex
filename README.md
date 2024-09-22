@@ -26,7 +26,7 @@ When the order is a Bid:
 Modules composing a pair can be generated using M4 macros.
 
 ### Fees
-This DEX works with ZERO maker fees. Only the maker pays fees. The fees have to be paid using the "paying currency" by transferring a higher amount than requested by the maker.
+This DEX works with ZERO maker fees. Only the taker pays fees. The fees have to be paid using the "paying currency" by transferring a higher amount than requested by the maker.
 
 ### Modules Overview
 
@@ -101,8 +101,8 @@ This is controlled by two functions:
 #### Order's specific accounts
 
 Each order is linked to a specific account for both currencies (BASE and QUOTE):
-  - This account will store the proposed amount (in BASE in case of an Ask order, in QUOTE in case of QUOTE order)
-  - This account will temporarily store the exchange counterpart when the order is taken. (in QUOTE when taking an Ask order, in QUOTE when taking q QUOTE order)
+  - This account will store the proposed amount (in BASE in case of an Ask order, in QUOTE in case of Bid order)
+  - This account will temporarily store the exchange counterpart when the order is taken. (in QUOTE when taking an Ask order, in BASE when taking a Bid order)
 
 **The Order's specific account must be founded externally before calling external API functions of the `core` module.**
 
@@ -154,7 +154,8 @@ Return the taken amount.
 ##### `(cancel-order)`
 `id` *integer* → *bool*
 
-Cancel an order. The transaction must be signed with the
+Cancel an order. The transaction must be signed with the guard used during the order creation.
+The signature should be scoped by the `(CANCEL-ORDER id)`.
 
 ## View module
 
@@ -179,7 +180,7 @@ Return the currently active orders (ie: to be taken) for a given account, starti
 ##### `(get-orders-in-history)`
 `from` *integer* `max-count` *integer* → *[object{order-sch}]*
 
-Return the global trading history, s starting from the `from` order (or `NIL`).
+Return the global trading history, starting from the `from` order (or `NIL`).
 Canceled orders are not present in Global history.
 
 ##### `(get-orders-in-account-history)`
