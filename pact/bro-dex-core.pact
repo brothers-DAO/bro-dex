@@ -385,7 +385,7 @@
       (enforce-order-account-min-balance id (primary-currency is-ask)
                                             (if is-ask amount (total-quote price amount)))
       (enforce (and? (between MIN-PRICE MAX-PRICE) (< 0.0 ) price) "Price out of bounds")
-      (enforce (between MIN-AMOUNT MAX-AMOUNT price) "Amount out of bounds")
+      (enforce (between MIN-AMOUNT MAX-AMOUNT amount) "Amount out of bounds")
       (with-capability (MAKE-ORDER id)
         (insert-order (+ {'id:id, 'state:STATE-ACTIVE, 'is-ask:is-ask,
                           'price:price, 'amount:amount, 'maker-acct:maker, 'guard:maker-guard} NIL-ORDER) prev))
