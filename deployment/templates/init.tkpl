@@ -1,13 +1,13 @@
 code: |
   (define-namespace "{{ns}}" (read-keyset 'ns-ks) (read-keyset 'ns-ks))
   (namespace "{{ns}}")
-  (define-keyset "{{ns}}.admin" (read-keyset 'admin-ks))
+  (define-keyset "{{ns}}.bro-dex-admin" (read-keyset 'admin-ks))
   (define-keyset "{{ns}}.fees" (read-keyset 'fee-ks))
 
 publicMeta:
   chainId: "{{chain}}"
   sender: {{gas-payer}}
-  gasLimit: 120000
+  gasLimit: 5000
   gasPrice: 0.000000013
   ttl: 86400
 networkId: {{network}}
@@ -18,7 +18,10 @@ data:
   admin-ks:
     - {{admin-key}}
   fee-ks:
-    - {{admin-key}}
+    pred: keys-any
+    keys:
+      - {{fee-key-1}}
+      - {{fee-key-2}}
 
 
 signers:
