@@ -58,7 +58,7 @@
                        (first-node (get-tree is-ask)))))
       (if (is-base first-n)
           []
-          (map (compose (compose (at 'id) (str-to-int 64)) (get-order))
+          (map (compose (compose (at 'id) (from-key)) (get-order))
                (fold (--append-next-node) [first-n] (enumerate 1 max-count)))))
   )
 
@@ -97,9 +97,9 @@
 
   (defun first-ask:object{order-sch} ()
     @doc "Returns the lowest price Ask"
-    (get-order (str-to-int 64 (rb-tree.first-value ASK_TREE))))
+    (get-order (from-key (rb-tree.first-value ASK_TREE))))
 
   (defun first-bid:object{order-sch}()
     @doc "Returns the highests price Bid"
-    (get-order (str-to-int 64 (rb-tree.first-value BID_TREE))))
+    (get-order (from-key (rb-tree.first-value BID_TREE))))
 )

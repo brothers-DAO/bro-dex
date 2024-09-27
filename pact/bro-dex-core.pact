@@ -159,6 +159,9 @@
   (defun key:string (x:integer)
     (int-to-str 64 x))
 
+  (defun from-key:integer (x:string)
+    (str-to-int 64 x))
+
   (defconst MAX-ID (^ 2 72))
 
   ; -------------------------- ORDER'S ACCOUNTS --------------------------------
