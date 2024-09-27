@@ -31,7 +31,8 @@
 (use free.util-lists)
 (use test-helpers)
 
-(expect-that "Orderbook should have a size of 16" (compose (length) (= 16)) (get-orderbook NIL 50))
+(expect-that "Ask Orderbook should have a size of 13" (compose (length) (= 13)) (get-orderbook true NIL 50))
+(expect-that "Bid Orderbook should have a size of 3" (compose (length) (= 3)) (get-orderbook false NIL 50))
 (expect "Initial ABC Balance of Carol" 100.0 (ABC_NS.abc.get-balance "carol"))
 (expect "Initial coin Balance of Taker" 1000.0 (coin.get-balance "carol"))
 
@@ -42,7 +43,8 @@
 (expect "Final ABC Balance of Carol" 101.0 (ABC_NS.abc.get-balance "carol"))
 (expect "Final coin Balance of Taker" (- 1000.0 (* 1.001 (sum [(* 1.0 20.0)]))) (coin.get-balance "carol"))
 (expect-that "Carol history should contain 1 element" (is-singleton) (get-orders-in-account-history "carol" NIL 50))
-(expect-that "Orderbook should have a size of 15" (compose (length) (= 15)) (get-orderbook NIL 50))
+(expect-that "Ask Orderbook should have a size of 12" (compose (length) (= 12)) (get-orderbook true NIL 50))
+(expect-that "Bid Orderbook should have a size of 3" (compose (length) (= 3)) (get-orderbook false NIL 50))
 (rollback-tx)
 
 ; Buy IOC first order only with a close limit
@@ -55,7 +57,8 @@
 (use free.util-lists)
 (use test-helpers)
 
-(expect-that "Orderbook should have a size of 16" (compose (length) (= 16)) (get-orderbook NIL 50))
+(expect-that "Ask Orderbook should have a size of 13" (compose (length) (= 13)) (get-orderbook true NIL 50))
+(expect-that "Bid Orderbook should have a size of 3" (compose (length) (= 3)) (get-orderbook false NIL 50))
 (expect "Initial ABC Balance of Carol" 100.0 (ABC_NS.abc.get-balance "carol"))
 (expect "Initial coin Balance of Taker" 1000.0 (coin.get-balance "carol"))
 
@@ -66,7 +69,8 @@
 (expect "Final ABC Balance of Carol" 101.0 (ABC_NS.abc.get-balance "carol"))
 (expect "Final coin Balance of Taker" (- 1000.0 (* 1.001 (sum [(* 1.0 20.0)]))) (coin.get-balance "carol"))
 (expect-that "Carol history should contain 1 element" (is-singleton) (get-orders-in-account-history "carol" NIL 50))
-(expect-that "Orderbook should have a size of 15" (compose (length) (= 15)) (get-orderbook NIL 50))
+(expect-that "Ask Orderbook should have a size of 12" (compose (length) (= 12)) (get-orderbook true NIL 50))
+(expect-that "Bid Orderbook should have a size of 3" (compose (length) (= 3)) (get-orderbook false NIL 50))
 (rollback-tx)
 
 
@@ -79,7 +83,8 @@
 (use free.util-math)
 (use test-helpers)
 
-(expect-that "Orderbook should have a size of 16" (compose (length) (= 16)) (get-orderbook NIL 50))
+(expect-that "Ask Orderbook should have a size of 13" (compose (length) (= 13)) (get-orderbook true NIL 50))
+(expect-that "Bid Orderbook should have a size of 3" (compose (length) (= 3)) (get-orderbook false NIL 50))
 (expect "Initial ABC Balance of Carol" 100.0 (ABC_NS.abc.get-balance "carol"))
 (expect "Initial coin Balance of Taker" 1000.0 (coin.get-balance "carol"))
 
@@ -90,7 +95,8 @@
 (expect "Final ABC Balance of Carol" 101.5 (ABC_NS.abc.get-balance "carol"))
 (expect "Final coin Balance of Taker" (- 1000.0 (* 1.001 (sum [(* 1.0 20.0),(* 0.5 30.0)]))) (coin.get-balance "carol"))
 (expect-that "Carol history should contain 2 elements" (compose (length) (= 2)) (get-orders-in-account-history "carol" NIL 50))
-(expect-that "Orderbook should have a size of 15" (compose (length) (= 15)) (get-orderbook NIL 50))
+(expect-that "Ask Orderbook should have a size of 12" (compose (length) (= 12)) (get-orderbook true NIL 50))
+(expect-that "Bid Orderbook should have a size of 3" (compose (length) (= 3)) (get-orderbook false NIL 50))
 (rollback-tx)
 
 
@@ -104,7 +110,8 @@
 (use free.util-lists)
 (use test-helpers)
 
-(expect-that "Orderbook should have a size of 16" (compose (length) (= 16)) (get-orderbook NIL 50))
+(expect-that "Ask Orderbook should have a size of 13" (compose (length) (= 13)) (get-orderbook true NIL 50))
+(expect-that "Bid Orderbook should have a size of 3" (compose (length) (= 3)) (get-orderbook false NIL 50))
 (expect "Initial ABC Balance of Carol" 100.0 (ABC_NS.abc.get-balance "carol"))
 (expect "Initial coin Balance of Taker" 1000.0 (coin.get-balance "carol"))
 
@@ -115,7 +122,8 @@
 (expect "Final ABC Balance of Carol" 101.0 (ABC_NS.abc.get-balance "carol"))
 (expect "Final coin Balance of Taker" (- 1000.0 (* 1.001 (sum [(* 1.0 20.0)]))) (coin.get-balance "carol"))
 (expect-that "Carol history should contain 1 elements" (is-singleton) (get-orders-in-account-history "carol" NIL 50))
-(expect-that "Orderbook should have a size of 15" (compose (length) (= 15)) (get-orderbook NIL 50))
+(expect-that "Ask Orderbook should have a size of 12" (compose (length) (= 12)) (get-orderbook true NIL 50))
+(expect-that "Bid Orderbook should have a size of 3" (compose (length) (= 3)) (get-orderbook false NIL 50))
 (rollback-tx)
 
 
@@ -129,7 +137,8 @@
 (use free.util-math)
 (use test-helpers)
 
-(expect-that "Orderbook should have a size of 16" (compose (length) (= 16)) (get-orderbook NIL 50))
+(expect-that "Ask Orderbook should have a size of 13" (compose (length) (= 13)) (get-orderbook true NIL 50))
+(expect-that "Bid Orderbook should have a size of 3" (compose (length) (= 3)) (get-orderbook false NIL 50))
 (expect "Initial ABC Balance of Carol" 100.0 (ABC_NS.abc.get-balance "carol"))
 (expect "Initial coin Balance of Taker" 1000.0 (coin.get-balance "carol"))
 
@@ -140,7 +149,8 @@
 (expect "Final ABC Balance of Carol" 100.0 (ABC_NS.abc.get-balance "carol"))
 (expect "Final coin Balance of Taker" 1000.0 (coin.get-balance "carol"))
 (expect-that "Carol history should contain 0 elements" (is-empty) (get-orders-in-account-history "carol" NIL 50))
-(expect-that "Orderbook should have a size of 16" (compose (length) (= 16)) (get-orderbook NIL 50))
+(expect-that "Ask Orderbook should have a size of 13" (compose (length) (= 13)) (get-orderbook true NIL 50))
+(expect-that "Bid Orderbook should have a size of 3" (compose (length) (= 3)) (get-orderbook false NIL 50))
 (rollback-tx)
 
 ; Sell IOC first order only
@@ -153,7 +163,8 @@
 (use free.util-lists)
 (use test-helpers)
 
-(expect-that "Orderbook should have a size of 16" (compose (length) (= 16)) (get-orderbook NIL 50))
+(expect-that "Ask Orderbook should have a size of 13" (compose (length) (= 13)) (get-orderbook true NIL 50))
+(expect-that "Bid Orderbook should have a size of 3" (compose (length) (= 3)) (get-orderbook false NIL 50))
 (expect "Initial ABC Balance of Carol" 100.0 (ABC_NS.abc.get-balance "carol"))
 (expect "Initial coin Balance of Taker" 1000.0 (coin.get-balance "carol"))
 
@@ -163,7 +174,8 @@
 (expect "Final ABC Balance of Carol" 98.999 (ABC_NS.abc.get-balance "carol"))
 (expect "Final coin Balance of Taker" 1010.0 (coin.get-balance "carol"))
 (expect-that "Carol history should contain 1 element" (is-singleton) (get-orders-in-account-history "carol" NIL 50))
-(expect-that "Orderbook should have a size of 15" (compose (length) (= 15)) (get-orderbook NIL 50))
+(expect-that "Ask Orderbook should have a size of 13" (compose (length) (= 13)) (get-orderbook true NIL 50))
+(expect-that "Bid Orderbook should have a size of 2" (compose (length) (= 2)) (get-orderbook false NIL 50))
 (rollback-tx)
 
 ; Sell IOC first order only with a close limit
@@ -176,7 +188,8 @@
 (use free.util-lists)
 (use test-helpers)
 
-(expect-that "Orderbook should have a size of 16" (compose (length) (= 16)) (get-orderbook NIL 50))
+(expect-that "Ask Orderbook should have a size of 13" (compose (length) (= 13)) (get-orderbook true NIL 50))
+(expect-that "Bid Orderbook should have a size of 3" (compose (length) (= 3)) (get-orderbook false NIL 50))
 (expect "Initial ABC Balance of Carol" 100.0 (ABC_NS.abc.get-balance "carol"))
 (expect "Initial coin Balance of Taker" 1000.0 (coin.get-balance "carol"))
 
@@ -186,7 +199,8 @@
 (expect "Final ABC Balance of Carol" 98.999 (ABC_NS.abc.get-balance "carol"))
 (expect "Final coin Balance of Taker" 1010.0 (coin.get-balance "carol"))
 (expect-that "Carol history should contain 1 element" (is-singleton) (get-orders-in-account-history "carol" NIL 50))
-(expect-that "Orderbook should have a size of 15" (compose (length) (= 15)) (get-orderbook NIL 50))
+(expect-that "Ask Orderbook should have a size of 13" (compose (length) (= 13)) (get-orderbook true NIL 50))
+(expect-that "Bid Orderbook should have a size of 2" (compose (length) (= 2)) (get-orderbook false NIL 50))
 (rollback-tx)
 
 
@@ -199,7 +213,8 @@
 (use free.util-math)
 (use test-helpers)
 
-(expect-that "Orderbook should have a size of 16" (compose (length) (= 16)) (get-orderbook NIL 50))
+(expect-that "Ask Orderbook should have a size of 13" (compose (length) (= 13)) (get-orderbook true NIL 50))
+(expect-that "Bid Orderbook should have a size of 3" (compose (length) (= 3)) (get-orderbook false NIL 50))
 (expect "Initial ABC Balance of Carol" 100.0 (ABC_NS.abc.get-balance "carol"))
 (expect "Initial coin Balance of Taker" 1000.0 (coin.get-balance "carol"))
 
@@ -209,7 +224,8 @@
 (expect "Final ABC Balance of Carol" 98.4985 (ABC_NS.abc.get-balance "carol"))
 (expect "Final coin Balance of Taker" 1012.5 (coin.get-balance "carol"))
 (expect-that "Carol history should contain 2 element" (compose (length) (= 2)) (get-orders-in-account-history "carol" NIL 50))
-(expect-that "Orderbook should have a size of 15" (compose (length) (= 15)) (get-orderbook NIL 50))
+(expect-that "Ask Orderbook should have a size of 13" (compose (length) (= 13)) (get-orderbook true NIL 50))
+(expect-that "Bid Orderbook should have a size of 2" (compose (length) (= 2)) (get-orderbook false NIL 50))
 (rollback-tx)
 
 ; Sell incomplete IOC first order only
@@ -222,7 +238,8 @@
 (use free.util-math)
 (use test-helpers)
 
-(expect-that "Orderbook should have a size of 16" (compose (length) (= 16)) (get-orderbook NIL 50))
+(expect-that "Ask Orderbook should have a size of 13" (compose (length) (= 13)) (get-orderbook true NIL 50))
+(expect-that "Bid Orderbook should have a size of 3" (compose (length) (= 3)) (get-orderbook false NIL 50))
 (expect "Initial ABC Balance of Carol" 100.0 (ABC_NS.abc.get-balance "carol"))
 (expect "Initial coin Balance of Taker" 1000.0 (coin.get-balance "carol"))
 
@@ -232,7 +249,8 @@
 (expect "Final ABC Balance of Carol" 98.999 (ABC_NS.abc.get-balance "carol"))
 (expect "Final coin Balance of Taker" 1010.0 (coin.get-balance "carol"))
 (expect-that "Carol history should contain 1 element" (is-singleton) (get-orders-in-account-history "carol" NIL 50))
-(expect-that "Orderbook should have a size of 15" (compose (length) (= 15)) (get-orderbook NIL 50))
+(expect-that "Ask Orderbook should have a size of 13" (compose (length) (= 13)) (get-orderbook true NIL 50))
+(expect-that "Bid Orderbook should have a size of 2" (compose (length) (= 2)) (get-orderbook false NIL 50))
 (rollback-tx)
 
 ; Sell IOC Empty
@@ -245,7 +263,8 @@
 (use free.util-math)
 (use test-helpers)
 
-(expect-that "Orderbook should have a size of 16" (compose (length) (= 16)) (get-orderbook NIL 50))
+(expect-that "Ask Orderbook should have a size of 13" (compose (length) (= 13)) (get-orderbook true NIL 50))
+(expect-that "Bid Orderbook should have a size of 3" (compose (length) (= 3)) (get-orderbook false NIL 50))
 (expect "Initial ABC Balance of Carol" 100.0 (ABC_NS.abc.get-balance "carol"))
 (expect "Initial coin Balance of Taker" 1000.0 (coin.get-balance "carol"))
 
@@ -255,5 +274,6 @@
 (expect "Final ABC Balance of Carol" 100.0 (ABC_NS.abc.get-balance "carol"))
 (expect "Final coin Balance of Taker" 1000.0 (coin.get-balance "carol"))
 (expect-that "Carol history should contain 0 element" (is-empty) (get-orders-in-account-history "carol" NIL 50))
-(expect-that "Orderbook should have a size of 16" (compose (length) (= 16)) (get-orderbook NIL 50))
+(expect-that "Ask Orderbook should have a size of 13" (compose (length) (= 13)) (get-orderbook true NIL 50))
+(expect-that "Bid Orderbook should have a size of 3" (compose (length) (= 3)) (get-orderbook false NIL 50))
 (rollback-tx)

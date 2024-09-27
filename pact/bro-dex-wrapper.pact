@@ -27,36 +27,6 @@
 
   ; Just 2 list to improve a little bit efficiency
   (defconst TAKE-ORDER-ATTEMPTS (enumerate 1 MAX-TAKE-ORDERS))
-  (defconst SEARCH-ORDER-ATTEMPTS (enumerate 1 (* 2 HINT-EXPECTED-OFFSET)))
-
-  ; ------------------INTERNAL SEARCH FUNCTIONS --------------------------------
-  ; ----------------------------------------------------------------------------
-  ; Search functions to be used by GTC or Post-Only functions, to find the right
-  ; place where an order must be inserted
-  (defun --is-after:bool (is-ask:bool order:object{order-sch} limit:decimal)
-    @doc "Return true is the provided order is after the limit"
-    (bind order {'price:=order-price}
-      (or (> order-price limit)
-          (and (= limit order-price) (not is-ask))))
-  )
-
-  (defun --search-order:object{order-sch} (is-ask:bool limit:decimal input:object{order-sch} _:integer)
-    @doc "Return the previous order of the linked list if the current is after the limit"
-    (if (--is-after is-ask input limit) (prev-order input) input)
-  )
-
-  (defun --search-start:object{order-sch} (is-ask:bool)
-    @doc "Compute the search starting point: uses an optionnal hint"
-    (let ((hint-order (get-order (try NIL (read-integer "hint")))))
-      (if (= STATE-ACTIVE (at 'state hint-order))
-          hint-order
-          (if is-ask (get-order ORDERBOOK-TAIL) (first-ask))))
-  )
-
-  (defun search-prev-order:object{order-sch} (is-ask:bool limit:decimal)
-    @doc "Search and find the order just before the given limit"
-    (fold (--search-order is-ask limit) (--search-start is-ask) SEARCH-ORDER-ATTEMPTS))
-
 
   ; ----------------- IMMEDIATE (TAKE) SALES ROUTINES --------------------------
   ; ----------------------------------------------------------------------------
@@ -158,9 +128,7 @@
             (install-capability (__QUOTE_MOD__.TRANSFER DEPOSIT-ACCOUNT (order-account id) (total-quote limit remaining)))
             (with-capability (DEPOSIT-ACCOUNT-CAP)
               (__QUOTE_MOD__.transfer-create DEPOSIT-ACCOUNT (order-account id)  (order-account-guard id) (total-quote limit remaining)))
-            (create-order false account account-guard remaining limit (at 'id (if (= amount remaining)
-                                                                                  (search-prev-order false limit)
-                                                                                  (first-bid)))))
+            (create-order false account account-guard remaining limit))
           ""))
     (transfer-back __QUOTE_MOD__ account)
   )
@@ -175,31 +143,33 @@
             (install-capability (__BASE_MOD__.TRANSFER DEPOSIT-ACCOUNT (order-account id) remaining))
             (with-capability (DEPOSIT-ACCOUNT-CAP)
               (__BASE_MOD__.transfer-create DEPOSIT-ACCOUNT (order-account id)  (order-account-guard id) remaining))
-            (create-order true account account-guard remaining limit (at 'id (if (= amount remaining)
-                                                                                 (search-prev-order true limit)
-                                                                                 (first-bid)))))
+            (create-order true account account-guard remaining limit))
           ""))
     (transfer-back __BASE_MOD__ account)
   )
 
   (defun buy-post-only:integer (account:string account-guard:guard amount:decimal limit:decimal)
+    (let ((f-ask (first-ask)))
+      (enforce (< limit (at 'price f-ask)) "Limit higher than market price"))
     (__QUOTE_MOD__.transfer-create account DEPOSIT-ACCOUNT DEPOSIT-ACCOUNT-GUARD (total-quote limit amount))
     (let ((id (next-id)))
       (install-capability (__QUOTE_MOD__.TRANSFER DEPOSIT-ACCOUNT (order-account id) (total-quote limit amount)))
       (with-capability (DEPOSIT-ACCOUNT-CAP)
         (__QUOTE_MOD__.transfer-create DEPOSIT-ACCOUNT (order-account id)  (order-account-guard id) (total-quote limit amount))))
 
-    (create-order false account account-guard amount limit (at 'id (search-prev-order false limit)))
+    (create-order false account account-guard amount limit)
   )
 
   (defun sell-post-only:integer (account:string account-guard:guard amount:decimal limit:decimal)
+    (let ((f-bid (first-bid)))
+      (enforce (> limit (at 'price f-bid)) "Limit lower than market price"))
     (__BASE_MOD__.transfer-create account DEPOSIT-ACCOUNT DEPOSIT-ACCOUNT-GUARD amount)
     (let ((id (next-id)))
       (install-capability (__BASE_MOD__.TRANSFER DEPOSIT-ACCOUNT (order-account id) amount))
       (with-capability (DEPOSIT-ACCOUNT-CAP)
         (__BASE_MOD__.transfer-create DEPOSIT-ACCOUNT (order-account id)  (order-account-guard id) amount)))
 
-    (create-order true account account-guard amount limit (at 'id (search-prev-order true limit)))
+    (create-order true account account-guard amount limit)
   )
 
 )
