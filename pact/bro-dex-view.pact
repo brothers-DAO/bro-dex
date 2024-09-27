@@ -4,6 +4,7 @@
   (use free.util-lists)
   (use free.util-math)
   (use bro-dex-core-PAIR)
+  (use rb-tree)
 
   (defcap GOVERNANCE ()
     (enforce-keyset "__NAMESPACE__.bro-dex-admin"))
@@ -30,10 +31,6 @@
     @doc "True if x is not nill"
     (!= NIL x))
 
-  (defun --append-next-order:[object:{order}] (input:[object:{order}] _:integer)
-    @doc "Appends next order from orderbook to an existing list"
-    (--append-valid-order input (next-order (last input))))
-
   (defun --append-next-order-in-history:[object:{order}] (input:[object:{order}] _:integer)
     @doc "Appends next order from global history to an existing list"
     (--append-valid-order input (next-order-in-history (last input))))
@@ -46,15 +43,23 @@
     @doc "Appends next order from Maker linked list to an existing list"
     (--append-valid-order input (next-order-by-maker (last input))))
 
-  (defun get-orderbook:[object{order-sch}] (from:integer max-count:integer)
+  (defun --append-next-node:[object{node-sch}] (input:[object{node-sch}] _:integer)
+    (let ((nn (next-node (last input))))
+      (if (is-base nn)
+          input
+          (append-last input nn)))
+  )
+
+  (defun get-orderbook:[object{order-sch}] (is-ask:bool from:integer max-count:integer)
     @doc "Returns max-count element from a specific point in Orderbook \
        \  Starts from the first element if from is NIL"
-    (cond
-      ( (is-not-nil from)
-          (fold (--append-next-order) [(get-order from)] (enumerate 1 max-count)))
-      ( (--is-valid (next-order-by-id ORDERBOOK-HEAD))
-          (fold (--append-next-order) [(next-order-by-id ORDERBOOK-HEAD)] (enumerate 1 max-count)))
-      [])
+    (let ((first-n (if (is-not-nil from)
+                       (get-node (key from))
+                       (first-node (get-tree is-ask)))))
+      (if (is-base first-n)
+          []
+          (map (compose (compose (at 'id) (str-to-int 64)) (get-order))
+               (fold (--append-next-node) [first-n] (enumerate 1 max-count)))))
   )
 
   (defun get-orders-by-maker:[object{order-sch}] (account:string from:integer max-count:integer)
@@ -92,9 +97,9 @@
 
   (defun first-ask:object{order-sch} ()
     @doc "Returns the lowest price Ask"
-    (pointed ASKS))
+    (get-order (str-to-int 64 (rb-tree.first-value ASK_TREE))))
 
   (defun first-bid:object{order-sch}()
     @doc "Returns the highests price Bid"
-    (prev-order (pointed ASKS)))
+    (get-order (str-to-int 64 (rb-tree.first-value BID_TREE))))
 )

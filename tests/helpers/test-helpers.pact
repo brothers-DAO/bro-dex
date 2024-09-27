@@ -2,6 +2,7 @@
   (use bro-dex-core-KDA-ABC)
   (use bro-dex-view-KDA-ABC)
   (use free.util-strings)
+  (use free.util-lists)
 
   (defcap G ()
     (enforce false "No"))
@@ -24,7 +25,8 @@
 
   (defun format-all-orders:string ()
     (join "\n" (+ [(format-title "ORDER-BOOK")]
-                  (map (format-order) (get-orderbook NIL 50))))
+                  (+ (map (format-order) (reverse (get-orderbook false NIL 50)))
+                     (map (format-order) (get-orderbook true NIL 50)))))
   )
 
   (defun all-orders-for:string (account:string)

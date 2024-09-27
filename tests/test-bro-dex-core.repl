@@ -24,7 +24,8 @@
 (use bro-dex-view-KDA-ABC)
 (use test-helpers)
 ;(print (all-orders-for "alice"))
-(expect-that "Orderbook should have a size of 16" (compose (length) (= 16)) (get-orderbook NIL 50))
+(expect-that "Ask Orderbook should have a size of 13" (compose (length) (= 13)) (get-orderbook true NIL 50))
+(expect-that "Bid Orderbook should have a size of 3" (compose (length) (= 3)) (get-orderbook false NIL 50))
 (expect-that "Alice Orderbook should have a size of 8" (compose (length) (= 8)) (get-orders-by-maker "alice" NIL  50))
 (expect-that "bob Orderbook should have a size of 8" (compose (length) (= 8)) (get-orders-by-maker "alice" NIL  50))
 
@@ -41,84 +42,20 @@
 (env-sigs [ {'key:"carol-key", 'caps:[(coin.TRANSFER "carol" (order-account (next-id)) 4.5)]}])
 
 (coin.transfer-create "carol" (order-account (next-id)) (order-account-guard (next-id)) 4.5)
-(create-order false "carol" (read-keyset 'ks) 1.0 4.5  0192872877885359610558)
+(create-order false "carol" (read-keyset 'ks) 1.0 4.5)
 
-(expect-that "Orderbook should have a size of 17" (compose (length) (= 17)) (get-orderbook NIL 50))
+(expect-that "Ask Orderbook should have a size of 13" (compose (length) (= 13)) (get-orderbook true NIL 50))
+(expect-that "Bid Orderbook should have a size of 4" (compose (length) (= 4)) (get-orderbook false NIL 50))
 (expect-that "Carol Orderbook should have a size of 1" (compose (length) (= 1)) (get-orders-by-maker "carol" NIL 50))
 
 (rollback-tx)
-
-
-; Try with bad position
-(begin-tx)
-(use bro-dex-core-KDA-ABC)
-(use bro-dex-view-KDA-ABC)
-
-(env-data {'ks:["carol-key"]})
-(env-sigs [ {'key:"carol-key", 'caps:[(coin.TRANSFER "carol" (order-account (next-id)) 4.5)]}])
-
-(coin.transfer-create "carol" (order-account (next-id)) (order-account-guard (next-id)) 4.5)
-(expect-failure "Bad position" "Order insertion position error" (create-order false "carol" (read-keyset 'ks) 1.0 4.5  0896561851709965799993))
-(rollback-tx)
-
-
-; Try with bad position again
-(begin-tx)
-(use bro-dex-core-KDA-ABC)
-(use bro-dex-view-KDA-ABC)
-
-(env-data {'ks:["carol-key"]})
-(env-sigs [ {'key:"carol-key", 'caps:[(coin.TRANSFER "carol" (order-account (next-id)) 4.0)]}])
-
-(coin.transfer-create "carol" (order-account (next-id)) (order-account-guard (next-id)) 4.0)
-(expect-failure "Bad position" "Order insertion position error" (create-order false "carol" (read-keyset 'ks) 1.0 4.0  0896561851709965799993))
-(rollback-tx)
-
-; Try with bad position again
-(begin-tx)
-(use bro-dex-core-KDA-ABC)
-(use bro-dex-view-KDA-ABC)
-
-(env-data {'ks:["carol-key"]})
-(env-sigs [ {'key:"carol-key", 'caps:[(coin.TRANSFER "carol" (order-account (next-id)) 4.0)]}])
-
-(coin.transfer-create "carol" (order-account (next-id)) (order-account-guard (next-id)) 4.0)
-(expect-failure "Bad position" "Order insertion position error" (create-order false "carol" (read-keyset 'ks) 1.0 4.0  0192872877885359610558))
-(rollback-tx)
-
-
-; Try with bad position again
-(begin-tx)
-(use bro-dex-core-KDA-ABC)
-(use bro-dex-view-KDA-ABC)
-
-(env-data {'ks:["carol-key"]})
-(env-sigs [ {'key:"carol-key", 'caps:[(coin.TRANSFER "carol" (order-account (next-id)) 4.0)]}])
-
-(coin.transfer-create "carol" (order-account (next-id)) (order-account-guard (next-id)) 4.0)
-(expect-failure "Bad position" "Order insertion position error" (create-order false "carol" (read-keyset 'ks) 1.0 4.0  0192872877885359610558))
-(rollback-tx)
-
-
-; Try with bad position again
-(begin-tx)
-(use bro-dex-core-KDA-ABC)
-(use bro-dex-view-KDA-ABC)
-
-(env-data {'ks:["carol-key"]})
-(env-sigs [ {'key:"carol-key", 'caps:[(coin.TRANSFER "carol" (order-account (next-id)) 35.0)]}])
-
-(coin.transfer-create "carol" (order-account (next-id)) (order-account-guard (next-id)) 35.0)
-(expect-failure "Bad position" "Order insertion position error" (create-order false "carol" (read-keyset 'ks) 1.0 35.0  1520416172771541360824))
-(rollback-tx)
-
 
 ; Try without paying
 (begin-tx)
 (use bro-dex-core-KDA-ABC)
 (use bro-dex-view-KDA-ABC)
 
-(expect-failure "Not payed" "Order account not funded" (create-order false "carol" (read-keyset 'ks) 1.0 4.5  0192872877885359610558))
+(expect-failure "Not payed" "Order account not funded" (create-order false "carol" (read-keyset 'ks) 1.0 4.5))
 (rollback-tx)
 
 ; Try with paying less than expected
@@ -130,7 +67,7 @@
 (env-sigs [ {'key:"carol-key", 'caps:[(coin.TRANSFER "carol" (order-account (next-id)) 4.5)]}])
 
 (coin.transfer-create "carol" (order-account (next-id)) (order-account-guard (next-id)) 4.4999999)
-(expect-failure "Not payed" "Order account not funded" (create-order false "carol" (read-keyset 'ks) 1.0 4.5  0192872877885359610558))
+(expect-failure "Not payed" "Order account not funded" (create-order false "carol" (read-keyset 'ks) 1.0 4.5))
 (rollback-tx)
 
 
@@ -143,9 +80,10 @@
 (env-sigs [ {'key:"carol-key", 'caps:[(ABC_NS.abc.TRANSFER "carol" (order-account (next-id)) 1.0)]}])
 
 (ABC_NS.abc.transfer-create "carol" (order-account (next-id)) (order-account-guard (next-id)) 1.0)
-(create-order true "carol" (read-keyset 'ks) 1.0 42.5  1135210929582361568944)
+(create-order true "carol" (read-keyset 'ks) 1.0 42.5)
 
-(expect-that "Orderbook should have a size of 17" (compose (length) (= 17)) (get-orderbook NIL 50))
+(expect-that "Ask Orderbook should have a size of 14" (compose (length) (= 14)) (get-orderbook true NIL 50))
+(expect-that "Bid Orderbook should have a size of 3" (compose (length) (= 3)) (get-orderbook false NIL 50))
 (expect-that "Carol Orderbook should have a size of 1" (compose (length) (= 1)) (get-orders-by-maker "carol" NIL 50))
 (rollback-tx)
 
@@ -159,51 +97,11 @@
 (env-sigs [ {'key:"carol-key", 'caps:[(ABC_NS.abc.TRANSFER "carol" (order-account (next-id)) 1.0)]}])
 
 (ABC_NS.abc.transfer-create "carol" (order-account (next-id)) (order-account-guard (next-id)) 1.0)
-(create-order true "carol" (read-keyset 'ks) 1.0 43.0  2413392777850430677452)
+(create-order true "carol" (read-keyset 'ks) 1.0 43.0)
 
-(expect-that "Orderbook should have a size of 17" (compose (length) (= 17)) (get-orderbook NIL 50))
+(expect-that "Ask Orderbook should have a size of 14" (compose (length) (= 14)) (get-orderbook true NIL 50))
+(expect-that "Bid Orderbook should have a size of 3" (compose (length) (= 3)) (get-orderbook false NIL 50))
 (expect-that "Carol Orderbook should have a size of 1" (compose (length) (= 1)) (get-orders-by-maker "carol" NIL  50))
-(rollback-tx)
-
-
-; Try with bad position
-(begin-tx)
-(use bro-dex-core-KDA-ABC)
-(use bro-dex-view-KDA-ABC)
-
-(env-data {'ks:["carol-key"]})
-(env-sigs [ {'key:"carol-key", 'caps:[(ABC_NS.abc.TRANSFER "carol" (order-account (next-id)) 1.0)]}])
-
-(ABC_NS.abc.transfer-create "carol" (order-account (next-id)) (order-account-guard (next-id)) 1.0)
-(expect-failure "Bad position" "Order insertion position error" (create-order true "carol" (read-keyset 'ks) 1.0 42.5  2159448978217457141053))
-
-(rollback-tx)
-
-; Try with bad position
-(begin-tx)
-(use bro-dex-core-KDA-ABC)
-(use bro-dex-view-KDA-ABC)
-
-(env-data {'ks:["carol-key"]})
-(env-sigs [ {'key:"carol-key", 'caps:[(ABC_NS.abc.TRANSFER "carol" (order-account (next-id)) 1.0)]}])
-
-(ABC_NS.abc.transfer-create "carol" (order-account (next-id)) (order-account-guard (next-id)) 1.0)
-(expect-failure "Bad position" "Order insertion position error" (create-order true "carol" (read-keyset 'ks) 1.0 42.5  2413392777850430677452))
-
-(rollback-tx)
-
-
-; Try with bad position
-(begin-tx)
-(use bro-dex-core-KDA-ABC)
-(use bro-dex-view-KDA-ABC)
-
-(env-data {'ks:["carol-key"]})
-(env-sigs [ {'key:"carol-key", 'caps:[(ABC_NS.abc.TRANSFER "carol" (order-account (next-id)) 1.0)]}])
-
-(ABC_NS.abc.transfer-create "carol" (order-account (next-id)) (order-account-guard (next-id)) 1.0)
-(expect-failure "Bad position" "Order insertion position error" (create-order true "carol" (read-keyset 'ks) 1.0 5.5  0896561851709965799993))
-
 (rollback-tx)
 
 
@@ -212,7 +110,7 @@
 (use bro-dex-core-KDA-ABC)
 (use bro-dex-view-KDA-ABC)
 
-(expect-failure "Not payed" "Order account not funded"  (create-order true "carol" (read-keyset 'ks) 1.0 42.5  1135210929582361568944))
+(expect-failure "Not payed" "Order account not funded"  (create-order true "carol" (read-keyset 'ks) 1.0 42.5))
 (rollback-tx)
 
 ; Try with paying less than  expected
@@ -224,9 +122,10 @@
 (env-sigs [ {'key:"carol-key", 'caps:[(ABC_NS.abc.TRANSFER "carol" (order-account (next-id)) 1.0)]}])
 
 (ABC_NS.abc.transfer-create "carol" (order-account (next-id)) (order-account-guard (next-id)) 1.0)
-(create-order true "carol" (read-keyset 'ks) 1.0 42.5  1135210929582361568944)
+(create-order true "carol" (read-keyset 'ks) 1.0 42.5)
 
-(expect-that "Orderbook should have a size of 17" (compose (length) (= 17)) (get-orderbook NIL 50))
+(expect-that "Ask Orderbook should have a size of 14" (compose (length) (= 14)) (get-orderbook true NIL 50))
+(expect-that "Bid Orderbook should have a size of 3" (compose (length) (= 3)) (get-orderbook false NIL 50))
 (expect-that "Carol Orderbook should have a size of 1" (compose (length) (= 1)) (get-orders-by-maker "carol" NIL  50))
 (rollback-tx)
 
@@ -247,7 +146,8 @@
 ; Check that we got refunded
 (expect "After Coin Balance" 1000.0 (coin.get-balance "alice"))
 
-(expect-that "Orderbook should have a size of 15" (compose (length) (= 15)) (get-orderbook NIL 50))
+(expect-that "Ask Orderbook should have a size of 13" (compose (length) (= 13)) (get-orderbook true NIL 50))
+(expect-that "Bid Orderbook should have a size of 2" (compose (length) (= 2)) (get-orderbook false NIL 50))
 (expect-that "Alice Orderbook should have a size of 7" (compose (length) (= 7)) (get-orders-by-maker "alice" NIL  50))
 (expect-that "Alice history should contain 1 element" (compose (length) (= 1)) (get-orders-in-account-history "alice" NIL 50))
 (expect-that "Alice first history element should have the right ID"  (compose (at 'id) (= 0896561851709965799993)) (first (get-orders-in-account-history "alice" NIL 1)))
@@ -272,12 +172,13 @@
 
 (env-sigs [ {'key:"bob-key", 'caps:[(CANCEL-ORDER 0192872877885359610558)]}])
 (cancel-order 0192872877885359610558)
-(expect-that "Orderbook should have a size of 15" (compose (length) (= 15)) (get-orderbook NIL 50))
+(expect-that "Ask Orderbook should have a size of 13" (compose (length) (= 13)) (get-orderbook true NIL 50))
+(expect-that "Bid Orderbook should have a size of 2" (compose (length) (= 2)) (get-orderbook false NIL 50))
 (expect-that "Bob Orderbook should have a size of 7" (compose (length) (= 7)) (get-orders-by-maker "bob" NIL  50))
 
 (expect-that "Bob first history element should have the right ID"  (compose (at 'id) (= 0192872877885359610558)) (first (get-orders-in-account-history "bob" NIL 1)))
 (expect-that "Bob  first history element must bee in canceled state"  (compose (at 'state) (= STATE-CANCELED)) (first (get-orders-in-account-history "bob" NIL 1)))
-(expect-that "First orderbook element should be "  (compose (at 'id) (= 0896561851709965799993)) (first (get-orderbook NIL 1)))
+(expect-that "First orderbook element should be "  (compose (at 'id) (= 0896561851709965799993)) (last (get-orderbook false NIL 1)))
 (expect-that "First Bob orderbook element should be "  (compose (at 'id) (= 1572796001557143547764)) (first (get-orders-by-maker "bob" NIL  1)))
 (rollback-tx)
 
@@ -288,7 +189,8 @@
 (use free.util-lists)
 (env-sigs [ {'key:"bob-key", 'caps:[(CANCEL-ORDER 1572796001557143547764)]}])
 (cancel-order 1572796001557143547764)
-(expect-that "Orderbook should have a size of 15" (compose (length) (= 15)) (get-orderbook NIL 50))
+(expect-that "Ask Orderbook should have a size of 13" (compose (length) (= 13)) (get-orderbook true NIL 50))
+(expect-that "Bid Orderbook should have a size of 2" (compose (length) (= 2)) (get-orderbook false NIL 50))
 (expect-that "Bob Orderbook should have a size of 7" (compose (length) (= 7)) (get-orders-by-maker "bob" NIL  50))
 
 (expect-that "Bob first history element should have the right ID"  (compose (at 'id) (= 1572796001557143547764)) (first (get-orders-in-account-history "bob" NIL 1)))
@@ -325,7 +227,8 @@
 ; Check that we got refunded
 (expect "After ABC Balance" 94.0 (ABC_NS.abc.get-balance "alice"))
 
-(expect-that "Orderbook should have a size of 15" (compose (length) (= 15)) (get-orderbook NIL 50))
+(expect-that "Ask Orderbook should have a size of 12" (compose (length) (= 12)) (get-orderbook true NIL 50))
+(expect-that "Bid Orderbook should have a size of 3" (compose (length) (= 3)) (get-orderbook false NIL 50))
 (expect-that "Alice Orderbook should have a size of 7" (compose (length) (= 7)) (get-orders-by-maker "alice" NIL  50))
 (expect-that "Alice history should contain 1 element" (compose (length) (= 1)) (get-orders-in-account-history "alice" NIL 50))
 (expect-that "Alice first history element should have the right ID"  (compose (at 'id) (= 4598807734136380309870)) (first (get-orders-in-account-history "alice" NIL 1)))
@@ -347,7 +250,8 @@
 
 (env-sigs [ {'key:"alice-key", 'caps:[(CANCEL-ORDER 2054700195086858548866)]}])
 (cancel-order 2054700195086858548866)
-(expect-that "Orderbook should have a size of 15" (compose (length) (= 15)) (get-orderbook NIL 50))
+(expect-that "Ask Orderbook should have a size of 12" (compose (length) (= 12)) (get-orderbook true NIL 50))
+(expect-that "Bid Orderbook should have a size of 3" (compose (length) (= 3)) (get-orderbook false NIL 50))
 (expect-that "Alice Orderbook should have a size of 7" (compose (length) (= 7)) (get-orders-by-maker "alice" NIL  50))
 
 (expect-that "Alice first history element should have the right ID"  (compose (at 'id) (= 2054700195086858548866)) (first (get-orders-in-account-history "alice" NIL 1)))
@@ -367,13 +271,14 @@
 
 (env-sigs [ {'key:"alice-key", 'caps:[(CANCEL-ORDER 2475187638815994249335)]}])
 (cancel-order 2475187638815994249335)
-(expect-that "Orderbook should have a size of 15" (compose (length) (= 15)) (get-orderbook NIL 50))
+(expect-that "Ask Orderbook should have a size of 13" (compose (length) (= 12)) (get-orderbook true NIL 50))
+(expect-that "Bid Orderbook should have a size of 3" (compose (length) (= 3)) (get-orderbook false NIL 50))
 (expect-that "Alice Orderbook should have a size of 7" (compose (length) (= 7)) (get-orders-by-maker "alice" NIL  50))
 
 (expect-that "Alice first history element should have the right ID"  (compose (at 'id) (= 2475187638815994249335)) (first (get-orders-in-account-history "alice" NIL 1)))
 (expect-that "Alice  first history element must bee in canceled state"  (compose (at 'state) (= STATE-CANCELED)) (first (get-orders-in-account-history "alice" NIL 1)))
 
-(expect-that "Last orderbook element"  (compose (at 'id) (= 3989432022929502080359)) (last (get-orderbook NIL 50)))
+(expect-that "Last orderbook element"  (compose (at 'id) (= 3989432022929502080359)) (last (get-orderbook true NIL 50)))
 (rollback-tx)
 
 ;;; TAKING ORDERS
@@ -399,7 +304,8 @@
 (expect "After ABC Balance of fee" 0.001 (ABC_NS.abc.get-balance "fee-receiver"))
 (expect "After coin Balance of Taker" 1005.0 (coin.get-balance "carol"))
 
-(expect-that "Orderbook should have a size of 15" (compose (length) (= 15)) (get-orderbook NIL 50))
+(expect-that "Ask Orderbook should have a size of 13" (compose (length) (= 13)) (get-orderbook true NIL 50))
+(expect-that "Bid Orderbook should have a size of 2" (compose (length) (= 2)) (get-orderbook false NIL 50))
 (expect-that "Alice Orderbook should have a size of 7" (compose (length) (= 7)) (get-orders-by-maker "alice" NIL  50))
 
 (expect-that "Alice history should contain 1 element" (compose (length) (= 1)) (get-orders-in-account-history "alice" NIL 50))
@@ -435,7 +341,8 @@
 (expect "After ABC Balance of fee" 0.00025 (ABC_NS.abc.get-balance "fee-receiver"))
 (expect "After coin Balance of Taker" 1001.25 (coin.get-balance "carol"))
 
-(expect-that "Orderbook should have a size of 16" (compose (length) (= 16)) (get-orderbook NIL 50))
+(expect-that "Ask Orderbook should have a size of 13" (compose (length) (= 13)) (get-orderbook true NIL 50))
+(expect-that "Bid Orderbook should have a size of 3" (compose (length) (= 3)) (get-orderbook false NIL 50))
 (expect-that "Alice Orderbook should have a size of 8" (compose (length) (= 8)) (get-orders-by-maker "alice" NIL  50))
 
 (expect-that "Alice history should contain 1 element" (compose (length) (= 1)) (get-orders-in-account-history "alice" NIL 50))
@@ -470,7 +377,8 @@
 (expect "After ABC Balance of fee" 0.0005 (ABC_NS.abc.get-balance "fee-receiver"))
 (expect "After coin Balance of Taker" 1002.5 (coin.get-balance "carol"))
 
-(expect-that "Orderbook should have a size of 16" (compose (length) (= 16)) (get-orderbook NIL 50))
+(expect-that "Ask Orderbook should have a size of 13" (compose (length) (= 13)) (get-orderbook true NIL 50))
+(expect-that "Bid Orderbook should have a size of 3" (compose (length) (= 3)) (get-orderbook false NIL 50))
 (expect-that "Alice Orderbook should have a size of 8" (compose (length) (= 8)) (get-orders-by-maker "alice" NIL  50))
 
 (expect-that "Alice history should contain 2 elements" (compose (length) (= 2)) (get-orders-in-account-history "alice" NIL 50))
@@ -505,7 +413,8 @@
 (expect "After ABC Balance of fee" 0.001 (ABC_NS.abc.get-balance "fee-receiver"))
 (expect "After coin Balance of Taker" 1005.0 (coin.get-balance "carol"))
 
-(expect-that "Orderbook should have a size of 15" (compose (length) (= 15)) (get-orderbook NIL 50))
+(expect-that "Ask Orderbook should have a size of 13" (compose (length) (= 13)) (get-orderbook true NIL 50))
+(expect-that "Bid Orderbook should have a size of 2" (compose (length) (= 2)) (get-orderbook false NIL 50))
 (expect-that "Alice Orderbook should have a size of 7" (compose (length) (= 7)) (get-orders-by-maker "alice" NIL  50))
 
 (expect-that "Alice history should contain 3 elements" (compose (length) (= 3)) (get-orders-in-account-history "alice" NIL 50))
@@ -546,8 +455,9 @@
 (expect "After ABC Balance of fee" 0.0015 (ABC_NS.abc.get-balance "fee-receiver"))
 (expect "After coin Balance of Taker" 1006.5 (coin.get-balance "carol"))
 
-(expect-that "Orderbook should have a size of 15" (compose (length) (= 15)) (get-orderbook NIL 50))
-(expect-that "First element of the orderbook should be the next"  (compose (at 'id) (= 0896561851709965799993))  (first (get-orderbook NIL 50)))
+(expect-that "Ask Orderbook should have a size of 13" (compose (length) (= 13)) (get-orderbook true NIL 50))
+(expect-that "Bid Orderbook should have a size of 3" (compose (length) (= 2)) (get-orderbook false NIL 50))
+(expect-that "First element of the orderbook should be the next"  (compose (at 'id) (= 0896561851709965799993))  (last (get-orderbook false NIL 50)))
 (expect-that "Bob Orderbook should have a size of 7" (compose (length) (= 7)) (get-orders-by-maker "bob" NIL  50))
 
 (expect-that "Bob history should contain 1 element" (compose (length) (= 1)) (get-orders-in-account-history "bob" NIL 50))
@@ -584,8 +494,9 @@
 (expect "After ABC Balance of fee" 0.0015 (ABC_NS.abc.get-balance "fee-receiver"))
 (expect "After coin Balance of Taker" 1006.5 (coin.get-balance "carol"))
 
-(expect-that "Orderbook should have a size of 15" (compose (length) (= 15)) (get-orderbook NIL 50))
-(expect-that "First element of the orderbook should be the next"  (compose (at 'id) (= 0896561851709965799993))  (first (get-orderbook NIL 50)))
+(expect-that "Ask Orderbook should have a size of 13" (compose (length) (= 13)) (get-orderbook true NIL 50))
+(expect-that "Bid Orderbook should have a size of 2" (compose (length) (= 2)) (get-orderbook false NIL 50))
+(expect-that "First element of the orderbook should be the next"  (compose (at 'id) (= 0896561851709965799993))  (last (get-orderbook false NIL 50)))
 (expect-that "Bob Orderbook should have a size of 7" (compose (length) (= 7)) (get-orders-by-maker "bob" NIL  50))
 
 (expect-that "Bob history should contain 1 element" (compose (length) (= 1)) (get-orders-in-account-history "bob" NIL 50))
@@ -621,7 +532,8 @@
 (expect "After ABC Balance of fee" 0.0015 (ABC_NS.abc.get-balance "fee-receiver"))
 (expect "After coin Balance of Taker" 1012.5 (coin.get-balance "carol"))
 
-(expect-that "Orderbook should have a size of 15" (compose (length) (= 15)) (get-orderbook NIL 50))
+(expect-that "Ask Orderbook should have a size of 13" (compose (length) (= 13)) (get-orderbook true NIL 50))
+(expect-that "Bid Orderbook should have a size of 3" (compose (length) (= 2)) (get-orderbook false NIL 50))
 
 (expect-that "First Bid of the orderbook should be the previous"  (compose (at 'id) (= 0896561851709965799993)) (first-bid))
 (expect-that "First Ask of the orderbook should be the same "  (compose (at 'id) (= 2054700195086858548866)) (first-ask))
@@ -661,7 +573,8 @@
 (expect "After coin Balance of Taker" 982.48 (coin.get-balance "carol"))
 (expect "After coin Balance of Maker" 1015.0 (coin.get-balance "alice"))
 
-(expect-that "Orderbook should have a size of 15" (compose (length) (= 15)) (get-orderbook NIL 50))
+(expect-that "Ask Orderbook should have a size of 12" (compose (length) (= 12)) (get-orderbook true NIL 50))
+(expect-that "Bid Orderbook should have a size of 3" (compose (length) (= 3)) (get-orderbook false NIL 50))
 
 (expect-that "First Bid of the orderbook should be the same"  (compose (at 'id) (= 1572796001557143547764)) (first-bid))
 (expect-that "First Ask of the orderbook should be the next "  (compose (at 'id) (= 1520416172771541360824)) (first-ask))
@@ -702,8 +615,9 @@
 (expect "After coin Balance of Taker" 952.45 (coin.get-balance "carol"))
 (expect "After coin Balance of Maker" 1045.0 (coin.get-balance "alice"))
 
-(expect-that "Orderbook should have a size of 15" (compose (length) (= 15)) (get-orderbook NIL 50))
-(expect-that "Last element of the orderbook should be the previous"  (compose (at 'id) (= 3989432022929502080359))  (last (get-orderbook NIL 50)))
+(expect-that "Ask Orderbook should have a size of 12" (compose (length) (= 12)) (get-orderbook true NIL 50))
+(expect-that "Bid Orderbook should have a size of 3" (compose (length) (= 3)) (get-orderbook false NIL 50))
+(expect-that "Last element of the orderbook should be the previous"  (compose (at 'id) (= 3989432022929502080359))  (last (get-orderbook true NIL 50)))
 
 (expect-that "Alice Orderbook should have a size of 7" (compose (length) (= 7)) (get-orders-by-maker "alice" NIL  50))
 
@@ -805,7 +719,8 @@
 (expect "After coin Balance of Maker Alice" (+ 995.0 (sum [50.0, 48.0, 46.0, 44.0, 42.0, 40.0, 20.0])) (coin.get-balance "alice"))
 (expect "After coin Balance of Maker Bob" (+ 986.0 (sum [49.0, 47.0, 45.0, 43.0, 41.0, 30.0])) (coin.get-balance "bob"))
 
-(expect-that "Orderbook should have a size of 0" (compose (length) (= 0)) (get-orderbook NIL 50))
+(expect-that "Orderbook should have a size of 0" (compose (length) (= 0)) (get-orderbook true NIL 50))
+(expect-that "Orderbook should have a size of 0" (compose (length) (= 0)) (get-orderbook false NIL 50))
 
 (expect-that "Alice Orderbook should have a size of 0" (compose (length) (= 0)) (get-orders-by-maker "alice" NIL  50))
 (expect-that "Bob Orderbook should have a size of 0" (compose (length) (= 0)) (get-orders-by-maker "bob" NIL  50))
@@ -835,13 +750,14 @@
 (use free.util-lists)
 (use test-helpers)
 ;(print (all-orders-for "alice"))
-(expect-that "Orderbook should have a size of 16" (compose (length) (= 16)) (get-orderbook NIL 50))
+(expect-that "Ask Orderbook should have a size of 13" (compose (length) (= 13)) (get-orderbook true NIL 50))
+(expect-that "Bid Orderbook should have a size of 3" (compose (length) (= 3)) (get-orderbook false NIL 50))
 (expect-that "Alice Orderbook should have a size of 8" (compose (length) (= 8)) (get-orders-by-maker "alice" NIL  50))
 (expect-that "bob Orderbook should have a size of 8" (compose (length) (= 8)) (get-orders-by-maker "alice" NIL  50))
 
 (expect-that "First ASK ID" (compose (at 'price) (= 20.0)) (first-ask))
 (expect-that "First BID ID" (compose (at 'price) (= 10.0)) (first-bid))
 
-(expect-that "First orderbook element"  (compose (at 'price) (= 4.0))  (first (get-orderbook NIL 50)))
-(expect-that "Last orderbook element"  (compose (at 'price) (= 50.0))  (last (get-orderbook NIL 50)))
+(expect-that "First orderbook element"  (compose (at 'price) (= 4.0))  (last (get-orderbook false NIL 50)))
+(expect-that "Last orderbook element"  (compose (at 'price) (= 50.0))  (last (get-orderbook true NIL 50)))
 (commit-tx)

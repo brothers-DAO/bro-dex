@@ -1,6 +1,6 @@
 MACROS=-DPAIR=KDA-ABC -D__QUOTE_MOD__=coin -D__BASE_MOD__=ABC_NS.abc -D__MIN_AMOUNT__=0.001 -D__FEE_ACOUNT__=fee-receiver
 
-all: .gen/bro-dex-core-KDA-ABC.pact .gen/bro-dex-wrapper-KDA-ABC.pact .gen/bro-dex-view-KDA-ABC.pact
+all: .gen/bro-dex-core-KDA-ABC.pact .gen/bro-dex-wrapper-KDA-ABC.pact .gen/bro-dex-view-KDA-ABC.pact .gen/rb-tree.pact
 
 .gen:
 	mkdir -p .gen
@@ -14,7 +14,11 @@ all: .gen/bro-dex-core-KDA-ABC.pact .gen/bro-dex-wrapper-KDA-ABC.pact .gen/bro-d
 .gen/bro-dex-view-KDA-ABC.pact: ../pact/bro-dex-view.pact .gen
 	m4 ${MACROS} $< > $@
 
-test-core: .gen/bro-dex-core-KDA-ABC.pact .gen/bro-dex-view-KDA-ABC.pact
+.gen/rb-tree.pact: ../pact_RB_tree/pact/rb-tree.pact .gen
+	m4 ${MACROS} $< > $@
+
+
+test-core: .gen/bro-dex-core-KDA-ABC.pact .gen/bro-dex-view-KDA-ABC.pact .gen/rb-tree.pact
 	pact test-bro-dex-core.repl
 
 test-wrapper-ioc: .gen/bro-dex-core-KDA-ABC.pact .gen/bro-dex-wrapper-KDA-ABC.pact .gen/bro-dex-view-KDA-ABC.pact

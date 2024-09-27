@@ -4,7 +4,7 @@ NS=n_966932c40a83cebb2fb0aece0d80c5155e148778
 #Comment to disable Init
 INIT= -D__INIT__
 
-MACROS=-D__NAMESPACE__=${NS} -DPAIR=${PAIR} -D__QUOTE_MOD__=coin -D__BASE_MOD__=n_5d119cc07ffd5efaef5c7feef9e878f34e3d4652.bro -D__MIN_AMOUNT__=0.001 -D__FEE_ACOUNT__=r:${NS}.fees 
+MACROS=-D__NAMESPACE__=${NS} -DPAIR=${PAIR} -D__QUOTE_MOD__=coin -D__BASE_MOD__=n_5d119cc07ffd5efaef5c7feef9e878f34e3d4652.bro -D__MIN_AMOUNT__=0.001 -D__FEE_ACOUNT__=r:${NS}.fees
 DATA_FILE=testnet.yaml
 
 .SECONDARY:
