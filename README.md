@@ -60,8 +60,6 @@ Each order is encoded in an object stored in the `order` table:
     is-ask:bool ; Whether the order is an Ask (true) or a Bid (False)
     state:integer ; Order state
     partial:bool ; Is this a partial (split order) => This field is for info only (UX)
-    o-p:integer ; Previous in the live list of orders
-    o-n:integer ; Next in the live list of orders
     m-p:integer ; Previous in the live list for a specific maker
     m-n:integer ; Next in  the live list for a specific maker
     h-m-n:integer ; Next in the history list of the maker
@@ -85,7 +83,7 @@ Each order is encoded in an object stored in the `order` table:
 *amount:* is always expressed in BASE currency
 *price:* is always expressed in QUOTE currency
 
-*o-p*, *o-n*, *m-p*, *m-n*, *h-m-n*, *h-t-n*, *h-n* are links to other orders and are part of the linked-list system explained below.
+*m-p*, *m-n*, *h-m-n*, *h-t-n*, *h-n* are links to other orders and are part of the linked-list system explained below.
 
 #### Orders ID's
 
@@ -115,9 +113,18 @@ Only functions of the Layer 3 are externally callable.
 
 ![Bro DEX Layers](/docs/bro-dex-core-layers.svg)
 
-#### Linked lists and pointers table
+#### Linked lists / Self-Balanced Trees and Pointers table
 
-![Bro DEX Linked Lists](/docs/bro-dex-linked-list.svg)
+The module manages several data structures for ordering orders:
+
+Orderbook Bids: Red-Black Tree
+Orderbook Ads: Red-Black Tree
+Maker active Orders: Double linked list
+User History: Single linked list
+Global history: Single linked list
+
+
+![Bro DEX Linked Lists](/docs/bro-dex-data-structures.svg)
 
 #### External API
 
@@ -168,9 +175,10 @@ All functions return complete Order objects.
 
 #### External API
 ##### `(get-orderbook)`
-`from` *integer* `max-count` *integer* → *[object{order-sch}]*
+`is-ask` *boolean* `from` *integer* `max-count` *integer* → *[object{order-sch}]*
 
-Return the currently active Orderbook, starting from the `from` order (or `NIL`)
+Return the currently active Orderbook, starting from the `from` order (or `NIL`).
+If is-ask is True, return the Ask part of the orderbook, else the Bid part.
 
 ##### `(get-orders-by-maker)`
 `account` *string* `from` *integer* `max-count` *integer* → *[object{order-sch}]*
@@ -202,5 +210,3 @@ Return the first bid in Orderbook.
 ## Wrapper module
 
 #### External API
-
-#### Hints management
