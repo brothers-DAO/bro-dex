@@ -72,6 +72,7 @@
     amount:decimal ; Amount price in BASE
     maker-acct:string ; Maker accounts
     guard:guard ; Make guard : used for canceling the order
+    take-tx:string ; Take transaction hash
   )
 
   (defun fail:bool ()
@@ -83,7 +84,7 @@
                        'm-p:NIL, 'm-n:NIL,
                        'h-m-n:NIL, 'h-t-n:NIL, 'h-n:NIL,
                        'price:0.0, 'amount:0.0, 'maker-acct: "",
-                       'guard: DEFAULT-GUARD})
+                       'guard: DEFAULT-GUARD, 'take-tx:""})
 
   (deftable order-table:{order-sch})
 
@@ -306,7 +307,7 @@
       (remove-order (+ {'h-m-n: (swap-ptr (account-history-head maker) id), ; Push to maker history
                         'h-t-n: (swap-ptr (account-history-head taker) id), ; Push to taker history
                         'h-n: (swap-ptr GLOBAL-HISTORY id), ;Push to main history
-                        'state:STATE-TAKEN} order))
+                        'state:STATE-TAKEN, 'take-tx: (tx-hash)} order))
       amount)
   )
 
@@ -318,6 +319,7 @@
 
       (let ((dummy-id (gen-id)))
         (insert order-table (key dummy-id) (+ {'id:dummy-id, 'amount:amount, 'partial:true, 'state: STATE-TAKEN,
+                                               'take-tx: (tx-hash),
                                                'h-m-n: (swap-ptr (account-history-head maker) dummy-id),
                                                'h-t-n: (swap-ptr (account-history-head taker) dummy-id),
                                                'h-n: (swap-ptr GLOBAL-HISTORY dummy-id)} order)))

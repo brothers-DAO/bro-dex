@@ -285,6 +285,7 @@
 
 ; Take a Bid order in FULL
 (begin-tx)
+(env-hash (hash "Take Bid"))
 (use bro-dex-core-KDA-ABC)
 (use bro-dex-view-KDA-ABC)
 (use free.util-lists)
@@ -310,6 +311,7 @@
 
 (expect-that "Alice history should contain 1 element" (compose (length) (= 1)) (get-orders-in-account-history "alice" NIL 50))
 (expect-that "Alice first history element should have the right ID"  (compose (at 'id) (= 0896561851709965799993)) (first (get-orders-in-account-history "alice" NIL 1)))
+(expect-that "Alice first history element should have the Tx Hash"  (compose (at 'take-tx) (= (hash "Take Bid"))) (first (get-orders-in-account-history "alice" NIL 1)))
 (expect-that "Alice  first history element must bee in taken state"  (compose (at 'state) (= STATE-TAKEN)) (first (get-orders-in-account-history "alice" NIL 1)))
 
 
