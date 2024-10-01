@@ -123,9 +123,6 @@
   (defun account-history-head:string (account:string)
     (hash ["H", account]))
 
-  ; Pointer to the first ask
-  (defconst ASKS "A")
-
   ; Pointer to the first global history order
   (defconst GLOBAL-HISTORY "G")
 
