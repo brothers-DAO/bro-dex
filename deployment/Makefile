@@ -1,4 +1,4 @@
-PAIR=BRO-KDA
+PAIR=BRO-KDA-R
 NS=n_966932c40a83cebb2fb0aece0d80c5155e148778
 
 #Comment to disable Init
@@ -18,6 +18,8 @@ DATA_FILE=testnet.yaml
 .pact/%-${PAIR}.pact: templates/%.pact.m4 ../pact/%.pact | .pact
 	m4 ${MACROS} ${INIT} $< > $@
 
+tx-%-${PAIR}.yaml: templates/%.tkpl .pact/%-${PAIR}.pact
+	kda gen -t $< -o $@ -d ${DATA_FILE}
 
 tx-%.yaml: templates/%.tkpl .pact/%.pact
 	kda gen -t $< -o $@ -d ${DATA_FILE}
@@ -30,7 +32,7 @@ tx-init.yaml: templates/init.tkpl
 	kda sign $< -k keys/testnet/admin.key
 	kda sign $< -k keys/testnet/ns.key
 
-json: tx-bro-dex-core-${PAIR}.json tx-bro-dex-view-${PAIR}.json tx-bro-dex-wrapper-${PAIR}.json tx-init.json
+json: tx-bro-dex-core-${PAIR}.json tx-bro-dex-view-${PAIR}.json tx-bro-dex-wrapper-${PAIR}.json tx-rb-tree.json tx-init.json
 
 yaml: tx-bro-dex-core-${PAIR}.yaml tx-bro-dex-view-${PAIR}.yaml tx-bro-dex-wrapper-${PAIR}.yaml tx-rb-tree.yaml tx-init.yaml
 
