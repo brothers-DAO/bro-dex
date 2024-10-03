@@ -223,13 +223,6 @@
 
   ; -------------------------- UTIL FUNCTIONS ----------------------------------
   ; ----------------------------------------------------------------------------
-  ; Some util functions to navigate through linked list.
-  (defun next-order:object{order-sch} (in:object{order-sch})
-    (get-order (at 'id (rb-tree.next-node (get-tree (at 'is-ask in))))))
-
-  (defun prev-order:object{order-sch} (in:object{order-sch})
-    (get-order (at 'id (rb-tree.prev-node (get-tree (at 'is-ask in))))))
-
   (defun next-order-by-maker:object{order-sch} (in:object{order-sch})
     (get-order (at 'm-n in)))
 
