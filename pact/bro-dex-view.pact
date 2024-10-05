@@ -126,11 +126,4 @@
                  (enumerate 1 max-count)))
   )
 
-  (defun first-ask:object{order-sch} ()
-    @doc "Returns the lowest price Ask"
-    (get-order (from-key (rb-tree.first-value ASK_TREE))))
-
-  (defun first-bid:object{order-sch}()
-    @doc "Returns the highests price Bid"
-    (get-order (from-key (rb-tree.first-value BID_TREE))))
 )

@@ -3,7 +3,6 @@
   ; => https://github.com/brothers-DAO/bro-dex/blob/main/LICENSE
   (use free.util-math)
   (use bro-dex-core-PAIR)
-  (use bro-dex-view-PAIR)
 
   (defcap GOVERNANCE ()
     (enforce-keyset "__NAMESPACE__.bro-dex-admin"))

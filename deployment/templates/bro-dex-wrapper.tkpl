@@ -3,7 +3,7 @@ publicMeta:
   chainId: "{{chain}}"
   sender: {{gas-payer}}
   gasLimit: 120000
-  gasPrice: 0.00000001
+  gasPrice: 0.000000011
   ttl: 86400
 networkId: {{network}}
 

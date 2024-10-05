@@ -223,15 +223,13 @@
 
   ; -------------------------- UTIL FUNCTIONS ----------------------------------
   ; ----------------------------------------------------------------------------
-  (defun next-order-by-maker:object{order-sch} (in:object{order-sch})
-    (get-order (at 'm-n in)))
+  (defun first-ask:object{order-sch} ()
+    @doc "Returns the lowest price Ask"
+    (get-order (from-key (rb-tree.first-value ASK_TREE))))
 
-  (defun next-order-in-account-history:object{order-sch} (in:object{order-sch} account:string)
-    (bind in {'h-m-n:=by-maker, 'h-t-n:=by-taker, 'maker-acct:=maker}
-      (get-order (if (= maker account) by-maker by-taker))))
-
-  (defun next-order-in-history:object{order-sch} (in:object{order-sch})
-    (get-order (at 'h-n in)))
+  (defun first-bid:object{order-sch}()
+    @doc "Returns the highests price Bid"
+    (get-order (from-key (rb-tree.first-value BID_TREE))))
 
   ; -------------------------- INIT FUNCTION -----------------------------------
   ; ----------------------------------------------------------------------------
