@@ -168,7 +168,7 @@ The signature should be scoped by the `(CANCEL-ORDER id)`.
 
 This modules contains convenience functions to iterate through the orders lists.
 
-Each list can be retrieved iteratively by specifying the first orderID and the number of elements to retrieve.
+Each list can be retrieved iteratively by specifying the previous (not included) orderID and the number of elements to retrieve.
 Using `NIL` as first orderID retrieves the beginning of the list.
 
 All functions return complete Order objects.

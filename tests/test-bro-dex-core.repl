@@ -33,6 +33,75 @@
 (expect-that "First BID ID" (compose (at 'id) (= 1572796001557143547764)) (first-bid))
 (commit-tx)
 
+; Test the viewer
+(begin-tx)
+(use bro-dex-view-KDA-ABC)
+(use free.util-lists)
+(expect-that "Ask Orderbook = 13" (compose (length) (= 13)) (get-orderbook true NIL 20))
+(expect-that "First ask" (compose (at 'id) (= 2054700195086858548866)) (first (get-orderbook true NIL 20)))
+(expect-that "Last  ask" (compose (at 'id) (= 2475187638815994249335)) (last (get-orderbook true NIL 20)))
+
+(expect-that "Ask Orderbook = 12/13" (compose (length) (= 12)) (get-orderbook true NIL 12))
+(expect-that "First ask" (compose (at 'id) (= 2054700195086858548866)) (first (get-orderbook true NIL 12)))
+(expect-that "Last  ask" (compose (at 'id) (= 3989432022929502080359)) (last (get-orderbook true NIL 12)))
+
+(expect-that "Ask Orderbook = 1/13" (compose (length) (= 1)) (get-orderbook true NIL 1))
+(expect-that "First ask" (compose (at 'id) (= 2054700195086858548866)) (first (get-orderbook true NIL 1)))
+(expect-that "Last  ask" (compose (at 'id) (= 2054700195086858548866)) (last (get-orderbook true NIL 1)))
+
+(expect-that "Bid Orderbook = 3" (compose (length) (= 3))  (get-orderbook false NIL 20))
+(expect-that "First bid" (compose (at 'id) (= 1572796001557143547764)) (first (get-orderbook false NIL 20)))
+(expect-that "Last  bid" (compose (at 'id) (= 0192872877885359610558)) (last (get-orderbook false NIL 20)))
+
+(expect-that "Bid Orderbook = 3/3" (compose (length) (= 3)) (get-orderbook false NIL 3))
+(expect-that "First bid" (compose (at 'id) (= 1572796001557143547764)) (first (get-orderbook false NIL 3)))
+(expect-that "Last  bid" (compose (at 'id) (= 0192872877885359610558)) (last (get-orderbook false NIL 3)))
+
+(expect-that "Bid Orderbook = 1/3" (compose (length) (= 1)) (get-orderbook false NIL 1))
+(expect-that "First bid" (compose (at 'id) (= 1572796001557143547764)) (first (get-orderbook false NIL 1)))
+(expect-that "Last  bid" (compose (at 'id) (= 1572796001557143547764)) (last (get-orderbook false NIL 1)))
+
+; With a starting pont =>
+(expect-that "Ask Orderbook = 13" (compose (length) (= 10)) (get-orderbook true 2441439105047490421929 20))
+(expect-that "First ask" (compose (at 'id) (= 2159448978217457141053)) (first (get-orderbook true 2441439105047490421929 20)))
+(expect-that "Last  ask" (compose (at 'id) (= 2475187638815994249335)) (last (get-orderbook true 2441439105047490421929 20)))
+
+(expect-that "Ask Orderbook = 1/13" (compose (length) (= 1)) (get-orderbook true 2441439105047490421929 1))
+(expect-that "First ask" (compose (at 'id) (= 2159448978217457141053)) (first (get-orderbook true 2441439105047490421929 1)))
+(expect-that "Last  ask" (compose (at 'id) (= 2159448978217457141053)) (last (get-orderbook true 2441439105047490421929 1)))
+
+(expect-that "Ask Orderbook = 0/13" (is-empty) (get-orderbook true 2475187638815994249335 1))
+
+(expect-that "Bid Orderbook = 3" (compose (length) (= 1))  (get-orderbook false 0896561851709965799993 20))
+(expect-that "First bid" (compose (at 'id) (= 0192872877885359610558)) (first (get-orderbook false 0896561851709965799993 20)))
+(expect-that "Last  bid" (compose (at 'id) (= 0192872877885359610558)) (last (get-orderbook false 0896561851709965799993 20)))
+
+(expect-that "Bid Orderbook = 1/3" (compose (length) (= 1)) (get-orderbook false 0896561851709965799993 1))
+(expect-that "First bid" (compose (at 'id) (= 0192872877885359610558)) (first (get-orderbook false 0896561851709965799993 1)))
+(expect-that "Last  bid" (compose (at 'id) (= 0192872877885359610558)) (last (get-orderbook false 0896561851709965799993 1)))
+
+(expect-that "Ask Orderbook = 0/13" (is-empty) (get-orderbook false 0192872877885359610558 1))
+
+; Test Maker list
+(expect-that "Alice Orderbook = 8" (compose (length) (= 8)) (get-orders-by-maker "alice" NIL 20))
+(expect-that "Alice First order" (compose (at 'id) (= 0896561851709965799993)) (first (get-orders-by-maker "alice" NIL 20)))
+(expect-that "Ask Last order" (compose (at 'id) (= 2475187638815994249335)) (last (get-orders-by-maker "alice" NIL 20)))
+
+(expect-that "Alice Orderbook = 2/8" (compose (length) (= 2)) (get-orders-by-maker "alice" NIL 2))
+(expect-that "Alice First order" (compose (at 'id) (= 0896561851709965799993)) (first (get-orders-by-maker "alice" NIL 2)))
+(expect-that "Ask Last order" (compose (at 'id) (= 2054700195086858548866)) (last (get-orders-by-maker "alice" NIL 2)))
+
+; With a starting point
+
+(expect-that "Alice Orderbook = 5/8" (compose (length) (= 5)) (get-orders-by-maker "alice" 2441439105047490421929 20))
+(expect-that "Alice First order" (compose (at 'id) (= 1135210929582361568944)) (first (get-orders-by-maker "alice" 2441439105047490421929 20)))
+(expect-that "Ask Last order" (compose (at 'id) (= 2475187638815994249335)) (last (get-orders-by-maker "alice" 2441439105047490421929 20)))
+
+(expect-that "Alice Orderbook = 0/8" (is-empty) (get-orders-by-maker "alice" 2475187638815994249335 20))
+
+(commit-tx)
+
+
 ; Try a BID create order
 (begin-tx)
 (use bro-dex-core-KDA-ABC)
@@ -178,7 +247,7 @@
 
 (expect-that "Bob first history element should have the right ID"  (compose (at 'id) (= 0192872877885359610558)) (first (get-orders-in-account-history "bob" NIL 1)))
 (expect-that "Bob  first history element must bee in canceled state"  (compose (at 'state) (= STATE-CANCELED)) (first (get-orders-in-account-history "bob" NIL 1)))
-(expect-that "First orderbook element should be "  (compose (at 'id) (= 0896561851709965799993)) (last (get-orderbook false NIL 1)))
+(expect-that "First orderbook element should be "  (compose (at 'id) (= 0896561851709965799993)) (last (get-orderbook false NIL 3)))
 (expect-that "First Bob orderbook element should be "  (compose (at 'id) (= 1572796001557143547764)) (first (get-orders-by-maker "bob" NIL  1)))
 (rollback-tx)
 
@@ -739,7 +808,30 @@
 (expect-that "Carol history should contain 18 elements" (compose (length) (= 18)) (get-orders-in-account-history "carol" NIL 50))
 (expect-that "Carol first history element should have the right ID"  (compose (at 'id) (= 2475187638815994249335)) (first (get-orders-in-account-history "carol" NIL 1)))
 
+
+; Dont forget that we have previously 2 times taken partially order 0896
 (expect-that "Global history should contain 18 elements" (compose (length) (= 18)) (get-orders-in-history NIL 50))
+
+;Test viewer with some starting points
+(expect-that "Global history should contain 17/18 elements" (compose (length) (= 17)) (get-orders-in-history 2475187638815994249335 50))
+(expect-that "Global history should contain 17/18 elements" (compose (length) (= 17)) (get-orders-in-history NIL 17))
+; 3326810889065994515947 is the first partial take
+(expect-that "Global history should contain 0/18 elements" (is-empty) (get-orders-in-history 3326810889065994515947 20))
+
+
+; Dont forget that we have previously 2 times taken partially order 0896
+(expect-that "Carol's history should contain 18 elements" (compose (length) (= 18)) (get-orders-in-account-history "carol" NIL 50))
+
+;Test viewer with some starting points
+(expect-that "Carols's history should contain 17/18 elements" (compose (length) (= 17)) (get-orders-in-account-history "carol" 2475187638815994249335 50))
+(expect-that "Carol's history should contain 17/18 elements" (compose (length) (= 17)) (get-orders-in-account-history "carol" NIL 17))
+; 3326810889065994515947 is the first partial take
+(expect-that "Carol's history should contain 0/18 elements" (is-empty) (get-orders-in-account-history "carol" 3326810889065994515947 20))
+
+
+
+
+
 (commit-tx)
 
 
