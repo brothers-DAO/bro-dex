@@ -132,6 +132,15 @@ Global history: Single linked list
 
 See comments in the source code in sections: `FINANCIAL RELATED FUNCTIONS` and `UTIL FUNCTIONS`.
 
+
+##### `(first-ask)`
+→ *[object{order-sch}]*
+Return the first ask in Orderbook.
+
+##### `(first-bid)`
+→ *[object{order-sch}]*
+Return the first bid in Orderbook.
+
 #### Transaction functions
 
 ##### `(create-order)`
@@ -197,16 +206,51 @@ Canceled orders are not present in Global history.
 Return the history for a given account, starting from the `from` order (or `NIL`).
 Canceled orders can be seen in account's history. Some orders may have been broken into several orders if they were partially filled.
 
-##### `(first-ask)`
-→ *[object{order-sch}]*
-Return the first ask in Orderbook.
-
-##### `(first-bid)`
-→ *[object{order-sch}]*
-Return the first bid in Orderbook.
-
 
 
 ## Wrapper module
 
+This module is supposed to be used by Frontends and other clients. It hides the complexity of the core module, and allows doing multiple operations at once, eg:
+  - Taking several orders that meet a limit criterion.
+  - Taking orders + Submitting a Maker order.
+
+#### Deposit account
+
+The module works by using a `DEPOSIT-ACCOUNT` with an associated `DEPOSIT-ACCOUNT-GUARD`. The caller is supposed to have pre-installed the `TRANSFER ` capability with the right amount (with fees included) before calling functions.
+
+If some part of the transaction amount (or fees), it will be automatically refunded back to the source account.
+
+Special functions from the core modules can be used to compute amounts.
+
+#### Order types
+
+The modules manage 4 orders types:
+  - **GTC**: Good Till Canceled => This flavor attempts to take a most 10 existing active offers (Taker), and if possible create a Maker order with the remaining amount.
+  - **IOC**: Immediate Or Cancel => This flavor attempts to take at most 10 existing active offers (Taker), but does not create a Maker order.
+  - **FOK**: Fill Or Kill => This flavor attempts to take at most 10 existing active offers (Taker), but revert the transaction if the order is not fully filled.
+  - **Post-Only**: Create a Maker order only if possible.
+
 #### External API
+
+##### buy-ioc / buy-gtc / buy-fok / buy-post-only
+`account` *string* `amount` *decimal* `limit` *decimal* →
+Buy (IOC / GTC  / FOK or Post-Only) a given `amount` of BASE at a maximum of `limit` price.
+
+The caller must install (eventually through a restricted signature) the cap:
+`(QUOTE.TRANSFER account DEPOSIT-ACCOUNT quote-amount)`
+
+where:
+- `quote-amount` =  amount * limit * (1.0 + FEE). In case of IOC, GTC or FOK. Can be computed with the function: `(total-quote-with-fee)`
+
+- `quote-amount` =  amount * limit. In case of Post-Only. Can be computed with the function: `(total-quote)`
+
+##### sell-ioc / sell-gtc / sell-fok / sell-post-only
+`account` *string* `amount` *decimal* `limit` *decimal* →
+Sell (IOC / GTC or FOK) a given `amount` of BASE at a minimum of `limit` price.
+
+The caller must install (eventually through a restricted signature) the cap:
+`(BASE.TRANSFER account DEPOSIT-ACCOUNT base-amount)`
+
+where:
+- `base-amount` =  amount * (1.0 + FEE). In case of IOC, GTC or FOK. Can be computed with the function: `(base-with-fee)`
+- `base-amount` =  amount. In case of Post-Only
