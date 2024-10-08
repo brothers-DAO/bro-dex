@@ -21,9 +21,6 @@
   ; Maximum orders taken during a single transaction
   (defconst MAX-TAKE-ORDERS 10)
 
-  ; Expected Hint offset
-  (defconst HINT-EXPECTED-OFFSET 5)
-
   ; Just 2 list to improve a little bit efficiency
   (defconst TAKE-ORDER-ATTEMPTS (enumerate 1 MAX-TAKE-ORDERS))
 

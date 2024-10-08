@@ -13,14 +13,6 @@
 
   ; -------------------------- INTERNAL FUNCTIONS  -----------------------------
   ; ----------------------------------------------------------------------------
-  (defun --is-valid:bool (x:object{order-sch})
-    @doc "True if the order is valid"
-    (!= STATE-DUMMY (at 'state x)))
-
-  (defun --append-valid-order:[object:{order-sch}] (input:[object{order-sch}] x:object{order-sch})
-    @doc "Appends an order to an existing list only if the order is valid"
-    (if (--is-valid x) (append-last input x) input))
-
   (defun --node-to-order:object{order-sch} (n:object{node-sch})
     @doc "Translate an RB node to an order"
     (get-order (from-key (at 'id n))))
@@ -28,10 +20,6 @@
   (defun is-nil:bool (x:integer)
     @doc "True if x is NIL"
     (= NIL x))
-
-  (defun is-not-nil:bool (x:integer)
-    @doc "True if x is not nill"
-    (!= NIL x))
 
   (defschema node-iterator
     p:object{node-sch}
@@ -103,7 +91,7 @@
     @doc "Returns max-count element from a specific point in Orderbook \
        \  Starts from the first element if from is NIL"
       (at 'out (fold (--append-next-node) {'p:(--initial-node is-ask from), 'out:[]}
-                   (enumerate 1 (+ 0 max-count))))
+                   (enumerate 1 max-count)))
   )
 
   (defun get-orders-by-maker:[object{order-sch}] (account:string from:integer max-count:integer)
