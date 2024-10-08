@@ -118,7 +118,7 @@ Only functions of the Layer 3 are externally callable.
 The module manages several data structures for ordering orders:
 
 Orderbook Bids: Red-Black Tree
-Orderbook Ads: Red-Black Tree
+Orderbook Asks: Red-Black Tree
 Maker active Orders: Double linked list
 User History: Single linked list
 Global history: Single linked list

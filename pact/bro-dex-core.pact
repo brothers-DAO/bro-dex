@@ -228,7 +228,7 @@
     (get-order (from-key (rb-tree.first-value ASK_TREE))))
 
   (defun first-bid:object{order-sch}()
-    @doc "Returns the highests price Bid"
+    @doc "Returns the highest price Bid"
     (get-order (from-key (rb-tree.first-value BID_TREE))))
 
   ; -------------------------- INIT FUNCTION -----------------------------------
