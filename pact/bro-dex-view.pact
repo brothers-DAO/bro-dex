@@ -91,12 +91,12 @@
     @doc "Returns max-count element from a specific point in Orderbook \
        \  Starts from the first element if from is NIL"
       (at 'out (fold (--append-next-node) {'p:(--initial-node is-ask from), 'out:[]}
-                   (enumerate 1 max-count)))
+                     (enumerate 1 max-count)))
   )
 
   (defun get-orders-by-maker:[object{order-sch}] (account:string from:integer max-count:integer)
     (at 'out (fold (--append-next-order-by-maker) {'next-id:(--initial-maker account from ), 'out:[]}
-                 (enumerate 1 max-count)))
+                   (enumerate 1 max-count)))
   )
 
   (defun get-orders-in-history:[object{order-sch}] (from:integer max-count:integer)
@@ -110,8 +110,8 @@
     @doc "Returns max-count element from a specific point in account's history \
          \  Starts from the first element if from is NIL"
     (at 'out (fold (--append-next-order-in-account-history account)
-                 {'next-id:(--initial-account-history account from), 'out:[]}
-                 (enumerate 1 max-count)))
+                   {'next-id:(--initial-account-history account from), 'out:[]}
+                   (enumerate 1 max-count)))
   )
 
 )
