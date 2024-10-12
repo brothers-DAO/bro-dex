@@ -210,7 +210,7 @@ Canceled orders can be seen in account's history. Some orders may have been brok
 
 ## Wrapper module
 
-This module is supposed to be used by Frontends and other clients. It hides the complexity of the core module, and allows doing multiple operations at once, eg:
+This module is supposed to be used by Frontends and other clients. It hides the complexity of the core module and allows doing multiple operations at once, eg:
   - Taking several orders that meet a limit criterion.
   - Taking orders + Submitting a Maker order.
 
@@ -218,16 +218,16 @@ This module is supposed to be used by Frontends and other clients. It hides the 
 
 The module works by using a `DEPOSIT-ACCOUNT` with an associated `DEPOSIT-ACCOUNT-GUARD`. The caller is supposed to have pre-installed the `TRANSFER ` capability with the right amount (with fees included) before calling functions.
 
-If some part of the transaction amount (or fees), it will be automatically refunded back to the source account.
+If some part of the transaction amount (or fees) remains unused, it will be automatically refunded back to the source account.
 
 Special functions from the core modules can be used to compute amounts.
 
 #### Order types
 
-The modules manage 4 orders types:
-  - **GTC**: Good Till Canceled => This flavor attempts to take a most 10 existing active offers (Taker), and if possible create a Maker order with the remaining amount.
-  - **IOC**: Immediate Or Cancel => This flavor attempts to take at most 10 existing active offers (Taker), but does not create a Maker order.
-  - **FOK**: Fill Or Kill => This flavor attempts to take at most 10 existing active offers (Taker), but revert the transaction if the order is not fully filled.
+The module manages 4 order types:
+  - **GTC**: Good Till Canceled => This flavor attempts to take 10 existing active offers (Taker) at most and creates a Maker order with the remaining amount if possible.
+  - **IOC**: Immediate Or Cancel => This flavor attempts to take 10 existing active offers (Taker) at most and creates a Maker order with the remaining amount if possible.
+  - **FOK**: Fill Or Kill => This flavor attempts to take 10 existing active offers (Taker) at most, but reverts the transaction if the order is not fully filled.
   - **Post-Only**: Create a Maker order only if possible.
 
 #### External API
