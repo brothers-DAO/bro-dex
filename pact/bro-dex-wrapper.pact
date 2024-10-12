@@ -21,8 +21,10 @@
   ; Maximum orders taken during a single transaction
   (defconst MAX-TAKE-ORDERS 10)
 
-  ; Just 2 list to improve a little bit efficiency
+  ; Just a list to improve a little bit efficiency
   (defconst TAKE-ORDER-ATTEMPTS (enumerate 1 MAX-TAKE-ORDERS))
+
+  (defconst RETURN-SUCCESS "DEX Order successful")
 
   ; ----------------- IMMEDIATE (TAKE) SALES ROUTINES --------------------------
   ; ----------------------------------------------------------------------------
@@ -79,7 +81,7 @@
             (install-capability (mod::TRANSFER DEPOSIT-ACCOUNT account remaining-quote))
             (with-capability (DEPOSIT-ACCOUNT-CAP)
               (mod::transfer DEPOSIT-ACCOUNT account remaining-quote)))
-          ""))
+          RETURN-SUCCESS))
   )
 
   ; ---------------------- EXTERNALLY CALABLE FUNCTIONS ------------------------
@@ -144,7 +146,7 @@
     (transfer-back __BASE_MOD__ account)
   )
 
-  (defun buy-post-only:integer (account:string account-guard:guard amount:decimal limit:decimal)
+  (defun buy-post-only:string (account:string account-guard:guard amount:decimal limit:decimal)
     (let ((f-ask (first-ask)))
       (enforce (< limit (at 'price f-ask)) "Limit higher than market price"))
     (__QUOTE_MOD__.transfer-create account DEPOSIT-ACCOUNT DEPOSIT-ACCOUNT-GUARD (total-quote limit amount))
@@ -154,9 +156,10 @@
         (__QUOTE_MOD__.transfer-create DEPOSIT-ACCOUNT (order-account id)  (order-account-guard id) (total-quote limit amount))))
 
     (create-order false account account-guard amount limit)
+    RETURN-SUCCESS
   )
 
-  (defun sell-post-only:integer (account:string account-guard:guard amount:decimal limit:decimal)
+  (defun sell-post-only:string (account:string account-guard:guard amount:decimal limit:decimal)
     (let ((f-bid (first-bid)))
       (enforce (> limit (at 'price f-bid)) "Limit lower than market price"))
     (__BASE_MOD__.transfer-create account DEPOSIT-ACCOUNT DEPOSIT-ACCOUNT-GUARD amount)
@@ -166,6 +169,7 @@
         (__BASE_MOD__.transfer-create DEPOSIT-ACCOUNT (order-account id)  (order-account-guard id) amount)))
 
     (create-order true account account-guard amount limit)
+    RETURN-SUCCESS
   )
 
 )
