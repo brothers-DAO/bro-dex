@@ -319,6 +319,7 @@
       (require-capability (CANCEL-ORDER id))
       (enforce-guard order-guard)
       (remove-order (+ {'state:STATE-CANCELED,
+                        'take-tx: (tx-hash),
                         'h-m-n: (swap-ptr (account-history-head maker) id)} order)))
     true
   )
