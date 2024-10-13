@@ -154,6 +154,8 @@ This function creates a new order for a given `amount` (in BASE), at a given `pr
 
 **Important note**: The `amount` in case of an Ask, or the product `amount` x `price` (can be computed with `(total-quote)`) in case of a Bid must have been previously transferred to the Order's specific account (can be computed by `(order-account (next-id))`).
 
+**Account prerequisites**: The `maker` account must already exist in both currencies (base and quote), otherwise the function will fail.
+
 Returns the OrderID.
 
 ##### `(take-order)`
@@ -164,6 +166,8 @@ Take an order `id`.
 `amount` must be equal or less than the order's amount. When it's "less", it will result in a "partial take".
 
 **Important note**: The `amount` + *Fees* (can be computed with `(base-with-fee)`) in case of taking a Bid, or the `amount` x `price` + *Fees* (can be computed with `(total-quote-with-fee)`) in case of taking an Ask must have been previously transferred to the the Order's specific account (can be computed by `(order-account id)`).
+
+**Account prerequisite**: The `taker` account is expected to exist in the target currency. The core module won't create it.
 
 Return the taken amount.
 

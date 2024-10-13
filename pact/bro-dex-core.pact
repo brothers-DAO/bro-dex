@@ -221,6 +221,12 @@
     (install-capability (currency::TRANSFER (order-account id) dst amount))
     (currency::transfer (order-account id) dst amount))
 
+  (defun --check-accounts:bool (account:string)
+    @doc "Check that an account exist in both currencies"
+    (__BASE_MOD__.get-balance account)
+    (__QUOTE_MOD__.get-balance account)
+    true)
+
   ; -------------------------- UTIL FUNCTIONS ----------------------------------
   ; ----------------------------------------------------------------------------
   (defun first-ask:object{order-sch} ()
@@ -242,9 +248,7 @@
     (rb-tree.init-tree ASK_TREE (create-capability-guard (UPDATE-TREE)) MAX-PRICE)
     (rb-tree.init-tree BID_TREE (create-capability-guard (UPDATE-TREE)) 0.0)
     ; Check that the fee account exists
-    (__BASE_MOD__.get-balance FEE-ACCOUNT)
-    (__BASE_MOD__.get-balance FEE-ACCOUNT)
-    true
+    (--check-accounts FEE-ACCOUNT)
   )
 
   ; -------------------------------- LAYER 1 -----------------------------------
@@ -362,6 +366,7 @@
 
   (defun create-order:integer (is-ask:bool maker:string maker-guard:guard amount:decimal price:decimal)
     @doc "Main function for creating a new order"
+    (--check-accounts maker)
     (let ((id (gen-id)))
       (enforce-order-account-min-balance id (primary-currency is-ask)
                                             (if is-ask amount (total-quote price amount)))

@@ -119,6 +119,20 @@
 
 (rollback-tx)
 
+; Try without a proper account
+; Note: Intentionnaly Dave account hasn't been created on ABC
+(begin-tx)
+(use bro-dex-core-KDA-ABC)
+(use bro-dex-view-KDA-ABC)
+(env-data {'ks:["dave-key"]})
+(env-sigs [ {'key:"dave-key", 'caps:[(coin.TRANSFER "dave" (order-account (next-id)) 4.5)]}])
+
+(coin.transfer-create "dave" (order-account (next-id)) (order-account-guard (next-id)) 4.5)
+(env-sigs [ {'key:"dave-key", 'caps:[(coin.TRANSFER "dave" (order-account (next-id)) 4.5)]}])
+
+(expect-failure "ABC Account doesn't exist" "row not found: dave" (create-order false "dave" (read-keyset 'ks) 1.0 4.5))
+(rollback-tx)
+
 ; Try without paying
 (begin-tx)
 (use bro-dex-core-KDA-ABC)

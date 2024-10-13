@@ -26,7 +26,7 @@
 
 (begin-tx)
 (use repl-bro-tools)
-(fund-accounts ["alice", "bob", "carol", "dave"] 100.0)
+(fund-accounts ["alice", "bob", "carol"] 100.0)
 (commit-tx)
 
 (env-enable-repl-natives false)
