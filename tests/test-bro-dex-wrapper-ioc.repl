@@ -4,6 +4,7 @@
 (namespace "")
 (load ".gen/bro-dex-wrapper-KDA-ABC.pact")
 (commit-tx)
+(env-data {})
 ; <--- 0192872877885359610558 / 1.0 - 4.0
 ; <--- 0896561851709965799993 / 1.0 - 5.0
 ; <--- 1572796001557143547764 / 1.0 - 10.0
@@ -35,14 +36,40 @@
 (expect-that "Bid Orderbook should have a size of 3" (compose (length) (= 3)) (get-orderbook false NIL 50))
 (expect "Initial ABC Balance of Carol" 100.0 (ABC_NS.abc.get-balance "carol"))
 (expect "Initial coin Balance of Taker" 1000.0 (coin.get-balance "carol"))
-
+(env-data {'ks:["carol-key"]})
 (env-sigs [ {'key:"carol-key", 'caps:[(coin.TRANSFER "carol" DEPOSIT-ACCOUNT 45.045 )]}])
 ; We buy 20547 in Full and 15204 in partial
-(buy-ioc "carol" 1.0 25.0)
+(buy-ioc "carol" (read-keyset 'ks) 1.0 25.0)
 
 (expect "Final ABC Balance of Carol" 101.0 (ABC_NS.abc.get-balance "carol"))
 (expect "Final coin Balance of Taker" (- 1000.0 (* 1.001 (sum [(* 1.0 20.0)]))) (coin.get-balance "carol"))
 (expect-that "Carol history should contain 1 element" (is-singleton) (get-orders-in-account-history "carol" NIL 50))
+(expect-that "Ask Orderbook should have a size of 12" (compose (length) (= 12)) (get-orderbook true NIL 50))
+(expect-that "Bid Orderbook should have a size of 3" (compose (length) (= 3)) (get-orderbook false NIL 50))
+(rollback-tx)
+
+; Buy IOC first order but with an unexistent account
+(begin-tx)
+(use bro-dex-core-KDA-ABC)
+(use bro-dex-wrapper-KDA-ABC)
+(use bro-dex-view-KDA-ABC)
+(use free.util-strings)
+(use free.util-math)
+(use free.util-lists)
+(use test-helpers)
+
+(expect-that "Ask Orderbook should have a size of 13" (compose (length) (= 13)) (get-orderbook true NIL 50))
+(expect-that "Bid Orderbook should have a size of 3" (compose (length) (= 3)) (get-orderbook false NIL 50))
+(expect-failure "Initial ABC Balance of Dave" (ABC_NS.abc.get-balance "dave"))
+(expect "Initial coin Balance of Taker" 1000.0 (coin.get-balance "dave"))
+(env-data {'ks:["dave-key"]})
+(env-sigs [ {'key:"dave-key", 'caps:[(coin.TRANSFER "dave" DEPOSIT-ACCOUNT 45.045 )]}])
+; We buy 20547 in Full and 15204 in partial
+(buy-ioc "dave" (read-keyset 'ks) 1.0 25.0)
+
+(expect "Final ABC Balance of Dave" 1.0 (ABC_NS.abc.get-balance "dave"))
+(expect "Final coin Balance of Taker" (- 1000.0 (* 1.001 (sum [(* 1.0 20.0)]))) (coin.get-balance "dave"))
+(expect-that "Carol history should contain 1 element" (is-singleton) (get-orders-in-account-history "dave" NIL 50))
 (expect-that "Ask Orderbook should have a size of 12" (compose (length) (= 12)) (get-orderbook true NIL 50))
 (expect-that "Bid Orderbook should have a size of 3" (compose (length) (= 3)) (get-orderbook false NIL 50))
 (rollback-tx)
@@ -61,10 +88,10 @@
 (expect-that "Bid Orderbook should have a size of 3" (compose (length) (= 3)) (get-orderbook false NIL 50))
 (expect "Initial ABC Balance of Carol" 100.0 (ABC_NS.abc.get-balance "carol"))
 (expect "Initial coin Balance of Taker" 1000.0 (coin.get-balance "carol"))
-
+(env-data {'ks:["carol-key"]})
 (env-sigs [ {'key:"carol-key", 'caps:[(coin.TRANSFER "carol" DEPOSIT-ACCOUNT 45.045 )]}])
 ; We buy 20547 in Full and 15204 in partial
-(buy-ioc "carol" 1.0 20.0)
+(buy-ioc "carol" (read-keyset 'ks) 1.0 20.0)
 
 (expect "Final ABC Balance of Carol" 101.0 (ABC_NS.abc.get-balance "carol"))
 (expect "Final coin Balance of Taker" (- 1000.0 (* 1.001 (sum [(* 1.0 20.0)]))) (coin.get-balance "carol"))
@@ -87,10 +114,10 @@
 (expect-that "Bid Orderbook should have a size of 3" (compose (length) (= 3)) (get-orderbook false NIL 50))
 (expect "Initial ABC Balance of Carol" 100.0 (ABC_NS.abc.get-balance "carol"))
 (expect "Initial coin Balance of Taker" 1000.0 (coin.get-balance "carol"))
-
+(env-data {'ks:["carol-key"]})
 (env-sigs [ {'key:"carol-key", 'caps:[(coin.TRANSFER "carol" DEPOSIT-ACCOUNT 45.045 )]}])
 ; We buy 20547 in Full and 15204 in partial
-(buy-ioc "carol" 1.5 30.0)
+(buy-ioc "carol" (read-keyset 'ks) 1.5 30.0)
 
 (expect "Final ABC Balance of Carol" 101.5 (ABC_NS.abc.get-balance "carol"))
 (expect "Final coin Balance of Taker" (- 1000.0 (* 1.001 (sum [(* 1.0 20.0),(* 0.5 30.0)]))) (coin.get-balance "carol"))
@@ -114,10 +141,10 @@
 (expect-that "Bid Orderbook should have a size of 3" (compose (length) (= 3)) (get-orderbook false NIL 50))
 (expect "Initial ABC Balance of Carol" 100.0 (ABC_NS.abc.get-balance "carol"))
 (expect "Initial coin Balance of Taker" 1000.0 (coin.get-balance "carol"))
-
+(env-data {'ks:["carol-key"]})
 (env-sigs [ {'key:"carol-key", 'caps:[(coin.TRANSFER "carol" DEPOSIT-ACCOUNT 45.045 )]}])
 ; We buy 20547 in Full
-(buy-ioc "carol" 1.5 25.0)
+(buy-ioc "carol" (read-keyset 'ks) 1.5 25.0)
 
 (expect "Final ABC Balance of Carol" 101.0 (ABC_NS.abc.get-balance "carol"))
 (expect "Final coin Balance of Taker" (- 1000.0 (* 1.001 (sum [(* 1.0 20.0)]))) (coin.get-balance "carol"))
@@ -141,10 +168,10 @@
 (expect-that "Bid Orderbook should have a size of 3" (compose (length) (= 3)) (get-orderbook false NIL 50))
 (expect "Initial ABC Balance of Carol" 100.0 (ABC_NS.abc.get-balance "carol"))
 (expect "Initial coin Balance of Taker" 1000.0 (coin.get-balance "carol"))
-
+(env-data {'ks:["carol-key"]})
 (env-sigs [ {'key:"carol-key", 'caps:[(coin.TRANSFER "carol" DEPOSIT-ACCOUNT 45.045 )]}])
 ; We buy nothing
-(buy-ioc "carol" 1.5 19.0)
+(buy-ioc "carol" (read-keyset 'ks) 1.5 19.0)
 
 (expect "Final ABC Balance of Carol" 100.0 (ABC_NS.abc.get-balance "carol"))
 (expect "Final coin Balance of Taker" 1000.0 (coin.get-balance "carol"))
@@ -167,9 +194,9 @@
 (expect-that "Bid Orderbook should have a size of 3" (compose (length) (= 3)) (get-orderbook false NIL 50))
 (expect "Initial ABC Balance of Carol" 100.0 (ABC_NS.abc.get-balance "carol"))
 (expect "Initial coin Balance of Taker" 1000.0 (coin.get-balance "carol"))
-
+(env-data {'ks:["carol-key"]})
 (env-sigs [ {'key:"carol-key", 'caps:[(ABC_NS.abc.TRANSFER "carol" DEPOSIT-ACCOUNT 1.001 )]}])
-(sell-ioc "carol" 1.0 9.0)
+(sell-ioc "carol" (read-keyset 'ks) 1.0 9.0)
 
 (expect "Final ABC Balance of Carol" 98.999 (ABC_NS.abc.get-balance "carol"))
 (expect "Final coin Balance of Taker" 1010.0 (coin.get-balance "carol"))
@@ -192,9 +219,9 @@
 (expect-that "Bid Orderbook should have a size of 3" (compose (length) (= 3)) (get-orderbook false NIL 50))
 (expect "Initial ABC Balance of Carol" 100.0 (ABC_NS.abc.get-balance "carol"))
 (expect "Initial coin Balance of Taker" 1000.0 (coin.get-balance "carol"))
-
+(env-data {'ks:["carol-key"]})
 (env-sigs [ {'key:"carol-key", 'caps:[(ABC_NS.abc.TRANSFER "carol" DEPOSIT-ACCOUNT 1.001 )]}])
-(sell-ioc "carol" 1.0 10.0)
+(sell-ioc "carol" (read-keyset 'ks) 1.0 10.0)
 
 (expect "Final ABC Balance of Carol" 98.999 (ABC_NS.abc.get-balance "carol"))
 (expect "Final coin Balance of Taker" 1010.0 (coin.get-balance "carol"))
@@ -217,9 +244,9 @@
 (expect-that "Bid Orderbook should have a size of 3" (compose (length) (= 3)) (get-orderbook false NIL 50))
 (expect "Initial ABC Balance of Carol" 100.0 (ABC_NS.abc.get-balance "carol"))
 (expect "Initial coin Balance of Taker" 1000.0 (coin.get-balance "carol"))
-
+(env-data {'ks:["carol-key"]})
 (env-sigs [ {'key:"carol-key", 'caps:[(ABC_NS.abc.TRANSFER "carol" DEPOSIT-ACCOUNT 1.5015 )]}])
-(sell-ioc "carol" 1.5 5.0)
+(sell-ioc "carol" (read-keyset 'ks) 1.5 5.0)
 
 (expect "Final ABC Balance of Carol" 98.4985 (ABC_NS.abc.get-balance "carol"))
 (expect "Final coin Balance of Taker" 1012.5 (coin.get-balance "carol"))
@@ -242,9 +269,9 @@
 (expect-that "Bid Orderbook should have a size of 3" (compose (length) (= 3)) (get-orderbook false NIL 50))
 (expect "Initial ABC Balance of Carol" 100.0 (ABC_NS.abc.get-balance "carol"))
 (expect "Initial coin Balance of Taker" 1000.0 (coin.get-balance "carol"))
-
+(env-data {'ks:["carol-key"]})
 (env-sigs [ {'key:"carol-key", 'caps:[(ABC_NS.abc.TRANSFER "carol" DEPOSIT-ACCOUNT 1.5015 )]}])
-(sell-ioc "carol" 1.5 7.5)
+(sell-ioc "carol" (read-keyset 'ks) 1.5 7.5)
 
 (expect "Final ABC Balance of Carol" 98.999 (ABC_NS.abc.get-balance "carol"))
 (expect "Final coin Balance of Taker" 1010.0 (coin.get-balance "carol"))
@@ -267,9 +294,9 @@
 (expect-that "Bid Orderbook should have a size of 3" (compose (length) (= 3)) (get-orderbook false NIL 50))
 (expect "Initial ABC Balance of Carol" 100.0 (ABC_NS.abc.get-balance "carol"))
 (expect "Initial coin Balance of Taker" 1000.0 (coin.get-balance "carol"))
-
+(env-data {'ks:["carol-key"]})
 (env-sigs [ {'key:"carol-key", 'caps:[(ABC_NS.abc.TRANSFER "carol" DEPOSIT-ACCOUNT 1.5015 )]}])
-(sell-ioc "carol" 1.5 11.0)
+(sell-ioc "carol" (read-keyset 'ks) 1.5 11.0)
 
 (expect "Final ABC Balance of Carol" 100.0 (ABC_NS.abc.get-balance "carol"))
 (expect "Final coin Balance of Taker" 1000.0 (coin.get-balance "carol"))

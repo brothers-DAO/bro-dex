@@ -26,6 +26,30 @@
 
   (defconst RETURN-SUCCESS "DEX Order successful")
 
+  ; ------------------------ UTIl FUNCTION - -----------------------------------
+  ; ----------------------------------------------------------------------------
+  (defun --init-buy-accounts:string (account:string guard:guard amount:decimal)
+    @doc "Do the common buying stuffs: \
+       \   1 - Transfer QUOTE to the DEPOSIT account \
+       \   2 - Create BASE user account"
+    (__QUOTE_MOD__.transfer-create account DEPOSIT-ACCOUNT DEPOSIT-ACCOUNT-GUARD amount)
+    (let ((bal (try -1.0 (__BASE_MOD__.get-balance account))))
+      (if (= bal -1.0)
+          (__BASE_MOD__.create-account account guard)
+          ""))
+  )
+
+  (defun --init-sell-accounts:string (account:string guard:guard amount:decimal)
+    @doc "Do the common selling stuffs: \
+       \   1 - Transfer BASE to the DEPOSIT account \
+       \   2 - Create QUOTE user account"
+    (__BASE_MOD__.transfer-create account DEPOSIT-ACCOUNT DEPOSIT-ACCOUNT-GUARD amount)
+    (let ((bal (try -1.0 (__QUOTE_MOD__.get-balance account))))
+      (if (= bal -1.0)
+          (__QUOTE_MOD__.create-account account guard)
+          ""))
+  )
+
   ; ----------------- IMMEDIATE (TAKE) SALES ROUTINES --------------------------
   ; ----------------------------------------------------------------------------
   ; A small object to pass informations between immediate sales operations.
@@ -86,31 +110,31 @@
 
   ; ---------------------- EXTERNALLY CALABLE FUNCTIONS ------------------------
   ; ----------------------------------------------------------------------------
-  (defun buy-ioc:string (account:string amount:decimal limit:decimal)
+  (defun buy-ioc:string (account:string account-guard:guard amount:decimal limit:decimal)
     @doc "Buy using a Immediate or Cancel policy"
-    (__QUOTE_MOD__.transfer-create account DEPOSIT-ACCOUNT DEPOSIT-ACCOUNT-GUARD (total-quote-with-fee limit amount))
+    (--init-buy-accounts account account-guard (total-quote-with-fee limit amount))
     (fold-try-immediate-buy account limit amount)
     (transfer-back __QUOTE_MOD__ account)
   )
 
-  (defun sell-ioc:string (account:string amount:decimal limit:decimal)
+  (defun sell-ioc:string (account:string account-guard:guard amount:decimal limit:decimal)
     @doc "Sell using a Immediate or Cancel policy"
-    (__BASE_MOD__.transfer-create account DEPOSIT-ACCOUNT DEPOSIT-ACCOUNT-GUARD (base-with-fee amount))
+    (--init-sell-accounts account account-guard (base-with-fee amount))
     (fold-try-immediate-sell account limit amount)
     (transfer-back __BASE_MOD__ account)
   )
 
-  (defun buy-fok:string (account:string amount:decimal limit:decimal)
+  (defun buy-fok:string (account:string account-guard:guard amount:decimal limit:decimal)
     @doc "Buy using a Fill or Kill policy"
-    (__QUOTE_MOD__.transfer-create account DEPOSIT-ACCOUNT DEPOSIT-ACCOUNT-GUARD (total-quote-with-fee limit amount))
+    (--init-buy-accounts account account-guard (total-quote-with-fee limit amount))
     (bind (fold-try-immediate-buy account limit amount) {'rem:=remaining}
       (enforce (= 0.0 remaining) "Order not immediately filled"))
     (transfer-back __QUOTE_MOD__ account)
   )
 
-  (defun sell-fok:string (account:string amount:decimal limit:decimal)
+  (defun sell-fok:string (account:string account-guard:guard amount:decimal limit:decimal)
     @doc "Sell using a Fill or Kill policy"
-    (__BASE_MOD__.transfer-create account DEPOSIT-ACCOUNT DEPOSIT-ACCOUNT-GUARD (base-with-fee amount))
+    (--init-sell-accounts account account-guard (base-with-fee amount))
     (bind (fold-try-immediate-sell account limit amount) {'rem:=remaining}
       (enforce (= 0.0 remaining) "Order not immediately filled"))
     (transfer-back __BASE_MOD__ account)
@@ -119,7 +143,7 @@
 
   (defun buy-gtc:string (account:string account-guard:guard amount:decimal limit:decimal)
     @doc "Buy using a GTC policy. Using an hint is recommended"
-    (__QUOTE_MOD__.transfer-create account DEPOSIT-ACCOUNT DEPOSIT-ACCOUNT-GUARD (total-quote-with-fee limit amount))
+    (--init-buy-accounts account account-guard (total-quote-with-fee limit amount))
     (bind (fold-try-immediate-buy account limit amount) {'rem:=remaining, 'cnt:=immediate-count}
       (if (and (> remaining 0.0) (< immediate-count MAX-TAKE-ORDERS))
           (let ((id (next-id)))
@@ -133,7 +157,7 @@
 
   (defun sell-gtc:string (account:string account-guard:guard amount:decimal limit:decimal)
       @doc "Sell using a GTC policy. Using an hint is recommended"
-    (__BASE_MOD__.transfer-create account DEPOSIT-ACCOUNT DEPOSIT-ACCOUNT-GUARD (base-with-fee amount))
+    (--init-sell-accounts account account-guard (base-with-fee amount))
     (bind (fold-try-immediate-sell account limit amount)
           {'rem:=remaining, 'cnt:=immediate-count}
       (if (and (> remaining 0.0) (< immediate-count MAX-TAKE-ORDERS))
@@ -149,7 +173,7 @@
   (defun buy-post-only:string (account:string account-guard:guard amount:decimal limit:decimal)
     (let ((f-ask (first-ask)))
       (enforce (< limit (at 'price f-ask)) "Limit higher than market price"))
-    (__QUOTE_MOD__.transfer-create account DEPOSIT-ACCOUNT DEPOSIT-ACCOUNT-GUARD (total-quote limit amount))
+    (--init-buy-accounts account account-guard (total-quote limit amount))
     (let ((id (next-id)))
       (install-capability (__QUOTE_MOD__.TRANSFER DEPOSIT-ACCOUNT (order-account id) (total-quote limit amount)))
       (with-capability (DEPOSIT-ACCOUNT-CAP)
@@ -162,7 +186,7 @@
   (defun sell-post-only:string (account:string account-guard:guard amount:decimal limit:decimal)
     (let ((f-bid (first-bid)))
       (enforce (> limit (at 'price f-bid)) "Limit lower than market price"))
-    (__BASE_MOD__.transfer-create account DEPOSIT-ACCOUNT DEPOSIT-ACCOUNT-GUARD amount)
+    (--init-sell-accounts account account-guard amount)
     (let ((id (next-id)))
       (install-capability (__BASE_MOD__.TRANSFER DEPOSIT-ACCOUNT (order-account id) amount))
       (with-capability (DEPOSIT-ACCOUNT-CAP)
