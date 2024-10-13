@@ -258,3 +258,10 @@ The caller must install (eventually through a restricted signature) the cap:
 where:
 - `base-amount` =  amount * (1.0 + FEE). In case of IOC, GTC or FOK. Can be computed with the function: `(base-with-fee)`
 - `base-amount` =  amount. In case of Post-Only
+
+##### Common API notes
+In the wrapper, `account-guard` will be used for 2 purposes:
+  - If an order is created (not in IOC or FOK), guard the order for cancellation.
+  - Create destination accounts, if one of them doesn't exist.
+
+Functions will always return "DEX Order successful", or fail. In the case of an IOC only, the transactions may be successful even if no trading happened.  
