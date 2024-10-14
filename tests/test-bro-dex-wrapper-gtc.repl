@@ -64,7 +64,7 @@
 (expect "Initial coin Balance of Taker" 1000.0 (coin.get-balance "dave"))
 
 (env-data {'ks:["dave-key"]})
-(env-sigs [ {'key:"dave-key", 'caps:[(coin.TRANSFER "csave" DEPOSIT-ACCOUNT 45.045 )]}])
+(env-sigs [ {'key:"dave-key", 'caps:[(coin.TRANSFER "dave" DEPOSIT-ACCOUNT 45.045 )]}])
 (buy-gtc "dave" (read-keyset 'ks) 1.0 20.0)
 
 (expect "Final ABC Balance of Dave" 1.0 (ABC_NS.abc.get-balance "dave"))
