@@ -336,6 +336,7 @@
     (let ((order (get-order id)))
       (bind order {'amount:=order-amount, 'price:=price, 'maker-acct:=maker, 'state:=state, 'is-ask:=is-ask}
         (enforce (= state STATE-ACTIVE) "Order not in active state")
+        (enforce (between 0.0 order-amount amount) "Amount out of bounds")
         (with-capability (TAKE-ORDER id)
           ; 1 Take care of the taker
           (--transfer-from-order id (primary-currency is-ask) taker (if is-ask amount (total-quote price amount)))
