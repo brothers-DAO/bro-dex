@@ -1,9 +1,9 @@
-codeFile: .pact/bro-dex-wrapper-{{pair}}.pact
+codeFile: .pact/rb-tree.pact
 publicMeta:
   chainId: "{{chain}}"
   sender: {{gas-payer}}
   gasLimit: 120000
-  gasPrice: 0.000000011
+  gasPrice: 0.000000012
   ttl: 86400
 networkId: {{network}}
 

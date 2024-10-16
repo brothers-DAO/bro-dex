@@ -1,10 +1,10 @@
-PAIR=BRO-KDA
+PAIR=BRO-KDA-R
 NS=n_966932c40a83cebb2fb0aece0d80c5155e148778
 
 #Comment to disable Init
 INIT= -D__INIT__
 
-MACROS=-D__NAMESPACE__=${NS} -DPAIR=${PAIR} -D__QUOTE_MOD__=coin -D__BASE_MOD__=n_5d119cc07ffd5efaef5c7feef9e878f34e3d4652.bro -D__MIN_AMOUNT__=0.001 -D__FEE_ACOUNT__=r:${NS}.fees 
+MACROS=-D__NAMESPACE__=${NS} -DPAIR=${PAIR} -D__QUOTE_MOD__=coin -D__BASE_MOD__=n_5d119cc07ffd5efaef5c7feef9e878f34e3d4652.bro -D__MIN_AMOUNT__=0.001 -D__FEE_ACOUNT__=r:${NS}.fees -DRB_TREE_NS=${NS}
 DATA_FILE=testnet.yaml
 
 .SECONDARY:
@@ -12,10 +12,16 @@ DATA_FILE=testnet.yaml
 .pact:
 	mkdir -p .pact
 
+.pact/rb-tree.pact: templates/rb-tree.pact.m4 ../pact_RB_tree/pact/rb-tree.pact | .pact
+	m4 ${MACROS} ${INIT} $< > $@
+
 .pact/%-${PAIR}.pact: templates/%.pact.m4 ../pact/%.pact | .pact
 	m4 ${MACROS} ${INIT} $< > $@
 
 tx-%-${PAIR}.yaml: templates/%.tkpl .pact/%-${PAIR}.pact
+	kda gen -t $< -o $@ -d ${DATA_FILE}
+
+tx-%.yaml: templates/%.tkpl .pact/%.pact
 	kda gen -t $< -o $@ -d ${DATA_FILE}
 
 tx-init.yaml: templates/init.tkpl
@@ -26,9 +32,9 @@ tx-init.yaml: templates/init.tkpl
 	kda sign $< -k keys/testnet/admin.key
 	kda sign $< -k keys/testnet/ns.key
 
-json: tx-bro-dex-core-${PAIR}.json tx-bro-dex-view-${PAIR}.json tx-bro-dex-wrapper-${PAIR}.json tx-init.json
+json: tx-bro-dex-core-${PAIR}.json tx-bro-dex-view-${PAIR}.json tx-bro-dex-wrapper-${PAIR}.json tx-rb-tree.json tx-init.json
 
-yaml: tx-bro-dex-core-${PAIR}.yaml tx-bro-dex-view-${PAIR}.yaml tx-bro-dex-wrapper-${PAIR}.yaml tx-init.yaml
+yaml: tx-bro-dex-core-${PAIR}.yaml tx-bro-dex-view-${PAIR}.yaml tx-bro-dex-wrapper-${PAIR}.yaml tx-rb-tree.yaml tx-init.yaml
 
 
 all: yaml

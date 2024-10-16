@@ -13,7 +13,9 @@
     @doc "Main cap acquired when creating an order"
     @event
     (compose-capability (INSERT-ORDER id))
-    (compose-capability (POINTER-SWAP)))
+    (compose-capability (POINTER-SWAP))
+    (compose-capability (UPDATE-TREE))
+  )
 
   (defcap TAKE-ORDER (id:integer)
     @doc "Main cap acquired when taking an order"
@@ -21,6 +23,7 @@
     (compose-capability (REMOVE-ORDER id))
     (compose-capability (ORDER-ACCOUNT id))
     (compose-capability (POINTER-SWAP))
+    (compose-capability (UPDATE-TREE))
   )
 
   (defcap CANCEL-ORDER (id:integer)
@@ -29,6 +32,7 @@
     (compose-capability (REMOVE-ORDER id))
     (compose-capability (ORDER-ACCOUNT id))
     (compose-capability (POINTER-SWAP))
+    (compose-capability (UPDATE-TREE))
   )
 
   ; These 3 caps are internals caps acquired via composability
@@ -44,6 +48,8 @@
   (defcap ORDER-ACCOUNT (id:integer)
     true)
 
+  (defcap UPDATE-TREE ()
+    true)
 
   ; --------------------------- ORDERS MANAGEMENT ------------------------------
   ; ----------------------------------------------------------------------------
@@ -57,8 +63,6 @@
     is-ask:bool ; Whether the order is an Ask (true) or a Bid (False)
     state:integer ; Order state
     partial:bool ; Is this a partial (split order) => This field is for info only (UX)
-    o-p:integer ; Previous in the live list of orders
-    o-n:integer ; Next in the live list of orders
     m-p:integer ; Previous in the live list for a specific maker
     m-n:integer ; Next in  the live list for a specific maker
     h-m-n:integer ; Next in the history list of the maker
@@ -68,6 +72,7 @@
     amount:decimal ; Amount price in BASE
     maker-acct:string ; Maker accounts
     guard:guard ; Make guard : used for canceling the order
+    take-tx:string ; Take transaction hash
   )
 
   (defun fail:bool ()
@@ -76,16 +81,20 @@
   (defconst DEFAULT-GUARD (create-user-guard (fail)))
 
   (defconst NIL-ORDER {'id:NIL, 'is-ask:false, 'state:STATE-DUMMY, 'partial:false,
-                       'o-p:NIL, 'o-n:NIL, 'm-p:NIL, 'm-n:NIL,
+                       'm-p:NIL, 'm-n:NIL,
                        'h-m-n:NIL, 'h-t-n:NIL, 'h-n:NIL,
                        'price:0.0, 'amount:0.0, 'maker-acct: "",
-                       'guard: DEFAULT-GUARD})
+                       'guard: DEFAULT-GUARD, 'take-tx:""})
 
   (deftable order-table:{order-sch})
 
   (defconst NIL 0)
-  (defconst ORDERBOOK-HEAD 1)
-  (defconst ORDERBOOK-TAIL (- MAX-ID ORDERBOOK-HEAD))
+  (defconst ASK_TREE (+ "PAIR" "_ask"))
+  (defconst BID_TREE (+ "PAIR" "_bid"))
+
+  (defun get-tree:string (is-ask:bool)
+    (if is-ask ASK_TREE BID_TREE))
+
 
   (defun get-order:object{order-sch} (id:integer)
     (read order-table (key id)))
@@ -113,9 +122,6 @@
   ; Pointer to account history linked list
   (defun account-history-head:string (account:string)
     (hash ["H", account]))
-
-  ; Pointer to the first ask
-  (defconst ASKS "A")
 
   ; Pointer to the first global history order
   (defconst GLOBAL-HISTORY "G")
@@ -150,6 +156,9 @@
 
   (defun key:string (x:integer)
     (int-to-str 64 x))
+
+  (defun from-key:integer (x:string)
+    (str-to-int 64 x))
 
   (defconst MAX-ID (^ 2 72))
 
@@ -212,24 +221,21 @@
     (install-capability (currency::TRANSFER (order-account id) dst amount))
     (currency::transfer (order-account id) dst amount))
 
+  (defun --check-accounts:bool (account:string)
+    @doc "Check that an account exist in both currencies"
+    (__BASE_MOD__.get-balance account)
+    (__QUOTE_MOD__.get-balance account)
+    true)
+
   ; -------------------------- UTIL FUNCTIONS ----------------------------------
   ; ----------------------------------------------------------------------------
-  ; Some util functions to navigate through linked list.
-  (defun next-order:object{order-sch} (in:object{order-sch})
-    (get-order (at 'o-n in)))
+  (defun first-ask:object{order-sch} ()
+    @doc "Returns the lowest price Ask"
+    (get-order (from-key (rb-tree.first-value ASK_TREE))))
 
-  (defun prev-order:object{order-sch} (in:object{order-sch})
-    (get-order (at 'o-p in)))
-
-  (defun next-order-by-maker:object{order-sch} (in:object{order-sch})
-    (get-order (at 'm-n in)))
-
-  (defun next-order-in-account-history:object{order-sch} (in:object{order-sch} account:string)
-    (bind in {'h-m-n:=by-maker, 'h-t-n:=by-taker, 'maker-acct:=maker}
-      (get-order (if (= maker account) by-maker by-taker))))
-
-  (defun next-order-in-history:object{order-sch} (in:object{order-sch})
-    (get-order (at 'h-n in)))
+  (defun first-bid:object{order-sch}()
+    @doc "Returns the highest price Bid"
+    (get-order (from-key (rb-tree.first-value BID_TREE))))
 
   ; -------------------------- INIT FUNCTION -----------------------------------
   ; ----------------------------------------------------------------------------
@@ -237,53 +243,36 @@
     @doc "Init the module"
     (insert seed-table "" {'last-id: (str-to-int 64 (tx-hash))})
     (insert order-table (key 0) NIL-ORDER)
-    (insert pointer-table ASKS {'pt:ORDERBOOK-TAIL})
-    (insert order-table (key ORDERBOOK-HEAD) (+ {'id:ORDERBOOK-HEAD, 'is-ask:false, 'o-n:ORDERBOOK-TAIL, 'price:MIN-PRICE} NIL-ORDER))
-    (insert order-table (key ORDERBOOK-TAIL) (+ {'id:ORDERBOOK-TAIL, 'is-ask:true , 'o-p:ORDERBOOK-HEAD, 'price:MAX-PRICE} NIL-ORDER))
+    (insert order-table (hash ASK_TREE) NIL-ORDER)
+    (insert order-table (hash BID_TREE) NIL-ORDER)
+    (rb-tree.init-tree ASK_TREE (create-capability-guard (UPDATE-TREE)) MAX-PRICE)
+    (rb-tree.init-tree BID_TREE (create-capability-guard (UPDATE-TREE)) 0.0)
     ; Check that the fee account exists
-    (__BASE_MOD__.get-balance FEE-ACCOUNT)
-    (__BASE_MOD__.get-balance FEE-ACCOUNT)
-    true
+    (--check-accounts FEE-ACCOUNT)
   )
 
   ; -------------------------------- LAYER 1 -----------------------------------
   ; ----------------------------------------------------------------------------
   ; Low level routines: insert and removes orders
-  (defun insert-order:string (order:object{order-sch} prev:integer)
+  (defun insert-order:string (order:object{order-sch})
     @doc "Low level function for inserting a new order. Updates Orderbook and Maker's linked lists"
-    (bind order {'id:=id, 'price:=order-price, 'maker-acct:=maker, 'is-ask:=cur-is-ask}
+    (bind order {'id:=id, 'price:=price, 'maker-acct:=maker, 'is-ask:=cur-is-ask}
       (require-capability (INSERT-ORDER id))
-      (with-read order-table (key prev) {'o-n:=next, 'price:=prev-value, 'is-ask:=prev-is-ask}
-        (with-read order-table (key next) {'price:=next-value, 'is-ask:=next-is-ask}
-          (let ((last-first-maker (swap-ptr (maker-head maker) id)))
-            ; Check that ordering is right in the linked list
-            (enforce (if cur-is-ask (and next-is-ask       (and? (<= prev-value) (>  next-value) order-price))
-                                    (and (not prev-is-ask) (and? (<  prev-value) (>= next-value) order-price)))
-                     "Order insertion position error")
-            ; Insert the order itself
-            (insert order-table (key id) (+ {'state:STATE-ACTIVE, 'o-p:prev, 'o-n:next, 'm-p:NIL, 'm-n:last-first-maker} order))
+        (let ((last-first-maker (swap-ptr (maker-head maker) id)))
+          (rb-tree.insert-value (if cur-is-ask ASK_TREE BID_TREE) (key id)  (if cur-is-ask price (- price)))
+          (insert order-table (key id) (+ {'state:STATE-ACTIVE, 'm-p:NIL, 'm-n:last-first-maker} order))
+          ; Maker's linked list => Push on head
+          (update order-table (key last-first-maker) {'m-p:id})
 
-            ; Orderbook Linked list updates
-            (update order-table (key prev) {'o-n:id})
-            (update order-table (key next) {'o-p:id})
-
-            ; Maker's linked list => Push on head
-            (update order-table (key last-first-maker) {'m-p:id})
-
-            ; Update the first ask pointer if needed (ie: we just added the lowest ask order)
-            (if (and cur-is-ask (not prev-is-ask))
-                (update pointer-table ASKS {'pt:id})
-                "")
-          ))))
+        ))
   )
+
 
   (defun remove-order:string (order:object{order-sch})
     @doc "Low level function for removing an order. Updates Orderbook and Maker's linked lists"
-    (bind order {'id:=id, 'o-p:=order-prev, 'o-n:=order-next, 'm-p:=maker-prev, 'm-n:=maker-next, 'is-ask:=is-ask, 'maker-acct:=maker}
+    (bind order {'id:=id, 'm-p:=maker-prev, 'm-n:=maker-next, 'is-ask:=is-ask, 'maker-acct:=maker}
       (require-capability (REMOVE-ORDER id))
-      ; Orderbook Linked list updates
-      (update order-table (key order-prev) {'o-n:order-next})
-      (update order-table (key order-next) {'o-p:order-prev})
+      (rb-tree.delete-value (key id))
 
       ; Update the previous in the Maker's linked list
       (if (!= maker-prev NIL)
@@ -296,13 +285,7 @@
           "")
 
       ; Update the order itself by blanking its pointers
-      (update order-table (key id) (+ {'o-p:NIL, 'o-n:NIL, 'm-p:NIL, 'm-n:NIL} order))
-
-      ; Update the first ask pointer (ie: we just remove the lowest ask pointer)
-      (with-read order-table (key order-prev) {'is-ask:=prev-is-ask}
-        (if (and is-ask (not prev-is-ask))
-            (update pointer-table ASKS {'pt:order-next})
-            "")))
+      (update order-table (key id) (+ {'m-p:NIL, 'm-n:NIL} order)))
   )
 
   ; -------------------------------- LAYER 2 -----------------------------------
@@ -316,7 +299,7 @@
       (remove-order (+ {'h-m-n: (swap-ptr (account-history-head maker) id), ; Push to maker history
                         'h-t-n: (swap-ptr (account-history-head taker) id), ; Push to taker history
                         'h-n: (swap-ptr GLOBAL-HISTORY id), ;Push to main history
-                        'state:STATE-TAKEN} order))
+                        'state:STATE-TAKEN, 'take-tx: (tx-hash)} order))
       amount)
   )
 
@@ -328,6 +311,7 @@
 
       (let ((dummy-id (gen-id)))
         (insert order-table (key dummy-id) (+ {'id:dummy-id, 'amount:amount, 'partial:true, 'state: STATE-TAKEN,
+                                               'take-tx: (tx-hash),
                                                'h-m-n: (swap-ptr (account-history-head maker) dummy-id),
                                                'h-t-n: (swap-ptr (account-history-head taker) dummy-id),
                                                'h-n: (swap-ptr GLOBAL-HISTORY dummy-id)} order)))
@@ -339,6 +323,7 @@
       (require-capability (CANCEL-ORDER id))
       (enforce-guard order-guard)
       (remove-order (+ {'state:STATE-CANCELED,
+                        'take-tx: (tx-hash),
                         'h-m-n: (swap-ptr (account-history-head maker) id)} order)))
     true
   )
@@ -351,6 +336,7 @@
     (let ((order (get-order id)))
       (bind order {'amount:=order-amount, 'price:=price, 'maker-acct:=maker, 'state:=state, 'is-ask:=is-ask}
         (enforce (= state STATE-ACTIVE) "Order not in active state")
+        (enforce (between 0.0 order-amount amount) "Amount out of bounds")
         (with-capability (TAKE-ORDER id)
           ; 1 Take care of the taker
           (--transfer-from-order id (primary-currency is-ask) taker (if is-ask amount (total-quote price amount)))
@@ -379,8 +365,9 @@
           (--cancel-order order))))
   )
 
-  (defun create-order:integer (is-ask:bool maker:string maker-guard:guard amount:decimal price:decimal prev:integer)
+  (defun create-order:integer (is-ask:bool maker:string maker-guard:guard amount:decimal price:decimal)
     @doc "Main function for creating a new order"
+    (--check-accounts maker)
     (let ((id (gen-id)))
       (enforce-order-account-min-balance id (primary-currency is-ask)
                                             (if is-ask amount (total-quote price amount)))
@@ -388,7 +375,7 @@
       (enforce (between MIN-AMOUNT MAX-AMOUNT amount) "Amount out of bounds")
       (with-capability (MAKE-ORDER id)
         (insert-order (+ {'id:id, 'state:STATE-ACTIVE, 'is-ask:is-ask,
-                          'price:price, 'amount:amount, 'maker-acct:maker, 'guard:maker-guard} NIL-ORDER) prev))
+                          'price:price, 'amount:amount, 'maker-acct:maker, 'guard:maker-guard} NIL-ORDER)))
       id)
   )
 

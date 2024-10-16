@@ -1,3 +1,6 @@
 [submodule "tests/kadena_repl_sandbox"]
 	path = tests/kadena_repl_sandbox
 	url = git@github.com:CryptoPascal31/kadena_repl_sandbox.git
+[submodule "pact_RB_tree"]
+	path = pact_RB_tree
+	url = https://github.com/CryptoPascal31/pact_RB_tree

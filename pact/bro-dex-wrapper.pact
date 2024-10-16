@@ -3,7 +3,6 @@
   ; => https://github.com/brothers-DAO/bro-dex/blob/main/LICENSE
   (use free.util-math)
   (use bro-dex-core-PAIR)
-  (use bro-dex-view-PAIR)
 
   (defcap GOVERNANCE ()
     (enforce-keyset "__NAMESPACE__.bro-dex-admin"))
@@ -22,41 +21,34 @@
   ; Maximum orders taken during a single transaction
   (defconst MAX-TAKE-ORDERS 10)
 
-  ; Expected Hint offset
-  (defconst HINT-EXPECTED-OFFSET 5)
-
-  ; Just 2 list to improve a little bit efficiency
+  ; Just a list to improve a little bit efficiency
   (defconst TAKE-ORDER-ATTEMPTS (enumerate 1 MAX-TAKE-ORDERS))
-  (defconst SEARCH-ORDER-ATTEMPTS (enumerate 1 (* 2 HINT-EXPECTED-OFFSET)))
 
-  ; ------------------INTERNAL SEARCH FUNCTIONS --------------------------------
+  (defconst RETURN-SUCCESS "DEX Order successful")
+
+  ; ------------------------ UTIl FUNCTION - -----------------------------------
   ; ----------------------------------------------------------------------------
-  ; Search functions to be used by GTC or Post-Only functions, to find the right
-  ; place where an order must be inserted
-  (defun --is-after:bool (is-ask:bool order:object{order-sch} limit:decimal)
-    @doc "Return true is the provided order is after the limit"
-    (bind order {'price:=order-price}
-      (or (> order-price limit)
-          (and (= limit order-price) (not is-ask))))
+  (defun --init-buy-accounts:string (account:string guard:guard amount:decimal)
+    @doc "Do the common buying stuffs: \
+       \   1 - Transfer QUOTE to the DEPOSIT account \
+       \   2 - Create BASE user account"
+    (__QUOTE_MOD__.transfer-create account DEPOSIT-ACCOUNT DEPOSIT-ACCOUNT-GUARD amount)
+    (let ((bal (try -1.0 (__BASE_MOD__.get-balance account))))
+      (if (= bal -1.0)
+          (__BASE_MOD__.create-account account guard)
+          ""))
   )
 
-  (defun --search-order:object{order-sch} (is-ask:bool limit:decimal input:object{order-sch} _:integer)
-    @doc "Return the previous order of the linked list if the current is after the limit"
-    (if (--is-after is-ask input limit) (prev-order input) input)
+  (defun --init-sell-accounts:string (account:string guard:guard amount:decimal)
+    @doc "Do the common selling stuffs: \
+       \   1 - Transfer BASE to the DEPOSIT account \
+       \   2 - Create QUOTE user account"
+    (__BASE_MOD__.transfer-create account DEPOSIT-ACCOUNT DEPOSIT-ACCOUNT-GUARD amount)
+    (let ((bal (try -1.0 (__QUOTE_MOD__.get-balance account))))
+      (if (= bal -1.0)
+          (__QUOTE_MOD__.create-account account guard)
+          ""))
   )
-
-  (defun --search-start:object{order-sch} (is-ask:bool)
-    @doc "Compute the search starting point: uses an optionnal hint"
-    (let ((hint-order (get-order (try NIL (read-integer "hint")))))
-      (if (= STATE-ACTIVE (at 'state hint-order))
-          hint-order
-          (if is-ask (get-order ORDERBOOK-TAIL) (first-ask))))
-  )
-
-  (defun search-prev-order:object{order-sch} (is-ask:bool limit:decimal)
-    @doc "Search and find the order just before the given limit"
-    (fold (--search-order is-ask limit) (--search-start is-ask) SEARCH-ORDER-ATTEMPTS))
-
 
   ; ----------------- IMMEDIATE (TAKE) SALES ROUTINES --------------------------
   ; ----------------------------------------------------------------------------
@@ -113,36 +105,36 @@
             (install-capability (mod::TRANSFER DEPOSIT-ACCOUNT account remaining-quote))
             (with-capability (DEPOSIT-ACCOUNT-CAP)
               (mod::transfer DEPOSIT-ACCOUNT account remaining-quote)))
-          ""))
+          RETURN-SUCCESS))
   )
 
   ; ---------------------- EXTERNALLY CALABLE FUNCTIONS ------------------------
   ; ----------------------------------------------------------------------------
-  (defun buy-ioc:string (account:string amount:decimal limit:decimal)
+  (defun buy-ioc:string (account:string account-guard:guard amount:decimal limit:decimal)
     @doc "Buy using a Immediate or Cancel policy"
-    (__QUOTE_MOD__.transfer-create account DEPOSIT-ACCOUNT DEPOSIT-ACCOUNT-GUARD (total-quote-with-fee limit amount))
+    (--init-buy-accounts account account-guard (total-quote-with-fee limit amount))
     (fold-try-immediate-buy account limit amount)
     (transfer-back __QUOTE_MOD__ account)
   )
 
-  (defun sell-ioc:string (account:string amount:decimal limit:decimal)
+  (defun sell-ioc:string (account:string account-guard:guard amount:decimal limit:decimal)
     @doc "Sell using a Immediate or Cancel policy"
-    (__BASE_MOD__.transfer-create account DEPOSIT-ACCOUNT DEPOSIT-ACCOUNT-GUARD (base-with-fee amount))
+    (--init-sell-accounts account account-guard (base-with-fee amount))
     (fold-try-immediate-sell account limit amount)
     (transfer-back __BASE_MOD__ account)
   )
 
-  (defun buy-fok:string (account:string amount:decimal limit:decimal)
+  (defun buy-fok:string (account:string account-guard:guard amount:decimal limit:decimal)
     @doc "Buy using a Fill or Kill policy"
-    (__QUOTE_MOD__.transfer-create account DEPOSIT-ACCOUNT DEPOSIT-ACCOUNT-GUARD (total-quote-with-fee limit amount))
+    (--init-buy-accounts account account-guard (total-quote-with-fee limit amount))
     (bind (fold-try-immediate-buy account limit amount) {'rem:=remaining}
       (enforce (= 0.0 remaining) "Order not immediately filled"))
     (transfer-back __QUOTE_MOD__ account)
   )
 
-  (defun sell-fok:string (account:string amount:decimal limit:decimal)
+  (defun sell-fok:string (account:string account-guard:guard amount:decimal limit:decimal)
     @doc "Sell using a Fill or Kill policy"
-    (__BASE_MOD__.transfer-create account DEPOSIT-ACCOUNT DEPOSIT-ACCOUNT-GUARD (base-with-fee amount))
+    (--init-sell-accounts account account-guard (base-with-fee amount))
     (bind (fold-try-immediate-sell account limit amount) {'rem:=remaining}
       (enforce (= 0.0 remaining) "Order not immediately filled"))
     (transfer-back __BASE_MOD__ account)
@@ -151,23 +143,21 @@
 
   (defun buy-gtc:string (account:string account-guard:guard amount:decimal limit:decimal)
     @doc "Buy using a GTC policy. Using an hint is recommended"
-    (__QUOTE_MOD__.transfer-create account DEPOSIT-ACCOUNT DEPOSIT-ACCOUNT-GUARD (total-quote-with-fee limit amount))
+    (--init-buy-accounts account account-guard (total-quote-with-fee limit amount))
     (bind (fold-try-immediate-buy account limit amount) {'rem:=remaining, 'cnt:=immediate-count}
       (if (and (> remaining 0.0) (< immediate-count MAX-TAKE-ORDERS))
           (let ((id (next-id)))
             (install-capability (__QUOTE_MOD__.TRANSFER DEPOSIT-ACCOUNT (order-account id) (total-quote limit remaining)))
             (with-capability (DEPOSIT-ACCOUNT-CAP)
               (__QUOTE_MOD__.transfer-create DEPOSIT-ACCOUNT (order-account id)  (order-account-guard id) (total-quote limit remaining)))
-            (create-order false account account-guard remaining limit (at 'id (if (= amount remaining)
-                                                                                  (search-prev-order false limit)
-                                                                                  (first-bid)))))
+            (create-order false account account-guard remaining limit))
           ""))
     (transfer-back __QUOTE_MOD__ account)
   )
 
   (defun sell-gtc:string (account:string account-guard:guard amount:decimal limit:decimal)
       @doc "Sell using a GTC policy. Using an hint is recommended"
-    (__BASE_MOD__.transfer-create account DEPOSIT-ACCOUNT DEPOSIT-ACCOUNT-GUARD (base-with-fee amount))
+    (--init-sell-accounts account account-guard (base-with-fee amount))
     (bind (fold-try-immediate-sell account limit amount)
           {'rem:=remaining, 'cnt:=immediate-count}
       (if (and (> remaining 0.0) (< immediate-count MAX-TAKE-ORDERS))
@@ -175,31 +165,35 @@
             (install-capability (__BASE_MOD__.TRANSFER DEPOSIT-ACCOUNT (order-account id) remaining))
             (with-capability (DEPOSIT-ACCOUNT-CAP)
               (__BASE_MOD__.transfer-create DEPOSIT-ACCOUNT (order-account id)  (order-account-guard id) remaining))
-            (create-order true account account-guard remaining limit (at 'id (if (= amount remaining)
-                                                                                 (search-prev-order true limit)
-                                                                                 (first-bid)))))
+            (create-order true account account-guard remaining limit))
           ""))
     (transfer-back __BASE_MOD__ account)
   )
 
-  (defun buy-post-only:integer (account:string account-guard:guard amount:decimal limit:decimal)
-    (__QUOTE_MOD__.transfer-create account DEPOSIT-ACCOUNT DEPOSIT-ACCOUNT-GUARD (total-quote limit amount))
+  (defun buy-post-only:string (account:string account-guard:guard amount:decimal limit:decimal)
+    (let ((f-ask (first-ask)))
+      (enforce (< limit (at 'price f-ask)) "Limit higher than market price"))
+    (--init-buy-accounts account account-guard (total-quote limit amount))
     (let ((id (next-id)))
       (install-capability (__QUOTE_MOD__.TRANSFER DEPOSIT-ACCOUNT (order-account id) (total-quote limit amount)))
       (with-capability (DEPOSIT-ACCOUNT-CAP)
         (__QUOTE_MOD__.transfer-create DEPOSIT-ACCOUNT (order-account id)  (order-account-guard id) (total-quote limit amount))))
 
-    (create-order false account account-guard amount limit (at 'id (search-prev-order false limit)))
+    (create-order false account account-guard amount limit)
+    RETURN-SUCCESS
   )
 
-  (defun sell-post-only:integer (account:string account-guard:guard amount:decimal limit:decimal)
-    (__BASE_MOD__.transfer-create account DEPOSIT-ACCOUNT DEPOSIT-ACCOUNT-GUARD amount)
+  (defun sell-post-only:string (account:string account-guard:guard amount:decimal limit:decimal)
+    (let ((f-bid (first-bid)))
+      (enforce (> limit (at 'price f-bid)) "Limit lower than market price"))
+    (--init-sell-accounts account account-guard amount)
     (let ((id (next-id)))
       (install-capability (__BASE_MOD__.TRANSFER DEPOSIT-ACCOUNT (order-account id) amount))
       (with-capability (DEPOSIT-ACCOUNT-CAP)
         (__BASE_MOD__.transfer-create DEPOSIT-ACCOUNT (order-account id)  (order-account-guard id) amount)))
 
-    (create-order true account account-guard amount limit (at 'id (search-prev-order true limit)))
+    (create-order true account account-guard amount limit)
+    RETURN-SUCCESS
   )
 
 )

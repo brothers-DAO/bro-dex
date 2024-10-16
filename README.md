@@ -60,8 +60,6 @@ Each order is encoded in an object stored in the `order` table:
     is-ask:bool ; Whether the order is an Ask (true) or a Bid (False)
     state:integer ; Order state
     partial:bool ; Is this a partial (split order) => This field is for info only (UX)
-    o-p:integer ; Previous in the live list of orders
-    o-n:integer ; Next in the live list of orders
     m-p:integer ; Previous in the live list for a specific maker
     m-n:integer ; Next in  the live list for a specific maker
     h-m-n:integer ; Next in the history list of the maker
@@ -85,7 +83,7 @@ Each order is encoded in an object stored in the `order` table:
 *amount:* is always expressed in BASE currency
 *price:* is always expressed in QUOTE currency
 
-*o-p*, *o-n*, *m-p*, *m-n*, *h-m-n*, *h-t-n*, *h-n* are links to other orders and are part of the linked-list system explained below.
+*m-p*, *m-n*, *h-m-n*, *h-t-n*, *h-n* are links to other orders and are part of the linked-list system explained below.
 
 #### Orders ID's
 
@@ -115,15 +113,33 @@ Only functions of the Layer 3 are externally callable.
 
 ![Bro DEX Layers](/docs/bro-dex-core-layers.svg)
 
-#### Linked lists and pointers table
+#### Linked lists / Self-Balanced Trees and Pointers table
 
-![Bro DEX Linked Lists](/docs/bro-dex-linked-list.svg)
+The module manages several data structures for ordering orders:
+
+Orderbook Bids: Red-Black Tree
+Orderbook Asks: Red-Black Tree
+Maker active Orders: Double linked list
+User History: Single linked list
+Global history: Single linked list
+
+
+![Bro DEX Linked Lists](/docs/bro-dex-data-structures.svg)
 
 #### External API
 
 ##### Read-Only and util functions
 
 See comments in the source code in sections: `FINANCIAL RELATED FUNCTIONS` and `UTIL FUNCTIONS`.
+
+
+##### `(first-ask)`
+→ *[object{order-sch}]*
+Return the first ask in Orderbook.
+
+##### `(first-bid)`
+→ *[object{order-sch}]*
+Return the first bid in Orderbook.
 
 #### Transaction functions
 
@@ -138,6 +154,8 @@ This function creates a new order for a given `amount` (in BASE), at a given `pr
 
 **Important note**: The `amount` in case of an Ask, or the product `amount` x `price` (can be computed with `(total-quote)`) in case of a Bid must have been previously transferred to the Order's specific account (can be computed by `(order-account (next-id))`).
 
+**Account prerequisites**: The `maker` account must already exist in both currencies (base and quote), otherwise the function will fail.
+
 Returns the OrderID.
 
 ##### `(take-order)`
@@ -148,6 +166,8 @@ Take an order `id`.
 `amount` must be equal or less than the order's amount. When it's "less", it will result in a "partial take".
 
 **Important note**: The `amount` + *Fees* (can be computed with `(base-with-fee)`) in case of taking a Bid, or the `amount` x `price` + *Fees* (can be computed with `(total-quote-with-fee)`) in case of taking an Ask must have been previously transferred to the the Order's specific account (can be computed by `(order-account id)`).
+
+**Account prerequisite**: The `taker` account is expected to exist in the target currency. The core module won't create it.
 
 Return the taken amount.
 
@@ -161,16 +181,17 @@ The signature should be scoped by the `(CANCEL-ORDER id)`.
 
 This modules contains convenience functions to iterate through the orders lists.
 
-Each list can be retrieved iteratively by specifying the first orderID and the number of elements to retrieve.
+Each list can be retrieved iteratively by specifying the previous (not included) orderID and the number of elements to retrieve.
 Using `NIL` as first orderID retrieves the beginning of the list.
 
 All functions return complete Order objects.
 
 #### External API
 ##### `(get-orderbook)`
-`from` *integer* `max-count` *integer* → *[object{order-sch}]*
+`is-ask` *boolean* `from` *integer* `max-count` *integer* → *[object{order-sch}]*
 
-Return the currently active Orderbook, starting from the `from` order (or `NIL`)
+Return the currently active Orderbook, starting from the `from` order (or `NIL`).
+If is-ask is True, return the Ask part of the orderbook, else the Bid part.
 
 ##### `(get-orders-by-maker)`
 `account` *string* `from` *integer* `max-count` *integer* → *[object{order-sch}]*
@@ -189,18 +210,58 @@ Canceled orders are not present in Global history.
 Return the history for a given account, starting from the `from` order (or `NIL`).
 Canceled orders can be seen in account's history. Some orders may have been broken into several orders if they were partially filled.
 
-##### `(first-ask)`
-→ *[object{order-sch}]*
-Return the first ask in Orderbook.
-
-##### `(first-bid)`
-→ *[object{order-sch}]*
-Return the first bid in Orderbook.
-
 
 
 ## Wrapper module
 
+This module is supposed to be used by Frontends and other clients. It hides the complexity of the core module and allows doing multiple operations at once, eg:
+  - Taking several orders that meet a limit criterion.
+  - Taking orders + Submitting a Maker order.
+
+#### Deposit account
+
+The module works by using a `DEPOSIT-ACCOUNT` with an associated `DEPOSIT-ACCOUNT-GUARD`. The caller is supposed to have pre-installed the `TRANSFER ` capability with the right amount (with fees included) before calling functions.
+
+If some part of the transaction amount (or fees) remains unused, it will be automatically refunded back to the source account.
+
+Special functions from the core modules can be used to compute amounts.
+
+#### Order types
+
+The module manages 4 order types:
+  - **GTC**: Good Till Canceled => This flavor attempts to take 10 existing active offers (Taker) at most and creates a Maker order with the remaining amount if possible.
+  - **IOC**: Immediate Or Cancel => This flavor attempts to take 10 existing active offers (Taker) at most and creates a Maker order with the remaining amount if possible.
+  - **FOK**: Fill Or Kill => This flavor attempts to take 10 existing active offers (Taker) at most, but reverts the transaction if the order is not fully filled.
+  - **Post-Only**: Create a Maker order only if possible.
+
 #### External API
 
-#### Hints management
+##### buy-ioc / buy-gtc / buy-fok / buy-post-only
+`account` *string* `account-guard` *guard* `amount` *decimal* `limit` *decimal* → `string`
+Buy (IOC / GTC  / FOK or Post-Only) a given `amount` of BASE at a maximum of `limit` price.
+
+The caller must install (eventually through a restricted signature) the cap:
+`(QUOTE.TRANSFER account DEPOSIT-ACCOUNT quote-amount)`
+
+where:
+- `quote-amount` =  amount * limit * (1.0 + FEE). In case of IOC, GTC or FOK. Can be computed with the function: `(total-quote-with-fee)`
+
+- `quote-amount` =  amount * limit. In case of Post-Only. Can be computed with the function: `(total-quote)`
+
+##### sell-ioc / sell-gtc / sell-fok / sell-post-only
+`account` *string* `account-guard` *guard* `amount` *decimal* `limit` *decimal* → `string`
+Sell (IOC / GTC or FOK) a given `amount` of BASE at a minimum of `limit` price.
+
+The caller must install (eventually through a restricted signature) the cap:
+`(BASE.TRANSFER account DEPOSIT-ACCOUNT base-amount)`
+
+where:
+- `base-amount` =  amount * (1.0 + FEE). In case of IOC, GTC or FOK. Can be computed with the function: `(base-with-fee)`
+- `base-amount` =  amount. In case of Post-Only
+
+##### Common API notes
+In the wrapper, `account-guard` will be used for 2 purposes:
+  - If an order is created (not in IOC or FOK), guard the order for cancellation.
+  - Create destination accounts, if one of them doesn't exist.
+
+Functions will always return "DEX Order successful", or fail. In the case of an IOC only, the transactions may be successful even if no trading happened.  
