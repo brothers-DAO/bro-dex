@@ -1,0 +1,37 @@
+{
+  "name": "bro-dex-basic",
+  "version": "0.0.1",
+  "description": "Bro DEX",
+  "main": "index.js",
+  "author": "CryptoPascal",
+  "license": "BSD-3-Clause",
+  "private": false,
+  "scripts": {
+    "dev": "vite",
+    "build": "yarn run gv && vite build",
+    "lint": "eslint . --ext js,jsx --report-unused-disable-directives --max-warnings 0",
+    "gv": "genversion -e src/version.js",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@kadena/client": "^1.14.0",
+    "decimals": "^1.0.0",
+    "genversion": "^3.2.0",
+    "primeflex": "^3.3.1",
+    "primeicons": "^7.0.0",
+    "primereact": "^10.8.3",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-router": "^6.27.0",
+    "react-router-dom": "^6.27.0",
+    "swr": "^2.2.5"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^4.3.2",
+    "eslint": "8.57.1",
+    "eslint-plugin-react": "^7.37.1",
+    "eslint-plugin-react-hooks": "^5.0.0",
+    "eslint-plugin-react-refresh": "^0.4.12",
+    "vite": "^5.4.8"
+  }
+}

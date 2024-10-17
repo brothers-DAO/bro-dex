@@ -1,0 +1,11 @@
+VITE_NETWORK=testnet04
+VITE_CHAIN=18
+
+VITE_EXPLORER=https://explorer.chainweb.com/testnet
+VITE_BALANCE_EXPLORER=https://balance.chainweb.com
+
+VITE_NS=n_966932c40a83cebb2fb0aece0d80c5155e148778
+
+VITE_ENDPOINT=api.testnet.chainweb.com
+VITE_TOKENS_DB=https://raw.githubusercontent.com/CryptoPascal31/kadena_tokens/refs/heads/testnet
+VITE_TOKENS_DB_NETWORK=testnet

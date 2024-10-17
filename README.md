@@ -1,5 +1,11 @@
 # BRO DEX = First 100% decentralized Order's based DEX on Kadena
 
+
+## License
+ - Pact modules (pact directory) are released under "Business Source License 1.1"
+ - Test and Deployement scripts (tests and deployment directories) released under "Modified BSD License"
+ - Frontend is released under "Modified BSD License"
+
 ## Pairs and Modules
 Each pair requires the deployment of 3 linked modules:
   - core

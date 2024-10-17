@@ -1,0 +1,31 @@
+#root {
+  margin: 0 auto;
+  padding: 0rem;
+}
+
+html {
+ font-size:9px;
+ height: 100%;
+}
+
+body {
+  height: 100%;
+}
+
+@media (min-width: 375px) {
+  html {
+    font-size:10px;
+    }
+}
+
+@media (min-width: 800px) {
+  html {
+    font-size:16px;
+    }
+}
+
+@media (min-width: 1000px) {
+  #root {
+    max-width: 98%;
+  }
+}
