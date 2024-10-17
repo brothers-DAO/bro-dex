@@ -244,6 +244,7 @@ The module manages 4 order types:
 
 ##### buy-ioc / buy-gtc / buy-fok / buy-post-only
 `account` *string* `account-guard` *guard* `amount` *decimal* `limit` *decimal* → `string`
+
 Buy (IOC / GTC  / FOK or Post-Only) a given `amount` of BASE at a maximum of `limit` price.
 
 The caller must install (eventually through a restricted signature) the cap:
@@ -256,6 +257,7 @@ where:
 
 ##### sell-ioc / sell-gtc / sell-fok / sell-post-only
 `account` *string* `account-guard` *guard* `amount` *decimal* `limit` *decimal* → `string`
+
 Sell (IOC / GTC or FOK) a given `amount` of BASE at a minimum of `limit` price.
 
 The caller must install (eventually through a restricted signature) the cap:
