@@ -14,7 +14,7 @@ export function useTokenBalance(account, token)
   if(data)
     return {balance:to_decimal(data)}
   else
-    return {balance:ZERO, mutate, error}
+    return {balance:null, mutate, error}
 }
 
 export function useTokensBalance(account, tokenA, tokenB)
@@ -27,7 +27,7 @@ export function useTokensBalance(account, tokenA, tokenB)
     return {balance_a, balance_b, mutate}
   }
   else
-    return {balance_a:ZERO, balance_b:ZERO, mutate, error}
+    return {balance_a:null, balance_b:null, mutate, error}
 }
 
 export function useGuard(account)

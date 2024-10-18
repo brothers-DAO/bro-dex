@@ -21,11 +21,11 @@ function Balances({pair})
           <div className="flex flew-row gap-3 text-center justify-content-center align-items-center">
           {base_info && <img src={base_info.img} className="w-5rem"/> }
           <Card title={<div className="flex gap-1 justify-content-center"> {pair.base}<AccountLink account={account} fungible={pair.base_module} /> </div>} className="w-7rem border-2 border-round-lg shadow-4 border-green-600" pt={{body:{className:"p-1"}}} >
-            {balance_b.toFixed(pair.base_decimals)}
+            {balance_b?balance_b.toFixed(pair.base_decimals):"~"}
           </Card>
 
           <Card title={<div className="flex gap-1 justify-content-center"> {pair.quote}<AccountLink account={account} fungible={pair.quote_module} /> </div>} className="w-7rem border-2 border-round-lg shadow-4 border-red-600" pt={{body:{className:"p-1"}}}>
-            {balance_a.toFixed(pair.quote_decimals)}
+            {balance_a?balance_a.toFixed(pair.quote_decimals):"~"}
           </Card>
           {quote_info && <img src={quote_info.img} className="w-5rem"/> }
         </div>
