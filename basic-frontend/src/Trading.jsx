@@ -62,7 +62,7 @@ function FeeHelpIcon({pair})
 
 function TradingPanel({pair, preSelectedOrder})
 {
-  const {account, key} = useContext(AccountContext);
+  const {account, key, signer} = useContext(AccountContext);
   const {setTrx} = useContext(TransactionContext);
   const {deposit_account, fee_ratio, min_amount, max_amount, min_price, max_price} = usePairConfig(pair.name);
   const [buyAmount, setBuyAmount] = useState(null);
@@ -123,7 +123,7 @@ function TradingPanel({pair, preSelectedOrder})
 
               </div>
                {exp_buy_fees!=null && <span className="text-sm"> Max fee: {exp_buy_fees.toFixed(8)} <Currency name={pair.quote} /> <FeeHelpIcon pair={pair}/> </span>}
-               <Button className="w-8" disabled={!buyAmount || !buyPrice || !account} label="Execute order" onClick={onBuy}/>
+               <Button className="w-8" disabled={!buyAmount || !buyPrice || !account || !key || !signer} label="Execute order" onClick={onBuy}/>
             </div>
 
             <Divider layout="vertical"/>
@@ -153,7 +153,7 @@ function TradingPanel({pair, preSelectedOrder})
                 <Dropdown id="_sell_type" value={sellType} onChange={(e) => setSellType(e.value)} options={TYPES} optionLabel="name" className="w-full md:w-14rem" />
               </div>
               {exp_sell_fees!=null && <span className="text-sm"> Max fee: {exp_sell_fees.toFixed(8)} <Currency name={pair.base} /> <FeeHelpIcon pair={pair}/> </span> }
-              <Button className="w-8" disabled={!sellAmount || !sellPrice || !account} label="Execute order" onClick={onSell}/>
+              <Button className="w-8" disabled={!sellAmount || !sellPrice || !account || !key || !signer} label="Execute order" onClick={onSell}/>
             </div>
         </div>
       </>

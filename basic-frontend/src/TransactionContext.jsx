@@ -1,8 +1,7 @@
-import { createContext, useState, useRef, useEffect} from 'react';
+import { createContext, useContext, useState, useRef, useEffect} from 'react';
 import useSWRImmutable from 'swr/immutable'
 
-import {signWithChainweaver} from '@kadena/client';
-
+import {AccountContext} from './AccountContext';
 import {usePreflight, useSubmitResult, useTrxStatusImmutable} from './backend/pact';
 
 import { Toast } from 'primereact/toast';
@@ -12,11 +11,12 @@ const TransactionContext = createContext(null);
 function TransactionContextProvider({children})
 {
   const toast = useRef(null);
+  const {signer} = useContext(AccountContext)
   const [trx, setTrx] = useState(null)
   const [trxCount, setTrxCount] = useState(0)
   const {data:pf_result, error:pf_error} = usePreflight(trx);
   const {data:sig_result, error:sig_error} = useSWRImmutable((trx && pf_result!=null && !pf_error)?trx:null,
-                                                             (t)=> signWithChainweaver(t), {shouldRetryOnError:false})
+                                                             (t)=> signer(t), {shouldRetryOnError:false})
 
   const {data:submit_result, error:submit_error} = useSubmitResult(sig_result);
   const {data:poll_result, error:poll_error} = useTrxStatusImmutable(submit_result, true);

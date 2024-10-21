@@ -1,69 +1,64 @@
 import { Toolbar } from 'primereact/toolbar';
-import { useState, useContext } from 'react';
-import {AccountContext} from './AccountContext';
+import {useContext } from 'react';
+import {AccountContext, WalletType} from './AccountContext';
 import { SplitButton } from 'primereact/splitbutton';
-import { FloatLabel } from "primereact/floatlabel";
-import { Dialog } from 'primereact/dialog';
-import { InputText } from 'primereact/inputtext';
-import { Button } from 'primereact/button';
+import WalletConnectIcon from './img/WalletConnect-icon.svg'
+import ChainWeaverIcon from './img/chainweaver-icon.png'
+import EckoIcon from './img/ecko-wallet-icon.svg'
 
 
+const ICONS = {RO:'pi pi-eye',
+               CW:<img style={{width: "1.25em", margin:"2px"}} src={ChainWeaverIcon} />,
+               EW:<img style={{width: "1.25em", height:"1.25em", margin:"2px"}} src={EckoIcon} />,
+               WC:<img style={{width: "1.25em", margin:"2px"}} src={WalletConnectIcon} />,}
 
-function AccountDialog({visible, onHide})
-{
-  const [_account, _setAccount] = useState("");
-  const {setAccount} = useContext(AccountContext);
-
-  return <Dialog header="Set Account" visible={visible} closable onShow={() => _setAccount("")} onHide={onHide}>
-        Enter your Kadena account (usually starts with k:)
-        <FloatLabel className="my-4">
-          <InputText id="__acount" value={_account} onChange={(e) => _setAccount(e.target.value)} size={50}/>
-          <label htmlFor="__acount">Account</label>
-        </FloatLabel>
-        <Button label="OK" icon="pi pi-check" onClick={()=>{setAccount(_account), onHide()}} />
-
-        </Dialog>
-}
 
 function AccountMenu ()
 {
-  const {account, setAccount} = useContext(AccountContext);
-  const [showAccountDialog, setShowAccountDialog] = useState(false)
-  console.log(showAccountDialog)
-
+  const {account, wallet, setWallet} = useContext(AccountContext);
+  console.log(wallet)
+  console.log(ICONS[wallet])
   if(account)
   {
       const items = [
       {
           label: 'Disconnect',
-          icon: 'pi pi-refresh',
-          command: ()=> setAccount(null)
+          icon: 'pi pi-sign-out',
+          command: ()=> setWallet(null)
 
       }
     ];
-    return <SplitButton label={account.substring(0,10) + "..."} rounded raised model={items} icon="pi pi-check"></SplitButton>
+    return <SplitButton label={account.substring(0,12) + "..."} rounded raised model={items} icon={ICONS[wallet]}></SplitButton>
   }
   else
   {
       const items = [
       {
-          label: 'Chainweaver',
-          icon: 'pi pi-refresh',
-          command: ()=>setShowAccountDialog(true)
-      },
-      {
-          label: 'Ecko-Wallet',
-          icon: 'pi pi-refresh'
+          label: 'Read-Only',
+          icon:  'pi pi-eye',
+          command: ()=>{setWallet(WalletType.READ_ONLY)}
       },
 
       {
-          label: 'WalletCoonect',
-          icon: 'pi pi-refresh'
+          label: 'Chainweaver',
+          icon:  (<img style={{width: "1.5em", marginRight:"0.2em"}} src={ChainWeaverIcon} />),
+          command: ()=>{setWallet(WalletType.CHAINWEAVER)}
+      },
+      {
+          label: 'Ecko-Wallet',
+          icon: (<img style={{width: "1.5em", height:"1.5em", marginRight:"0.2em"}} src={EckoIcon} />),
+          command: ()=>{setWallet(WalletType.ECKO)}
+      },
+
+      {
+          label: 'WalletConnect',
+          icon: (<img style={{width: "1.5em", marginRight:"0.2em"}} src={WalletConnectIcon} />),
+          command: ()=>{setWallet(WalletType.WALLET_CONNECT)}
       }
     ];
     return  <>
-              <AccountDialog visible={showAccountDialog} onHide={()=>setShowAccountDialog(false)} />
-              <SplitButton label="Connect Wallet" model={items} rounded raised icon="pi pi-check"></SplitButton>
+
+              <SplitButton label="Connect Wallet" model={items} rounded raised icon="pi pi-wallet"></SplitButton>
             </>
   }
 }
