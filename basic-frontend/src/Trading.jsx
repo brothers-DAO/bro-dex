@@ -1,4 +1,4 @@
-import {useContext, useState, useEffect} from 'react';
+import {useContext, useState, useEffect, useRef} from 'react';
 import {Decimal} from 'decimals';
 import {usePairConfig} from './backend/bro-dex-react';
 import {AccountContext} from './AccountContext';
@@ -9,6 +9,8 @@ import { Button } from 'primereact/button';
 import {make_order} from './backend/bro-dex-transactions';
 import { Message } from 'primereact/message';
 import {TransactionContext} from './TransactionContext';
+import { OverlayPanel } from 'primereact/overlaypanel';
+
 
 
 const Currency = ({name}) => <span className="text-sm font-italic">{name}</span>
@@ -20,6 +22,43 @@ const TYPES = [ {name:"GTC", value:"GTC"},
                 {name:"FOK", value:"FOK"},
                 {name:"Post-Only", value:"Post-Only"}
               ]
+
+function OrderTypeHelpIcon()
+{
+  const op = useRef(null);
+  return <>  <span className="pi pi-question-circle cursor-pointer text-lg vertical-align-middle"  onClick={(e) => op.current.toggle(e)}/>
+            <OverlayPanel className="max-w-30rem" ref={op}>
+              <p>
+                <ul>
+                  <li className="my-2"> <span className="font-bold">GTC:</span> Good Till Canceled ⇒ Attempt to take 10 existing active offers (Taker) at most and creates a Maker order with the remaining amount if possible. </li>
+                  <li className="my-2"> <span className="font-bold">IOC:</span> Immediate Or Cancel ⇒ Attempt to take 10 existing active offers (Taker) at most and creates a Maker order with the remaining amount if possible. </li>
+                  <li className="my-2"> <span className="font-bold">FOK:</span> Fill Or Kill ⇒ Attempt to take 10 existing active offers (Taker) at most, but reverts the transaction if the order is not fully filled. </li>
+                  <li className="my-2"> <span className="font-bold">Post-Only:</span> Create a Maker order only if possible. Guarantee a zero fee order.</li>
+                </ul>
+              </p>
+            </OverlayPanel>
+        </>
+
+}
+
+function FeeHelpIcon({pair})
+{
+  const {fee_ratio} = usePairConfig(pair.name);
+  const op = useRef(null);
+  return <>  <span className="pi pi-question-circle cursor-pointer text-lg vertical-align-middle"  onClick={(e) => op.current.toggle(e)}/>
+            <OverlayPanel className="max-w-30rem" ref={op}>
+              <p>
+                <ul>
+                  <li className="my-2"> <span className="font-bold">Taker: {fee_ratio?fee_ratio.mul(100).toString():"Unknown"} %</span> </li>
+                  <li className="my-2"> <span className="font-bold">Maker: 0 %</span> </li>
+
+                </ul>
+                In case of a mixed order (GTC), fee is only charged on the Taker&apos;s part. The overpriced part is immediately refunded.
+              </p>
+            </OverlayPanel>
+        </>
+
+}
 
 function TradingPanel({pair, preSelectedOrder})
 {
@@ -79,10 +118,11 @@ function TradingPanel({pair, preSelectedOrder})
               </div>
 
               <div className="flex flex-column">
-                <label htmlFor="_buy_type" className="font-bold"> Order type:</label>
+                <label htmlFor="_buy_type" className="font-bold"> Order type: <OrderTypeHelpIcon /> </label>
                 <Dropdown id="_buy_type" value={buyType} onChange={(e) => setBuyType(e.value)} options={TYPES} optionLabel="name" className="w-full md:w-14rem" />
+
               </div>
-               {exp_buy_fees!=null && <span className="text-sm"> Max fee: {exp_buy_fees.toFixed(12)} <Currency name={pair.quote} /> </span>}
+               {exp_buy_fees!=null && <span className="text-sm"> Max fee: {exp_buy_fees.toFixed(8)} <Currency name={pair.quote} /> <FeeHelpIcon pair={pair}/> </span>}
                <Button className="w-8" disabled={!buyAmount || !buyPrice || !account} label="Execute order" onClick={onBuy}/>
             </div>
 
@@ -109,10 +149,10 @@ function TradingPanel({pair, preSelectedOrder})
               </div>
 
               <div className="flex flex-column">
-                <label htmlFor="_sell_type" className="font-bold"> Order type:</label>
+                <label htmlFor="_sell_type" className="font-bold"> Order type: <OrderTypeHelpIcon /></label>
                 <Dropdown id="_sell_type" value={sellType} onChange={(e) => setSellType(e.value)} options={TYPES} optionLabel="name" className="w-full md:w-14rem" />
               </div>
-              {exp_sell_fees!=null && <span className="text-sm"> Max fee: {exp_sell_fees.toFixed(12)} <Currency name={pair.base} /> </span>}
+              {exp_sell_fees!=null && <span className="text-sm"> Max fee: {exp_sell_fees.toFixed(8)} <Currency name={pair.base} /> <FeeHelpIcon pair={pair}/> </span> }
               <Button className="w-8" disabled={!sellAmount || !sellPrice || !account} label="Execute order" onClick={onSell}/>
             </div>
         </div>
