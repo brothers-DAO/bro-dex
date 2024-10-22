@@ -16,9 +16,8 @@ const ICONS = {RO:'pi pi-eye',
 function AccountMenu ()
 {
   const {account, wallet, setWallet} = useContext(AccountContext);
-  console.log(wallet)
-  console.log(ICONS[wallet])
-  if(account)
+
+  if(wallet)
   {
       const items = [
       {
@@ -28,7 +27,8 @@ function AccountMenu ()
 
       }
     ];
-    return <SplitButton label={account.substring(0,12) + "..."} rounded raised model={items} icon={ICONS[wallet]}></SplitButton>
+    const label = account?account.substring(0,12) + "...":"Connecting ...";
+    return <SplitButton label={label} rounded raised model={items} icon={ICONS[wallet]}></SplitButton>
   }
   else
   {
