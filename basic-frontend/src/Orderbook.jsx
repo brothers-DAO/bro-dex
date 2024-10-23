@@ -13,10 +13,10 @@ function cum_percent(orders)
   return cumsum.map(x=> x.mul(100.0).div(psum))
 }
 
-function OrderBookLine({price, key, amount, size, onClick})
+function OrderBookLine({price, amount, size, onClick})
 {
 
-  return <li key={key} onClick={onClick} className="NiceOrderbook__list-item" style={{"--ob-size":size.toString()+"%"}}>
+  return <li onClick={onClick} className="NiceOrderbook__list-item" style={{"--ob-size":size.toString()+"%"}}>
           <span className="NiceOrderbook__price">{price}</span>
           <span className="NiceOrderbook__size">{amount.toString()}</span>
         </li>
