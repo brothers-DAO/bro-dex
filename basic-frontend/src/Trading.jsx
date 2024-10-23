@@ -95,6 +95,8 @@ function TradingPanel({pair, preSelectedOrder})
   const amount_invalid = (x) => x!=null && min_amount && max_amount && (x.lt(min_amount) || x.gt(max_amount))
   const price_invalid = (x) => x!=null && min_price && max_price && (x.lt(min_price) || x.gt(max_price))
 
+  const _form_to_dec = x => x?Decimal(x):null;
+
 /*(pair, account, deposit, key, amount, limit, total)*/
   return <>
             <div className="flex flex-row m-2 mt-4">
@@ -104,7 +106,7 @@ function TradingPanel({pair, preSelectedOrder})
                   <label htmlFor="_buy_amount" className="font-bold"> Quantity:</label>
                   <div className="p-inputgroup flex-1 w-14rem">
                     <span className="p-inputgroup-addon">{pair.base}</span>
-                    <InputNumber id="_buy_amount" value={buyAmount?buyAmount.toNumber():null} invalid={amount_invalid(buyAmount)} onValueChange={(e) => setBuyAmount(e.value && Decimal(e.value))} minFractionDigits={1} maxFractionDigits={12} />
+                    <InputNumber id="_buy_amount" value={buyAmount?buyAmount.toNumber():null} invalid={amount_invalid(buyAmount)} onValueChange={(e) => setBuyAmount(_form_to_dec(e.value))} minFractionDigits={1} maxFractionDigits={12} />
                   </div>
                   {amount_invalid(buyAmount) && <Message className="max-w-max text-xs" severity="error" text={`[${min_amount} - ${max_amount} ]`}/>}
               </div>
@@ -112,7 +114,7 @@ function TradingPanel({pair, preSelectedOrder})
                   <label htmlFor="_buy_price" className="font-bold"> Max price:</label>
                   <div className="p-inputgroup flex-1 w-14rem">
                     <span className="p-inputgroup-addon">{pair.quote}</span>
-                    <InputNumber id="_buy_price" value={buyPrice?buyPrice.toNumber():null} invalid={price_invalid(buyPrice)} onValueChange={(e) => setBuyPrice(e.value && Decimal(e.value))} minFractionDigits={1} maxFractionDigits={12} />
+                    <InputNumber id="_buy_price" value={buyPrice?buyPrice.toNumber():null} invalid={price_invalid(buyPrice)} onValueChange={(e) => setBuyPrice(_form_to_dec(e.value))} minFractionDigits={1} maxFractionDigits={12} />
                   </div>
                   {price_invalid(buyPrice) && <Message className="max-w-max text-xs" severity="error" text={`[${min_price} - ${max_price} ]`}/>}
               </div>
@@ -135,7 +137,7 @@ function TradingPanel({pair, preSelectedOrder})
                   <label htmlFor="_sell_amount" className="font-bold"> Quantity:</label>
                   <div className="p-inputgroup flex-1 w-14rem">
                     <span className="p-inputgroup-addon">{pair.base}</span>
-                    <InputNumber  id="_sell_amount" value={sellAmount?sellAmount.toNumber():null} invalid={amount_invalid(sellAmount)} onValueChange={(e) => setSellAmount(e.value && Decimal(e.value))} minFractionDigits={1} maxFractionDigits={12} />
+                    <InputNumber  id="_sell_amount" value={sellAmount?sellAmount.toNumber():null} invalid={amount_invalid(sellAmount)} onValueChange={(e) => setSellAmount(_form_to_dec(e.value))} minFractionDigits={1} maxFractionDigits={12} />
                   </div>
                   {amount_invalid(sellAmount) && <Message className="max-w-max" severity="error" text={`[${min_amount} - ${max_amount} ]`}/>}
               </div>
@@ -143,7 +145,7 @@ function TradingPanel({pair, preSelectedOrder})
                   <label htmlFor="_sell_price" className="font-bold"> Min price:</label>
                   <div className="p-inputgroup flex-1 w-14rem">
                     <span className="p-inputgroup-addon">{pair.quote}</span>
-                    <InputNumber id="_sell_price" value={sellPrice?sellPrice.toNumber():null} invalid={price_invalid(sellPrice)} onValueChange={(e) => setSellPrice(e.value && Decimal(e.value))} minFractionDigits={1} maxFractionDigits={12} />
+                    <InputNumber id="_sell_price" value={sellPrice?sellPrice.toNumber():null} invalid={price_invalid(sellPrice)} onValueChange={(e) => setSellPrice(_form_to_dec(e.value))} minFractionDigits={1} maxFractionDigits={12} />
                   </div>
                   {price_invalid(sellPrice) && <Message className="max-w-max text-xs" severity="error" text={`[${min_price} - ${max_price} ]`}/>}
               </div>
