@@ -5,7 +5,7 @@ import { SplitButton } from 'primereact/splitbutton';
 import WalletConnectIcon from './img/WalletConnect-icon.svg'
 import ChainWeaverIcon from './img/chainweaver-icon.png'
 import EckoIcon from './img/ecko-wallet-icon.svg'
-
+import { ProgressSpinner } from 'primereact/progressspinner';
 
 const ICONS = {RO:'pi pi-eye',
                CW:<img style={{width: "1.25em", margin:"2px"}} src={ChainWeaverIcon} />,
@@ -27,7 +27,7 @@ function AccountMenu ()
 
       }
     ];
-    const label = account?account.substring(0,12) + "...":"Connecting ...";
+    const label = account?account.substring(0,12) + "...":<>Connecting <ProgressSpinner style={{width: '1em', height: '1em', position: "relative", top:"0.2em"}} strokeWidth="8" /></>;
     return <SplitButton label={label} rounded raised model={items} icon={ICONS[wallet]}></SplitButton>
   }
   else
