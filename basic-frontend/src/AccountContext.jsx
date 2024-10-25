@@ -59,12 +59,12 @@ function AccountDialog({visible, onHide, onConfirm})
 
 const WalletType  = {READ_ONLY:"RO", CHAINWEAVER:"CW", ECKO:"EW", WALLET_CONNECT:"WC"}
 
-function useEckoWalletAccount(wallet)
+function useEckoWalletAccount(wallet, onFail)
 {
   const [status, setStatus] = useState(null);
 
   useEffect( () => {  if(wallet== WalletType.ECKO)
-                        ecko_quicksign.checkStatus(NETWORK).then(setStatus).catch(e => console.log(e));
+                        ecko_quicksign.checkStatus(NETWORK).then(setStatus).catch(e => {console.log(e); onFail()});
                       else
                         setStatus(null);
                       }, [wallet])
@@ -162,7 +162,7 @@ function AccountContextProvider({children})
   // Intentionnaly, I removed the dependency _setWallet
   const resetWallet = useCallback(()=> _setWallet(null), []);
 
-  const ecko_account = useEckoWalletAccount(wallet);
+  const ecko_account = useEckoWalletAccount(wallet, resetWallet);
 
   const wc_client = useWalletConnectClient(wallet);
   const {session:wc_session, signer:wc_signer} = useWalletConnectSession(wc_client, resetWallet);
@@ -191,7 +191,7 @@ function AccountContextProvider({children})
   const {key} = useSingleKeyAccount(account);
 
   return <AccountContext.Provider value={{account, key, signer, wallet, setWallet}} >
-          <AccountDialog visible={showAccountDialog} onHide={()=>setShowAccountDialog(false)} onConfirm={(x) => {setWalletAccount(x);setShowAccountDialog(false)} } />
+          <AccountDialog visible={showAccountDialog} onHide={()=>{setShowAccountDialog(false); resetWallet()}} onConfirm={(x) => {setWalletAccount(x);setShowAccountDialog(false)} } />
           {children}
          </AccountContext.Provider>
 
