@@ -67,7 +67,7 @@ function useEckoWalletAccount(wallet, onFail)
                         ecko_quicksign.checkStatus(NETWORK).then(setStatus).catch(e => {console.log(e); onFail()});
                       else
                         setStatus(null);
-                      }, [wallet])
+                      }, [wallet, onFail])
   return status?.account?.account;
 }
 
