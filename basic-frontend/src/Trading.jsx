@@ -1,6 +1,7 @@
 import {useContext, useState, useEffect, useRef} from 'react';
 import {Decimal} from 'decimals';
 import {usePairConfig} from './backend/bro-dex-react';
+import { ONE, ZERO } from './backend/utils';
 import {AccountContext} from './AccountContext';
 import { Divider } from 'primereact/divider';
 import { InputNumber } from 'primereact/inputnumber';
@@ -15,7 +16,6 @@ import { OverlayPanel } from 'primereact/overlaypanel';
 
 const Currency = ({name}) => <span className="text-sm font-italic">{name}</span>
 
-const ZERO = Decimal("0.0")
 
 const TYPES = [ {name:"GTC", value:"GTC"},
                 {name:"IOC", value:"IOC"},

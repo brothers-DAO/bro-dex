@@ -2,6 +2,7 @@ import { useState, useContext, useEffect } from 'react';
 import { Decimal } from 'decimals';
 
 import {usePairConfig, useHistory, useAccountHistory, useActiveMakerTransactions} from './backend/bro-dex-react'
+import {ZERO} from './backend/utils'
 import {useTrxDate} from './backend/pact';
 import {make_cancel_order} from './backend/bro-dex-transactions';
 
@@ -48,7 +49,7 @@ function OrderDialog({pair, onClose, order, onCancel})
   const tx_date = useTrxDate(order.take_tx, NETWORK, CHAIN)
   const {fee_ratio} = usePairConfig("BRO-KDA-R")
   const fee = fee_ratio ? (order.is_ask?order.amount.mul(order.price).mul(fee_ratio):order.amount.mul(fee_ratio))
-                        :Decimal("0");
+                        : ZERO;
 
 
   return  <Dialog header={<> Order {order.id.toString()} {order.state==4 && <DirectionIcon order={order} />}</>} visible={order!=null} closable onHide={onClose}>

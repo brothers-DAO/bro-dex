@@ -1,5 +1,6 @@
 import {useContext, useState, useEffect} from 'react';
 import {useOrderbook} from './backend/bro-dex-react'
+import { ZERO, HUNDRED,ZERO_FIVE } from './backend/utils'
 import {TransactionContext} from './TransactionContext';
 import {Decimal} from 'decimals';
 import { SelectButton } from 'primereact/selectbutton';
@@ -8,9 +9,9 @@ import './Orderbook.css';
 
 function cum_percent(orders)
 {
-  let psum = Decimal("0.0")
+  let psum = ZERO;
   const cumsum = orders.map(x => {psum = psum.add(x.amount); return psum});
-  return cumsum.map(x=> x.mul(100.0).div(psum))
+  return cumsum.map(x=> x.mul(HUNDRED).div(psum))
 }
 
 function OrderBookLine({price, amount, size, onClick})
@@ -69,8 +70,8 @@ function OrderBook({pair, onClick})
   const asks_cum_percent = cum_percent(aggregated_asks)
   const bids_cum_percent = cum_percent(aggregated_bids)
 
-  const medianPrice = (asks.length && bids.length)?asks[0].price.plus(bids[0].price).mul(0.5):null
-  const spread = medianPrice?asks[0].price.minus(bids[0].price).mul(100).div(medianPrice):null
+  const medianPrice = (asks.length && bids.length)?asks[0].price.plus(bids[0].price).mul(ZERO_FIVE):null
+  const spread = medianPrice?asks[0].price.minus(bids[0].price).mul(HUNDRED).div(medianPrice):null
 
   return  <>
           <div className="flex mb-1 justify-content-center">

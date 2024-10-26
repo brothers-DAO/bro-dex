@@ -1,8 +1,6 @@
-import {Decimal} from 'decimals';
 import {useLocalPact, useLocalPactImmutable} from './pact';
 import {to_decimal} from './utils.js';
 
-const ZERO = Decimal("0.0");
 const NETWORK = import.meta.env.VITE_NETWORK
 const CHAIN = import.meta.env.VITE_CHAIN
 
