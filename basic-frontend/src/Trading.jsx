@@ -26,16 +26,15 @@ const TYPES = [ {name:"GTC", value:"GTC"},
 function OrderTypeHelpIcon()
 {
   const op = useRef(null);
-  return <>  <span className="pi pi-question-circle cursor-pointer text-lg vertical-align-middle"  onClick={(e) => op.current.toggle(e)}/>
+  return <>
+            <span className="pi pi-question-circle cursor-pointer text-lg vertical-align-middle"  onClick={(e) => op.current.toggle(e)}/>
             <OverlayPanel className="max-w-30rem" ref={op}>
-              <p>
-                <ul>
-                  <li className="my-2"> <span className="font-bold">GTC:</span> Good Till Canceled ⇒ Attempt to take 10 existing active offers (Taker) at most and creates a Maker order with the remaining amount if possible. </li>
-                  <li className="my-2"> <span className="font-bold">IOC:</span> Immediate Or Cancel ⇒ Attempt to take 10 existing active offers (Taker) at most and creates a Maker order with the remaining amount if possible. </li>
-                  <li className="my-2"> <span className="font-bold">FOK:</span> Fill Or Kill ⇒ Attempt to take 10 existing active offers (Taker) at most, but reverts the transaction if the order is not fully filled. </li>
-                  <li className="my-2"> <span className="font-bold">Post-Only:</span> Create a Maker order only if possible. Guarantee a zero fee order.</li>
-                </ul>
-              </p>
+              <ul>
+                <li className="my-2"> <span className="font-bold">GTC:</span> Good Till Canceled ⇒ Attempt to take 10 existing active offers (Taker) at most and creates a Maker order with the remaining amount if possible. </li>
+                <li className="my-2"> <span className="font-bold">IOC:</span> Immediate Or Cancel ⇒ Attempt to take 10 existing active offers (Taker) at most and creates a Maker order with the remaining amount if possible. </li>
+                <li className="my-2"> <span className="font-bold">FOK:</span> Fill Or Kill ⇒ Attempt to take 10 existing active offers (Taker) at most, but reverts the transaction if the order is not fully filled. </li>
+                <li className="my-2"> <span className="font-bold">Post-Only:</span> Create a Maker order only if possible. Guarantee a zero fee order.</li>
+              </ul>
             </OverlayPanel>
         </>
 
@@ -45,18 +44,17 @@ function FeeHelpIcon({pair})
 {
   const {fee_ratio} = usePairConfig(pair.name);
   const op = useRef(null);
-  return <>  <span className="pi pi-question-circle cursor-pointer text-lg vertical-align-middle"  onClick={(e) => op.current.toggle(e)}/>
+  return  <>
+            <span className="pi pi-question-circle cursor-pointer text-lg vertical-align-middle"  onClick={(e) => op.current.toggle(e)}/>
             <OverlayPanel className="max-w-30rem" ref={op}>
-              <p>
-                <ul>
-                  <li className="my-2"> <span className="font-bold">Taker: {fee_ratio?fee_ratio.mul(100).toString():"Unknown"} %</span> </li>
-                  <li className="my-2"> <span className="font-bold">Maker: 0 %</span> </li>
+              <ul>
+                <li className="my-2"> <span className="font-bold">Taker: {fee_ratio?fee_ratio.mul(100).toString():"Unknown"} %</span> </li>
+                <li className="my-2"> <span className="font-bold">Maker: 0 %</span> </li>
 
-                </ul>
-                In case of a mixed order (GTC), fee is only charged on the Taker&apos;s part. The overpriced part is immediately refunded.
-              </p>
+              </ul>
+              In case of a mixed order (GTC), fee is only charged on the Taker&apos;s part. The overpriced part is immediately refunded.
             </OverlayPanel>
-        </>
+          </>
 
 }
 
