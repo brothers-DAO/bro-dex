@@ -1,6 +1,6 @@
 import {useLocalPactImmutable, local_pact} from './pact';
 import useSWRInfinite from 'swr/infinite';
-import {to_decimal, to_big_int} from './utils.js';
+import {to_decimal, to_big_int, ZERO_FIVE} from './utils.js';
 import {core_mod, wrapper_mod, view_mod} from './bro-dex-common';
 
 /* Modules refs */
@@ -47,6 +47,17 @@ export function useOrderbook(pair, is_ask)
   if(error)
     console.error(error)
   return {data:data?data.flat():[], error, mutate}
+}
+
+export function useOrderbookMedian(pair)
+{
+  const {data:data_ask} = useOrderbook(pair, true);
+  const {data:data_bid} = useOrderbook(pair, false);
+
+  if (!data_bid || !data_ask || data_bid.length == 0 || data_ask.length == 0)
+    return null;
+  else
+    return data_bid[0].price.plus(data_ask[0].price).mul(ZERO_FIVE);
 }
 
 export function useHistory(pair)
