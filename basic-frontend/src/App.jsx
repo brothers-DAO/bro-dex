@@ -16,31 +16,11 @@ import Balances from './Balances';
 import {GlobalHistory, AccountHistory, AccountActiveOrders} from './GlobalHistory';
 import {MainBar} from './MainBar';
 import {TradingPanel} from './Trading';
-import {ModuleLink} from './Explorer'
+import {ModuleLink} from './Explorer';
+import _PAIRS from '../pairs.json';
+const PAIRS = _PAIRS.map(({orderbook_precision, ...rest}) => ({orderbook_precision:Decimal(orderbook_precision), ...rest}))
 
 import './App.css';
-
-const PAIRS  = [{name:"BRO-KDA-R",
-                 code: "BRO-KDA",
-                 display_name:"BRO/KDA",
-                 quote:"KDA",
-                 quote_module:"coin",
-                 base:"$BRO",
-                 base_module:"n_5d119cc07ffd5efaef5c7feef9e878f34e3d4652.bro",
-                 orderbook_precision:Decimal(1.0),
-                 quote_decimals:1,
-                 base_decimals:4 },
-                {name:"BRO-ABC-R",
-                 code: "BRO-ABC",
-                 display_name:"BRO/ABC",
-                 quote:"ABC",
-                 quote_module:"n_ff0f76ee90735fba124eba93a1c49423c75654b1.abc",
-                 base:"$BRO",
-                 base_module:"n_5d119cc07ffd5efaef5c7feef9e878f34e3d4652.bro",
-                 orderbook_precision:Decimal(10.0),
-                 quote_decimals:1,
-                 base_decimals:2 },
-                ]
 
 function CommonCard({title, toggleable=false, children})
 {
