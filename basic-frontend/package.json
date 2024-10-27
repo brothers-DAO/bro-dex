@@ -1,6 +1,6 @@
 {
   "name": "bro-dex-basic",
-  "version": "0.0.1",
+  "version": "1.0-beta-1",
   "description": "Bro DEX",
   "main": "index.js",
   "author": "CryptoPascal",
