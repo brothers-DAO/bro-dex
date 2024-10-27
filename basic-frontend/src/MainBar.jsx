@@ -6,6 +6,7 @@ import WalletConnectIcon from './img/WalletConnect-icon.svg'
 import ChainWeaverIcon from './img/chainweaver-icon.png'
 import EckoIcon from './img/ecko-wallet-icon.svg'
 import { ProgressSpinner } from 'primereact/progressspinner';
+import AboutButton from './AboutButton';
 
 const ICONS = {RO:'pi pi-eye',
                CW:<img style={{width: "1.25em", margin:"2px"}} src={ChainWeaverIcon} />,
@@ -66,5 +67,5 @@ function AccountMenu ()
 
 export function MainBar()
 {
-  return <Toolbar center={<span className="font-bold text-2xl">Bro DEX</span>} end={<AccountMenu />} />
+  return <Toolbar start={<AboutButton/>} center={<span className="font-bold text-3xl">Bro DEX</span>} end={<AccountMenu />} />
 }
