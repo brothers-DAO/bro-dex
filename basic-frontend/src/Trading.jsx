@@ -78,7 +78,8 @@ function HalfTradingPanel({pair, fee, direction, onSubmit, preSelectedOrder})
   const _fee = fee(amount, price, type);
 
   return  <div className="flex flex-column w-full gap-3" >
-            <span className="font-bold text-primary text-center"> Buy {pair.base} from {pair.quote} </span>
+            {direction=="BUY" &&<span className="font-bold text-primary text-center"> Buy {pair.base} from {pair.quote} </span>}
+            {direction=="SELL" &&<span className="font-bold text-primary text-center"> Sell {pair.base} to {pair.quote} </span>}
               <div className="flex flex-column gap-1">
                 <label htmlFor="_form_amount" className="font-bold"> Quantity:</label>
                   <div className="p-inputgroup flex-1 w-14rem">
