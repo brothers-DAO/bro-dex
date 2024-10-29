@@ -57,10 +57,7 @@ function AccountMenu ()
           command: ()=>{setWallet(WalletType.WALLET_CONNECT)}
       }
     ];
-    return  <>
-
-              <SplitButton label="Connect Wallet" model={items} rounded raised icon="pi pi-wallet"></SplitButton>
-            </>
+    return <SplitButton label="Connect Wallet" model={items} rounded raised icon="pi pi-wallet" />
   }
 }
 
