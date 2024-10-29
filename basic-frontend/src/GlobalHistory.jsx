@@ -149,13 +149,17 @@ function AccountHistory({pair})
 {
   const {trxCount} = useContext(TransactionContext);
   const {account} = useContext(AccountContext);
-  const {data, mutate} = useAccountHistory(pair.name, account);
+  const {data, mutate, setSize, totalSize} = useAccountHistory(pair.name, account);
   const [clickedOrder, setClickedOrder] = useState(null);
+  const [first, setFirst] = useState(0);
 
   useEffect(() => {if(trxCount){mutate()}}, [trxCount,mutate])
 
+  const onPage =  (e) => { setFirst(e.first);
+                           setSize(e.first+10);}
+
   return <> {clickedOrder && <OrderDialog pair={pair} order={clickedOrder} onClose={() => setClickedOrder(null)} />}
-            <DataTable emptyMessage="No orders" dataKey="id"  value={data} stripedRows selectionMode="single" onRowClick={x=> setClickedOrder(x.data)} >
+            <DataTable className="w-30rem" lazy totalRecords={totalSize} value={data.slice(first)} first={first} onPage={onPage} paginator rows={10} emptyMessage="No data" dataKey="id"  stripedRows selectionMode="single" onRowClick={x=> setClickedOrder(x.data)} >
               <Column header="" body={x=>dir_icon(x.is_ask, x.state==3)} />
               <Column header="ID" body={x=> short_id(x.id)} />
               <Column header="Price" body={x=> <Price pair={pair} val={x.price}/>} />

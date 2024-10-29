@@ -78,12 +78,16 @@ export function useHistory(pair)
 export function useAccountHistory(pair, account)
 {
   const PREFIX = ["AH", pair, account];
-  const {data, error, mutate} = useSWRInfinite((i, p) => __getKey(PREFIX, i, p),
-                                               ([,,,x]) => local_pact(`(${view_mod(pair)}.get-orders-in-account-history "${account}" ${x} ${SIZE_PER_REQUEST})`,NETWORK, CHAIN)
-                                                         .then(x => x.map(to_order)), {initialSize:1024, refreshInterval: 60_000})
+  const {data, error, mutate, size, setSize} = useSWRInfinite((i, p) => __getKey(PREFIX, i, p),
+                                                              ([,,,x]) => local_pact(`(${view_mod(pair)}.get-orders-in-account-history "${account}" ${x} ${SIZE_PER_REQUEST})`,NETWORK, CHAIN)
+                                                                        .then(x => x.map(to_order)), {initialSize:1, revalidateFirstPage:true, refreshInterval: 60_000})
   if(error)
     console.error(error)
-  return {data:data?data.flat():[], error, mutate}
+  const _setSize = (x) => {const new_size = Math.ceil(x / SIZE_PER_REQUEST);
+                           if(new_size != size) {setSize(new_size) }}
+  const _data = data?data.flat():[]
+  const _total = (data && data[data.length -1]?.length == SIZE_PER_REQUEST)?_data.length+50:_data.length;
+  return {data:_data, error, mutate, setSize:_setSize, totalSize:_total}
 }
 
 
