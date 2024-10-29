@@ -26,7 +26,7 @@ export function usePairConfig(pair)
 }
 
 
-const SIZE_PER_REQUEST = 32;
+const SIZE_PER_REQUEST = 40;
 const __getKey = (prefix, pageIndex, prev) =>
 {
   if(pageIndex == 0)
@@ -69,11 +69,9 @@ export function useHistory(pair)
   if(error)
     console.error(error)
   const _setSize = (x) => {const new_size = Math.ceil(x / SIZE_PER_REQUEST);
-                           if(new_size > size) {setSize(new_size) }}
-
+                           if(new_size != size) {setSize(new_size) }}
   const _data = data?data.flat():[]
-  const _total = _data.length%SIZE_PER_REQUEST != 0?_data.length:_data.length+50;
-
+  const _total = (data && data[data.length -1]?.length == SIZE_PER_REQUEST)?_data.length+50:_data.length;
   return {data:_data, error, mutate, setSize:_setSize, totalSize:_total}
 }
 
