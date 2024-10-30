@@ -7,6 +7,7 @@ import { Panel } from 'primereact/panel';
 import {usePairConfig} from './backend/bro-dex-react';
 import {core_mod, wrapper_mod} from './backend/bro-dex-common'
 import {useTokenInfo} from './backend/tokens_info';
+import {useModulesHash} from './backend/modules-info-react';
 
 import {AccountContextProvider} from './AccountContext';
 import {TransactionContextProvider} from './TransactionContext';
@@ -22,10 +23,11 @@ const PAIRS = _PAIRS.map(({orderbook_precision, ...rest}) => ({orderbook_precisi
 
 import './App.css';
 
-function CommonCard({title, toggleable=false, children})
+function CommonCard({title, toggleable=false, onToggle=()=>{}, children})
 {
-  return <Panel toggleable={toggleable} collapsed={toggleable} header={title} className="shadow-3 m-2 border-round-top-md border-round-bottom-2xl" pt={{header:{className:"text-xl border-round-top-md justify-content-between"},
-                                                                                                                      content:{className:"border-round-bottom-2xl py-3"}}}>
+  return <Panel toggleable={toggleable} collapsed={toggleable} header={title} onExpand={()=>onToggle(true)} onCollapse={()=>onToggle(false)}
+                className="shadow-3 m-2 border-round-top-md border-round-bottom-2xl" pt={{header:{className:"text-xl border-round-top-md justify-content-between"},
+                content:{className:"border-round-bottom-2xl py-3"}}}>
             {children}
           </Panel>
 }
@@ -74,8 +76,11 @@ function PairIcon({pair})
 function PairInfoCard({pair})
 {
   const config = usePairConfig(pair.name);
+  const [expanded, setExpanded] = useState(false);
+  // Retrive data only if the panel has already been expanded
+  const [core_hash, wrapper_hash] = useModulesHash(expanded?[core_mod(pair.name), wrapper_mod(pair.name)]:[null, null])
 
-  return <CommonCard title="Pair Info" toggleable>
+  return <CommonCard title="Pair Info" toggleable onToggle={(x) => setExpanded((v) => v || x)}>
             <ul className="line-height-2 m-0">
             <li> <span className="font-bold">Network:</span> {import.meta.env.VITE_NETWORK} </li>
 
@@ -83,7 +88,11 @@ function PairInfoCard({pair})
 
             <li> <span className="font-bold">Module:</span>  {core_mod(pair.name)} <ModuleLink module={core_mod(pair.name)} /> </li>
 
+            <ul> <li> <span className="font-bold">Hash:</span> {core_hash} </li> </ul>
+
             <li> <span className="font-bold">Wrapper:</span>  {wrapper_mod(pair.name)} <ModuleLink module={wrapper_mod(pair.name)} /> </li>
+
+            <ul> <li> <span className="font-bold">Hash:</span> {wrapper_hash} </li> </ul>
 
             {config?.deposit_account && <li> <span className="font-bold">Deposit account:</span>  {config.deposit_account} </li>}
 
