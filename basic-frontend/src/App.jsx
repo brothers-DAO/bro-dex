@@ -5,7 +5,7 @@ import { TabView, TabPanel } from 'primereact/tabview';
 import { Panel } from 'primereact/panel';
 
 import {usePairConfig} from './backend/bro-dex-react';
-import {core_mod, wrapper_mod} from './backend/bro-dex-common'
+import {core_mod, wrapper_mod, view_mod} from './backend/bro-dex-common'
 import {useTokenInfo} from './backend/tokens_info';
 import {useModulesHash} from './backend/modules-info-react';
 
@@ -78,7 +78,8 @@ function PairInfoCard({pair})
   const config = usePairConfig(pair.name);
   const [expanded, setExpanded] = useState(false);
   // Retrive data only if the panel has already been expanded
-  const [core_hash, wrapper_hash] = useModulesHash(expanded?[core_mod(pair.name), wrapper_mod(pair.name)]:[null, null])
+  const [core_hash, wrapper_hash, view_hash] = useModulesHash(expanded?[core_mod(pair.name), wrapper_mod(pair.name), view_mod(pair.name)]:
+                                                                       [null, null,null])
 
   return <CommonCard title="Pair Info" toggleable onToggle={(x) => setExpanded((v) => v || x)}>
             <ul className="line-height-2 m-0">
@@ -93,6 +94,10 @@ function PairInfoCard({pair})
             <li> <span className="font-bold">Wrapper:</span>  {wrapper_mod(pair.name)} <ModuleLink module={wrapper_mod(pair.name)} /> </li>
 
             <ul> <li> <span className="font-bold">Hash:</span> {wrapper_hash} </li> </ul>
+
+            <li> <span className="font-bold">Viewer:</span>  {view_mod(pair.name)} <ModuleLink module={view_mod(pair.name)} /> </li>
+
+            <ul> <li> <span className="font-bold">Hash:</span> {view_hash} </li> </ul>
 
             {config?.deposit_account && <li> <span className="font-bold">Deposit account:</span>  {config.deposit_account} </li>}
 
