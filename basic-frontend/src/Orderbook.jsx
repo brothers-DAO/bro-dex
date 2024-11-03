@@ -2,7 +2,7 @@ import {useContext, useState, useEffect} from 'react';
 import {useOrderbook} from './backend/bro-dex-react'
 import { ZERO, HUNDRED,ZERO_FIVE } from './backend/utils'
 import {TransactionContext} from './TransactionContext';
-import {Decimal} from 'decimals';
+import {Decimal} from 'decimal.js';
 import { SelectButton } from 'primereact/selectbutton';
 
 import './Orderbook.css';

@@ -1,5 +1,5 @@
 import {useContext, useState, useEffect, useRef} from 'react';
-import {Decimal} from 'decimals';
+import {Decimal} from 'decimal.js';
 import {usePairConfig, useOrderbookMedian} from './backend/bro-dex-react';
 import {useTokensBalance} from './backend/tokens-react';
 import { ONE, ZERO, HUNDRED } from './backend/utils';

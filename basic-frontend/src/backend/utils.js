@@ -1,4 +1,4 @@
-import {Decimal} from 'decimals';
+import {Decimal} from 'decimal.js';
 
 /* Generic types Adapters */
 export const to_big_int = x=>BigInt(x.int)

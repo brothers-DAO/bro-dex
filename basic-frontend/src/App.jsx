@@ -1,5 +1,5 @@
 import {useState} from 'react';
-import {Decimal} from 'decimals';
+import {Decimal} from 'decimal.js';
 
 import { TabView, TabPanel } from 'primereact/tabview';
 import { Panel } from 'primereact/panel';

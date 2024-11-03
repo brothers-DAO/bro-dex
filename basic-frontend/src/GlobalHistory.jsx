@@ -1,5 +1,5 @@
 import { useState, useContext, useEffect } from 'react';
-import { Decimal } from 'decimals';
+import { Decimal } from 'decimal.js';
 
 import {usePairConfig, useHistory, useAccountHistory, useActiveMakerTransactions} from './backend/bro-dex-react'
 import {ZERO} from './backend/utils'

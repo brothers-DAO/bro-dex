@@ -1,6 +1,6 @@
 {
   "name": "bro-dex-basic",
-  "version": "1.0-beta-2",
+  "version": "1.0-beta-3",
   "description": "Bro DEX",
   "main": "index.js",
   "author": "CryptoPascal",
@@ -17,7 +17,7 @@
     "@kadena/client": "^1.14.0",
     "@walletconnect/modal": "^2.7.0",
     "@walletconnect/sign-client": "^2.17.1",
-    "decimals": "^1.0.0",
+    "decimal.js": "^10.4.3",
     "genversion": "^3.2.0",
     "primeflex": "^3.3.1",
     "primeicons": "^7.0.0",
