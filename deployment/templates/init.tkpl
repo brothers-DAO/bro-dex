@@ -2,8 +2,8 @@ code: |
   (define-namespace "{{ns}}" (read-keyset 'ns-ks) (read-keyset 'ns-ks))
   (namespace "{{ns}}")
   (define-keyset "{{ns}}.bro-dex-admin" (read-keyset 'admin-ks))
-  (define-keyset "{{ns}}.rb_tree_governance" (read-keyset 'admin-ks))
-  (define-keyset "{{ns}}.rb_tree_op" (read-keyset 'admin-ks))
+  (define-keyset "{{ns}}.rb-tree-admin" (read-keyset 'admin-ks))
+  (define-keyset "{{ns}}.rb-tree-create" (read-keyset 'admin-ks))
   (define-keyset "{{ns}}.fees" (read-keyset 'fee-ks))
 
 publicMeta:

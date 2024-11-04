@@ -19,7 +19,7 @@
 (define-namespace "RB_TREE_NS" GUARD_SUCCESS GUARD_SUCCESS)
 (namespace "RB_TREE_NS")
 
-(define-keyset "RB_TREE_NS.rb_tree_op" (read-keyset 'ks-op))
+(define-keyset "RB_TREE_NS.rb-tree-create" (read-keyset 'ks-op))
 (namespace "")
 (load ".gen/rb-tree.pact")
 (create-table nodes)
