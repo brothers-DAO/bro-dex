@@ -3,6 +3,7 @@ import { Decimal } from 'decimal.js';
 
 import {usePairConfig, useHistory, useAccountHistory, useActiveMakerTransactions} from './backend/bro-dex-react'
 import {ZERO} from './backend/utils'
+import {make_order_account} from './backend/bro-dex-common'
 import {useTrxDate} from './backend/pact';
 import {make_cancel_order} from './backend/bro-dex-transactions';
 
@@ -16,7 +17,7 @@ import { Button } from 'primereact/button';
 
 import {TransactionContext} from './TransactionContext';
 import {AccountContext} from './AccountContext';
-import {TransactionLink} from './Explorer'
+import {TransactionLink, AccountTransferLink} from './Explorer'
 
 const NETWORK = import.meta.env.VITE_NETWORK
 const CHAIN = import.meta.env.VITE_CHAIN
@@ -50,7 +51,7 @@ function OrderDialog({pair, onClose, order, onCancel})
   const {fee_ratio} = usePairConfig("BRO-KDA-R")
   const fee = fee_ratio ? (order.is_ask?order.amount.mul(order.price).mul(fee_ratio):order.amount.mul(fee_ratio))
                         : ZERO;
-
+  const order_account = (order.state!=4 || !order.partial)?make_order_account(pair.name, order.id):null;
 
   return  <Dialog header={<> Order {order.id.toString()} {order.state==4 && <DirectionIcon order={order} />}</>} visible={order!=null} closable onHide={onClose}>
           <Divider />
@@ -81,6 +82,13 @@ function OrderDialog({pair, onClose, order, onCancel})
                 <label htmlFor="_id" className="font-bold block mb-1"> Order ID </label>
                 <InputText id="_id" readOnly value={order.id.toString()} />
               </div>
+              {order_account &&
+                <div>
+                  <label htmlFor="_o_account" className="font-bold block mb-1"> Order Account <AccountTransferLink account={order_account} fungible={pair.quote_module} /> <AccountTransferLink account={order_account} fungible={pair.base_module} /> </label>
+                  <InputText size={47} id="_o_account" readOnly value={order_account}/>
+                </div>
+              }
+
               { (order.state==3 || order.state==4) &&
                 <>
                 <div>

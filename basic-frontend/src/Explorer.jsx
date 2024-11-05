@@ -11,6 +11,10 @@ export const AccountLink = ({account, fungible}) => <a target="_blank" href={`${
                                                       <i className="pi pi-external-link" / >
                                                     </a>
 
+export const AccountTransferLink = ({account, fungible}) => <a target="_blank" href={`${EXPLORER}/transfer/${account}?chain=${CHAIN}&token=${fungible}`}>
+                                                              <i className="pi pi-external-link" / >
+                                                            </a>
+
 export const ModuleLink = ({module}) => <a target="_blank" href={`${BALANCE_EXPLORER}/modules.html?server=${ENDPOINT}&module=${module}&chain=${CHAIN}`}>
                                               <i className="pi pi-external-link" / >
                                             </a>
