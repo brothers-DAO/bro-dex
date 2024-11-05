@@ -133,7 +133,7 @@ function TradingPanel({pair, preSelectedOrder})
   const _onSell = (amount, price, type) => setTrx(make_sell_trx(amount, price, type));
 
   const onBuy = (amount, price, type) => {if(median_price && price.minus(median_price).div(median_price).gt(SLIPPAGE_WARNING))
-                                            confirmPopup({message: <p>The buy price is more than {SLIPPAGE_WARNING.mul(HUNDRED).toFixed(1)}% of the current prixe <br/> Are you sure you want to continue and experience probable slippage loss ?</p>,
+                                            confirmPopup({message: <p>The buy price is more than {SLIPPAGE_WARNING.mul(HUNDRED).toFixed(1)}% of the current price <br/> Are you sure you want to continue and experience probable slippage loss ?</p>,
                                                           icon: 'pi pi-exclamation-triangle', defaultFocus: 'reject', acceptClassName: 'p-button-danger', accept:() => _onBuy(amount, price, type)})
                                           else if( balance_quote && balance_quote.lt(compute_buy_total(amount,price,type)))
                                             confirmPopup({message: <p>Your {pair.quote} balance is too low.<br/> The transaction will probably fail. <br/> Are you sure you want to continue?</p>,
@@ -141,9 +141,9 @@ function TradingPanel({pair, preSelectedOrder})
                                           else
                                             _onBuy(amount, price, type)};
 
-  const onSell = (amount, price, type) => {if(median_price && price.minus(median_price).div(median_price).lt(SLIPPAGE_WARNING))
-                                              confirmPopup({message: <p>The sell price is less than {SLIPPAGE_WARNING.mul(HUNDRED).toFixed(1)}% of the current prixe <br/> Are you sure you want to continue and experience probable slippage loss ?</p>,
-                                                            icon: 'pi pi-exclamation-triangle', defaultFocus: 'reject', acceptClassName: 'p-button-danger', accept:() => _onBuy(amount, price, type)})
+  const onSell = (amount, price, type) => {if(median_price && median_price.minus(price).div(median_price).gt(SLIPPAGE_WARNING))
+                                              confirmPopup({message: <p>The sell price is less than {SLIPPAGE_WARNING.mul(HUNDRED).toFixed(1)}% of the current price <br/> Are you sure you want to continue and experience probable slippage loss ?</p>,
+                                                            icon: 'pi pi-exclamation-triangle', defaultFocus: 'reject', acceptClassName: 'p-button-danger', accept:() => _onSell(amount, price, type)})
                                            else if(balance_base && balance_base.lt(compute_sell_total(amount, price, type)))
                                               confirmPopup({message: <p>Your {pair.base} balance is too low.<br/> The transaction will probably fail. <br/> Are you sure you want to continue?</p>,
                                                             icon: 'pi pi-exclamation-circle', defaultFocus: 'reject', acceptClassName: 'p-button-danger', accept:() => _onSell(amount, price, type)})
