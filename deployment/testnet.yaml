@@ -6,6 +6,5 @@ admin-key: db5d7064fe2f92c8ae7825f85da63477ab91e3ded61cdfdcd49244b538db82cd
 gas-payer: k:e0ba4204224cca1ea6144d502c7d2673ed30c7f7c837109f2a862a6774da09f5
 gas-payer-key: e0ba4204224cca1ea6144d502c7d2673ed30c7f7c837109f2a862a6774da09f5
 network: testnet04
-#pair: BRO-KDA
-pair: BRO-KDA-R
-ns: n_966932c40a83cebb2fb0aece0d80c5155e148778
+pair: PAIR
+ns: __NAMESPACE__
