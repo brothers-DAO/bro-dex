@@ -29,6 +29,7 @@ ${_DATA_FILE}: ${DATA_FILE}
 	m4 ${MACROS} $< > $@
 
 .pact/rb-tree.pact: templates/rb-tree.pact.m4 ../pact_RB_tree/pact/rb-tree.pact | .pact
+	m4 ${MACROS} ${INIT} $< > $@
 
 .pact/%-${PAIR}.pact: templates/%.pact.m4 ../pact/%.pact | .pact
 	m4 ${MACROS} ${INIT} $< > $@
