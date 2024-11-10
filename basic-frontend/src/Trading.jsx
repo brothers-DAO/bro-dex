@@ -62,7 +62,7 @@ function FeeHelpIcon({pair})
 function HalfTradingPanel({pair, fee, direction, onSubmit, preSelectedOrder})
 {
   const {account, key, signer} = useContext(AccountContext);
-  const {min_amount, max_amount, min_price, max_price} = usePairConfig(pair.name);
+  const {min_amount, max_amount, min_price, max_price, decimals} = usePairConfig(pair.name);
   const [amount, setAmount] = useState(null);
   const [price, setPrice] = useState(null);
   const [type, setType] = useState("GTC");
@@ -84,7 +84,7 @@ function HalfTradingPanel({pair, fee, direction, onSubmit, preSelectedOrder})
                 <label htmlFor="_form_amount" className="font-bold"> Quantity:</label>
                   <div className="p-inputgroup flex-1 w-14rem">
                     <span className="p-inputgroup-addon">{pair.base}</span>
-                    <InputNumber id="_form_amount" value={amount?amount.toNumber():null} invalid={amount_invalid(amount)} onValueChange={(e) => setAmount(_form_to_dec(e.value))} minFractionDigits={1} maxFractionDigits={12} />
+                    <InputNumber id="_form_amount" value={amount?amount.toNumber():null} invalid={amount_invalid(amount)} onValueChange={(e) => setAmount(_form_to_dec(e.value))} minFractionDigits={1} maxFractionDigits={decimals ?? 12} />
                   </div>
                   {amount_invalid(amount) && <Message className="max-w-max text-xs" severity="error" text={`[${min_amount} - ${max_amount} ]`}/>}
               </div>

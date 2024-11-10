@@ -11,6 +11,8 @@ MACROS= -D__NAMESPACE__=${NS} \
         -D__QUOTE_MOD__=n_ff0f76ee90735fba124eba93a1c49423c75654b1.abc \
         -D__BASE_MOD__=n_5d119cc07ffd5efaef5c7feef9e878f34e3d4652.bro \
         -D__MIN_AMOUNT__=0.001 \
+        -D__MIN_PRICE__=1.0 \
+				-D__DECIMALS__=6 \
         -D__FEE_ACOUNT__=r:${NS}.fees \
         -DRB_TREE_NS=${NS} \
 

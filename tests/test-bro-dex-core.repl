@@ -153,6 +153,31 @@
 (expect-failure "Not payed" "Order account not funded" (create-order false "carol" (read-keyset 'ks) 1.0 4.5))
 (rollback-tx)
 
+; With an amount less  than minimum
+(begin-tx)
+(use bro-dex-core-KDA-ABC)
+(use bro-dex-view-KDA-ABC)
+
+(env-data {'ks:["carol-key"]})
+(env-sigs [ {'key:"carol-key", 'caps:[(coin.TRANSFER "carol" (order-account (next-id)) 0.00225)]}])
+
+(coin.transfer-create "carol" (order-account (next-id)) (order-account-guard (next-id)) 0.00225)
+(expect-failure "Less than minimum" "Amount out of bounds" (create-order false "carol" (read-keyset 'ks) 0.0005 4.5))
+(rollback-tx)
+
+
+; With an amount not multiple of quantum
+(begin-tx)
+(use bro-dex-core-KDA-ABC)
+(use bro-dex-view-KDA-ABC)
+
+(env-data {'ks:["carol-key"]})
+(env-sigs [ {'key:"carol-key", 'caps:[(coin.TRANSFER "carol" (order-account (next-id)) 0.0045000045)]}])
+
+(coin.transfer-create "carol" (order-account (next-id)) (order-account-guard (next-id)) 0.0045000045)
+(expect-failure "Not a multiple of quantum" "Amount is not a multiple of" (create-order false "carol" (read-keyset 'ks) 0.001000001 4.5))
+(rollback-tx)
+
 
 ; Try a ASK create order
 (begin-tx)
@@ -210,6 +235,19 @@
 (expect-that "Ask Orderbook should have a size of 14" (compose (length) (= 14)) (get-orderbook true NIL 50))
 (expect-that "Bid Orderbook should have a size of 3" (compose (length) (= 3)) (get-orderbook false NIL 50))
 (expect-that "Carol Orderbook should have a size of 1" (compose (length) (= 1)) (get-orders-by-maker "carol" NIL  50))
+(rollback-tx)
+
+; With a price less than minimum
+(begin-tx)
+(use bro-dex-core-KDA-ABC)
+(use bro-dex-view-KDA-ABC)
+
+(env-data {'ks:["carol-key"]})
+(env-sigs [ {'key:"carol-key", 'caps:[(ABC_NS.abc.TRANSFER "carol" (order-account (next-id)) 1.0)]}])
+
+(ABC_NS.abc.transfer-create "carol" (order-account (next-id)) (order-account-guard (next-id)) 1.0)
+(expect-failure "Less than minimum" "Price out of bounds" (create-order true "carol" (read-keyset 'ks) 1.0 0.0001))
+
 (rollback-tx)
 
 
@@ -403,6 +441,43 @@
 
 (expect-that "Global history should contain 1 element" (compose (length) (= 1)) (get-orders-in-history NIL 50))
 (rollback-tx)
+
+; Try a take an order with an amount less than Quantum
+(begin-tx)
+(env-hash (hash "Take Bid-Not-Quantum"))
+(use bro-dex-core-KDA-ABC)
+(use bro-dex-view-KDA-ABC)
+(use free.util-lists)
+
+; Sanity check
+(expect "Initial ABC Balance of Maker" 93.0 (ABC_NS.abc.get-balance "alice"))
+(expect "Initial ABC Balance of Taker" 100.0 (ABC_NS.abc.get-balance "carol"))
+(expect "Initial coin Balance of Taker" 1000.0 (coin.get-balance "carol"))
+(expect "Initial ABC Balance of fee" 0.0 (ABC_NS.abc.get-balance "fee-receiver"))
+
+(env-sigs [ {'key:"carol-key", 'caps:[(ABC_NS.abc.TRANSFER "carol" (order-account 0896561851709965799993) 0.00000001001)]}])
+(ABC_NS.abc.transfer-create "carol" (order-account 0896561851709965799993) (order-account-guard 0896561851709965799993) 0.00000001001)
+(expect-failure "Less than quantum" "Amount out of bounds" (take-order 0896561851709965799993 "carol" 0.00000001))
+(rollback-tx)
+
+; Try a take an order with an amount not a multiple of Quantum
+(begin-tx)
+(env-hash (hash "Take Bid-Not-Quantum"))
+(use bro-dex-core-KDA-ABC)
+(use bro-dex-view-KDA-ABC)
+(use free.util-lists)
+
+; Sanity check
+(expect "Initial ABC Balance of Maker" 93.0 (ABC_NS.abc.get-balance "alice"))
+(expect "Initial ABC Balance of Taker" 100.0 (ABC_NS.abc.get-balance "carol"))
+(expect "Initial coin Balance of Taker" 1000.0 (coin.get-balance "carol"))
+(expect "Initial ABC Balance of fee" 0.0 (ABC_NS.abc.get-balance "fee-receiver"))
+
+(env-sigs [ {'key:"carol-key", 'caps:[(ABC_NS.abc.TRANSFER "carol" (order-account 0896561851709965799993) 0.100010010001)]}])
+(ABC_NS.abc.transfer-create "carol" (order-account 0896561851709965799993) (order-account-guard 0896561851709965799993) 0.100010010001)
+(expect-failure "Less than quantum" "Amount is not a multiple of" (take-order 0896561851709965799993 "carol" 0.10000001))
+(rollback-tx)
+
 
 
 ; Take a Bid order in THREE steps

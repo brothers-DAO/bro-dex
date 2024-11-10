@@ -1,6 +1,6 @@
 import {useLocalPactImmutable, local_pact} from './pact';
 import useSWRInfinite from 'swr/infinite';
-import {to_decimal, to_big_int, ZERO_FIVE} from './utils.js';
+import {to_decimal, to_int, to_big_int, ZERO_FIVE} from './utils.js';
 import {core_mod, wrapper_mod, view_mod} from './bro-dex-common';
 
 /* Modules refs */
@@ -13,14 +13,16 @@ const to_order = ({state, amount, id, price, "is-ask":is_ask, partial, "take-tx"
 
 export function usePairConfig(pair)
 {
-  const {data} = useLocalPactImmutable(`{'a:[${core_mod(pair)}.MIN-PRICE, ${core_mod(pair)}.MAX-PRICE, ${core_mod(pair)}.MIN-AMOUNT, ${core_mod(pair)}.MAX-AMOUNT, ${core_mod(pair)}.FEE-RATIO],
-                                       'b:${wrapper_mod(pair)}.DEPOSIT-ACCOUNT}`, NETWORK, CHAIN)
+  const {data} = useLocalPactImmutable(`{'d:[${core_mod(pair)}.MIN-PRICE, ${core_mod(pair)}.MAX-PRICE, ${core_mod(pair)}.QUANTUM-AMOUNT, ${core_mod(pair)}.MIN-AMOUNT, ${core_mod(pair)}.MAX-AMOUNT, ${core_mod(pair)}.FEE-RATIO],
+                                         's:${wrapper_mod(pair)}.DEPOSIT-ACCOUNT,
+                                         'i:[${core_mod(pair)}.DECIMALS]}`, NETWORK, CHAIN)
 
   if(data)
   {
-    const [min_price, max_price, min_amount, max_amount, fee_ratio] = data.a.map(to_decimal);
-    const deposit_account = data.b;
-    return {min_price, max_price, min_amount, max_amount,fee_ratio, deposit_account};
+    const [min_price, max_price, quantum_amount, min_amount, max_amount, fee_ratio] = data.d.map(to_decimal);
+    const [decimals] = data.i.map(to_int);
+    const deposit_account = data.s;
+    return {min_price, max_price, min_amount, max_amount, quantum_amount, decimals, fee_ratio, deposit_account};
   }
   return {};
 }

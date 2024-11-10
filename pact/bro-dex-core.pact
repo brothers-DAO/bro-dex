@@ -175,14 +175,22 @@
 
   ; -----------------FINANCIAL RELATED FUNCTIONS -------------------------------
   ; ----------------------------------------------------------------------------
-  (defconst MIN-PRICE 0.0)
+  (defconst MIN-PRICE __MIN_PRICE__)
   (defconst MAX-PRICE 1000000000000.0)
+
   (defconst MIN-AMOUNT __MIN_AMOUNT__)
   (defconst MAX-AMOUNT 100.0)
+
+  (defconst DECIMALS __DECIMALS__)
+  (defconst QUANTUM-AMOUNT (pow10 (- DECIMALS)))
 
   (defconst FEE-RATIO 0.001)
 
   ; We have here some useful functions to compute amounts
+  (defun enforce-quantum:bool (amount:decimal)
+    @doc "Verify that amount is a multiple of a quantum"
+    (enforce (= amount (floor amount DECIMALS)) (format "Amount is not a multiple of {}" [QUANTUM-AMOUNT])))
+
   (defun total-quote:decimal (price:decimal amount:decimal)
     @doc "Compute the raw price in QUOTE to pay"
     (floor (* price amount) (__QUOTE_MOD__.precision)))
@@ -336,7 +344,8 @@
     (let ((order (get-order id)))
       (bind order {'amount:=order-amount, 'price:=price, 'maker-acct:=maker, 'state:=state, 'is-ask:=is-ask}
         (enforce (= state STATE-ACTIVE) "Order not in active state")
-        (enforce (between 0.0 order-amount amount) "Amount out of bounds")
+        (enforce (between QUANTUM-AMOUNT order-amount amount) "Amount out of bounds")
+        (enforce-quantum amount)
         (with-capability (TAKE-ORDER id)
           ; 1 Take care of the taker
           (--transfer-from-order id (primary-currency is-ask) taker (if is-ask amount (total-quote price amount)))
@@ -371,8 +380,9 @@
     (let ((id (gen-id)))
       (enforce-order-account-min-balance id (primary-currency is-ask)
                                             (if is-ask amount (total-quote price amount)))
-      (enforce (and? (between MIN-PRICE MAX-PRICE) (< 0.0 ) price) "Price out of bounds")
+      (enforce (between MIN-PRICE MAX-PRICE price) "Price out of bounds")
       (enforce (between MIN-AMOUNT MAX-AMOUNT amount) "Amount out of bounds")
+      (enforce-quantum amount)
       (with-capability (MAKE-ORDER id)
         (insert-order (+ {'id:id, 'state:STATE-ACTIVE, 'is-ask:is-ask,
                           'price:price, 'amount:amount, 'maker-acct:maker, 'guard:maker-guard} NIL-ORDER)))

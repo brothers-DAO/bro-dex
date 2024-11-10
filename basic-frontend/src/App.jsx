@@ -113,6 +113,8 @@ function PairInfoCard({pair})
 
             {config?.max_amount  && <li> <span className="font-bold">Maximum amount (Qty):</span> {config.max_amount.toString()} {pair.base}</li>}
 
+            {config?.quantum_amount  && <li> <span className="font-bold">Quantum amount (Qty):</span> {config.quantum_amount.toString()} {pair.base}</li>}
+
             {config?.min_price  && <li> <span className="font-bold">Minimum price:</span> {config.min_price.toString()} {pair.quote}</li>}
 
             {config?.max_price  && <li> <span className="font-bold">Maximum price:</span> {config.max_price.toString()} {pair.quote}</li>}

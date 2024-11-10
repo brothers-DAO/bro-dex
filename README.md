@@ -129,6 +129,23 @@ Maker active Orders: Double linked list
 User History: Single linked list
 Global history: Single linked list
 
+### DoS and minimum amounts/prices considerations
+
+#### Prevent "cheap orders"
+An attacker could submit thousands of very cheap orders, making it mandatory for takers to spend a lot of gas (in the worst case, more than transferred value) for using the DEX.
+To prevent this, each pair has a `MIN-AMOUNT` constant which applies for each order creation.
+
+#### Prevent 0-value transfers
+An attacker could take partially an order and let minimal remaining, which could lead to 0-value transfers (especially on the fee part), and stuck the DEX.
+To prevent this, taking operations are allowed only to transact amounts in multiples of `QUANTUM-AMOUNT` defined by the constant `DECIMALS`, and `MIN-PRICE` applies for each order creation.
+
+The equations must hold for all deployed DEX modules:
+`QUANTUM-AMOUNT` = 10 ^ -`DECIMALS`
+`MIN-AMOUNT` >= `QUANTUM-AMOUNT` and `MIN-AMOUNT` is a multiple of `QUANTUM-AMOUNT`
+`QUANTUM-AMOUNT` * `MIN-PRICE` >= minimum transferable amount of the base token (usually 1e-12)
+`MIN-AMOUNT` * `MIN-PRICE` * `FEE-RATIO` >= minimum transferable amount for the quote token (usually 1e-12)
+
+
 
 ![Bro DEX Linked Lists](/docs/bro-dex-data-structures.svg)
 
