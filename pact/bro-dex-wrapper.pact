@@ -145,7 +145,7 @@
     @doc "Buy using a GTC policy. Using an hint is recommended"
     (--init-buy-accounts account account-guard (total-quote-with-fee limit amount))
     (bind (fold-try-immediate-buy account limit amount) {'rem:=remaining, 'cnt:=immediate-count}
-      (if (and (> remaining 0.0) (< immediate-count MAX-TAKE-ORDERS))
+      (if (and (>= remaining MIN-AMOUNT) (< immediate-count MAX-TAKE-ORDERS))
           (let ((id (next-id)))
             (install-capability (__QUOTE_MOD__.TRANSFER DEPOSIT-ACCOUNT (order-account id) (total-quote limit remaining)))
             (with-capability (DEPOSIT-ACCOUNT-CAP)
@@ -160,7 +160,7 @@
     (--init-sell-accounts account account-guard (base-with-fee amount))
     (bind (fold-try-immediate-sell account limit amount)
           {'rem:=remaining, 'cnt:=immediate-count}
-      (if (and (> remaining 0.0) (< immediate-count MAX-TAKE-ORDERS))
+      (if (and (>= remaining MIN-AMOUNT) (< immediate-count MAX-TAKE-ORDERS))
           (let ((id (next-id)))
             (install-capability (__BASE_MOD__.TRANSFER DEPOSIT-ACCOUNT (order-account id) remaining))
             (with-capability (DEPOSIT-ACCOUNT-CAP)
