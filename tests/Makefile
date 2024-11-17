@@ -5,19 +5,19 @@ all: .gen/bro-dex-core-KDA-ABC.pact .gen/bro-dex-wrapper-KDA-ABC.pact .gen/bro-d
 .gen:
 	mkdir -p .gen
 
-.gen/bro-dex-core-KDA-ABC.pact: ../pact/bro-dex-core.pact .gen
+.gen/bro-dex-core-KDA-ABC.pact: ../pact/bro-dex-core.pact | .gen
 	m4 ${MACROS} $< > $@
 
-.gen/bro-dex-repl-KDA-ABC.pact: ../pact/bro-dex-repl.pact .gen
+.gen/bro-dex-repl-KDA-ABC.pact: ../pact/bro-dex-repl.pact | .gen
 	m4 ${MACROS} $< > $@
 
-.gen/bro-dex-wrapper-KDA-ABC.pact: ../pact/bro-dex-wrapper.pact .gen
+.gen/bro-dex-wrapper-KDA-ABC.pact: ../pact/bro-dex-wrapper.pact | .gen
 	m4 ${MACROS} $< > $@
 
-.gen/bro-dex-view-KDA-ABC.pact: ../pact/bro-dex-view.pact .gen
+.gen/bro-dex-view-KDA-ABC.pact: ../pact/bro-dex-view.pact | .gen
 	m4 ${MACROS} $< > $@
 
-.gen/rb-tree.pact: ../pact_RB_tree/pact/rb-tree.pact .gen
+.gen/rb-tree.pact: ../pact_RB_tree/pact/rb-tree.pact | .gen
 	m4 ${MACROS} $< > $@
 
 CORE_MODS = .gen/bro-dex-core-KDA-ABC.pact .gen/bro-dex-repl-KDA-ABC.pact .gen/rb-tree.pact
