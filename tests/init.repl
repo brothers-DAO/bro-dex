@@ -38,7 +38,7 @@
 (create-table pointer-table)
 (init)
 (load ".gen/bro-dex-view-KDA-ABC.pact")
-(load "helpers/test-helpers.pact")
+(load ".gen/bro-dex-repl-KDA-ABC.pact")
 (commit-tx)
 
 

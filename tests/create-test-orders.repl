@@ -1,8 +1,7 @@
 (begin-tx)
 (use bro-dex-core-KDA-ABC)
 (use bro-dex-view-KDA-ABC)
-(use free.util-strings)
-(use test-helpers)
+(use bro-dex-repl-KDA-ABC)
 
 (env-data {'ks:["alice-key"]})
 (env-sigs [ {'key:"alice-key", 'caps:[(ABC_NS.abc.TRANSFER "alice" (order-account (next-id)) 1.0)]}])
