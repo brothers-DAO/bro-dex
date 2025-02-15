@@ -266,11 +266,11 @@
     @doc "Low level function for inserting a new order. Updates Orderbook and Maker's linked lists"
     (bind order {'id:=id, 'price:=price, 'maker-acct:=maker, 'is-ask:=cur-is-ask}
       (require-capability (INSERT-ORDER id))
-        (let ((last-first-maker (swap-ptr (maker-head maker) id)))
+        (let ((old-first-maker (swap-ptr (maker-head maker) id)))
           (rb-tree.insert-value (if cur-is-ask ASK_TREE BID_TREE) (key id)  (if cur-is-ask price (- price)))
-          (insert order-table (key id) (+ {'state:STATE-ACTIVE, 'm-p:NIL, 'm-n:last-first-maker} order))
+          (insert order-table (key id) (+ {'state:STATE-ACTIVE, 'm-p:NIL, 'm-n:old-first-maker} order))
           ; Maker's linked list => Push on head
-          (update order-table (key last-first-maker) {'m-p:id})
+          (update order-table (key old-first-maker) {'m-p:id})
 
         ))
   )
