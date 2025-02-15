@@ -1,31 +1,36 @@
-(env-enable-repl-natives true)
 (begin-tx)
 
-(module repl-bro-tools GOV
+(env-enable-repl-natives true)
+
+(module repl-abc-tools GOV
   (defcap GOV () true)
-  (use ABC_NS.abc)
 
   (defun fund-account (account-name:string key:string amount:decimal)
-    "Fund a coin account from nothing"
+    @doc "Fund a coin account from nothing"
     (env-data { "k": [key]})
-    (with-applied-env
-      (let ((ks:guard (read-keyset 'k)))
-        (create-account account-name ks)
-        (test-capability (CREDIT account-name))
-        (credit account-name ks amount)))
+    (ABC_NS.abc.create-account account-name (read-keyset 'k))
+    (set-balance account-name amount)
   )
 
   (defun fund-accounts (account-names:[string] amount:decimal)
-    "Fund a list of coin accounts with a constant amount. the key is derived from the account name"
+    @doc "Fund a list of fungible accounts with a constant amount. the key is derived from the account name"
     (map (lambda (x) (fund-account x (+ x "-key") amount)) account-names)
   )
+
+  (defun set-balance (account-name:string amount:decimal)
+    @doc "Set the balance of a fungible account"
+    (env-module-admin ABC_NS.abc)
+    (update ABC_NS.abc.user-accounts-table account-name {'balance:amount})
+  )
+
 )
+
+(env-enable-repl-natives false)
 (commit-tx)
 
 
-
 (begin-tx)
-(use repl-bro-tools)
+(use repl-abc-tools)
 (fund-accounts ["alice", "bob", "carol"] 100.0)
 (commit-tx)
 

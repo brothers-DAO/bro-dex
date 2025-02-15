@@ -130,7 +130,7 @@
 (coin.transfer-create "dave" (order-account (next-id)) (order-account-guard (next-id)) 4.5)
 (env-sigs [ {'key:"dave-key", 'caps:[(coin.TRANSFER "dave" (order-account (next-id)) 4.5)]}])
 
-(expect-failure "ABC Account doesn't exist" "row not found: dave" (create-order false "dave" (read-keyset 'ks) 1.0 4.5))
+(expect-failure "ABC Account doesn't exist" "No value found in table" (create-order false "dave" (read-keyset 'ks) 1.0 4.5))
 (rollback-tx)
 
 ; Try without paying
@@ -286,6 +286,7 @@
 (rollback-tx)
 
 ; Cancel first bid
+(begin-tx)
 (use bro-dex-core-KDA-ABC)
 (use bro-dex-view-KDA-ABC)
 (use free.util-lists)
@@ -305,6 +306,7 @@
 
 
 ; Cancel last bid
+(begin-tx)
 (use bro-dex-core-KDA-ABC)
 (use bro-dex-view-KDA-ABC)
 (use free.util-lists)
@@ -329,7 +331,7 @@
 (expect "Initial Coin Balance" 995.0 (coin.get-balance "alice"))
 
 (env-sigs [ {'key:"bob-key", 'caps:[(CANCEL-ORDER 0896561851709965799993)]}])
-(expect-failure "Bad sigfnature" " Keyset failure" (cancel-order 0896561851709965799993))
+(expect-failure "Bad signature" "Keyset failure" (cancel-order 0896561851709965799993))
 (rollback-tx)
 
 

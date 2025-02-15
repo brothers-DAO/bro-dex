@@ -1,5 +1,6 @@
 .gen
 .pact-history
+.pc-history
 .pact
 tx*.yaml
 tx*.json

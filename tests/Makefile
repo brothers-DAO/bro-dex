@@ -1,5 +1,9 @@
 MACROS=-DPAIR=KDA-ABC -D__QUOTE_MOD__=coin -D__BASE_MOD__=ABC_NS.abc -D__MIN_AMOUNT__=0.001 -D__MIN_PRICE__=0.1 -D__DECIMALS__=6 -D__FEE_ACOUNT__=fee-receiver
 
+PACT = pact -t
+
+POST = | grep "FAILURE" || true
+
 all: .gen/bro-dex-core-KDA-ABC.pact .gen/bro-dex-wrapper-KDA-ABC.pact .gen/bro-dex-view-KDA-ABC.pact .gen/rb-tree.pact
 
 .gen:
@@ -24,19 +28,19 @@ CORE_MODS = .gen/bro-dex-core-KDA-ABC.pact .gen/bro-dex-repl-KDA-ABC.pact .gen/r
 
 
 test-core: ${CORE_MODS} .gen/bro-dex-view-KDA-ABC.pact
-	pact test-bro-dex-core.repl
+	${PACT} test-bro-dex-core.repl ${POST}
 
 test-wrapper-ioc: ${CORE_MODS} .gen/bro-dex-wrapper-KDA-ABC.pact .gen/bro-dex-view-KDA-ABC.pact
-	pact test-bro-dex-wrapper-ioc.repl
+	${PACT} test-bro-dex-wrapper-ioc.repl ${POST}
 
 test-wrapper-gtc: ${CORE_MODS} .gen/bro-dex-wrapper-KDA-ABC.pact .gen/bro-dex-view-KDA-ABC.pact
-	pact test-bro-dex-wrapper-gtc.repl
+	${PACT} test-bro-dex-wrapper-gtc.repl ${POST}
 
 test-wrapper-fok: ${CORE_MODS} .gen/bro-dex-wrapper-KDA-ABC.pact .gen/bro-dex-view-KDA-ABC.pact
-	pact test-bro-dex-wrapper-fok.repl
+	${PACT} test-bro-dex-wrapper-fok.repl ${POST}
 
 test-wrapper-post-only: ${CORE_MODS} .gen/bro-dex-wrapper-KDA-ABC.pact .gen/bro-dex-view-KDA-ABC.pact
-	pact test-bro-dex-wrapper-post-only.repl
+	${PACT} test-bro-dex-wrapper-post-only.repl ${POST}
 
 test: test-core test-wrapper-ioc test-wrapper-gtc test-wrapper-fok test-wrapper-post-only
 

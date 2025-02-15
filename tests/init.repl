@@ -1,3 +1,5 @@
+(enforce-pact-version "5.0")
+
 (load "kadena_repl_sandbox/kda-env/init.repl")
 
 (begin-tx)
@@ -27,6 +29,7 @@
 (commit-tx)
 
 (begin-tx)
+(env-hash "2n12TVKIdyigszwESxXUSOkAtK48XfsKcVoUGxWYSSE")
 (namespace "")
 (env-data {'ks:["fee-key"]})
 (coin.create-account "fee-receiver" (read-keyset 'ks))

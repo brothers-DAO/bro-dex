@@ -101,9 +101,8 @@
     @doc "Util function to transfer back remaining funds (cleaning) from the deposit account to the user"
     (let ((remaining-quote (mod::get-balance DEPOSIT-ACCOUNT)))
       (if (> remaining-quote 0.0)
-          (let ((_ 0))
-            (install-capability (mod::TRANSFER DEPOSIT-ACCOUNT account remaining-quote))
-            (with-capability (DEPOSIT-ACCOUNT-CAP)
+          (do (install-capability (mod::TRANSFER DEPOSIT-ACCOUNT account remaining-quote))
+              (with-capability (DEPOSIT-ACCOUNT-CAP)
               (mod::transfer DEPOSIT-ACCOUNT account remaining-quote)))
           RETURN-SUCCESS))
   )
