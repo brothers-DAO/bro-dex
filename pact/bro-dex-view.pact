@@ -79,10 +79,8 @@
   (defun --initial-account-history:integer (account:string from:integer)
     (if (is-nil from)
         (pointer (account-history-head account))
-        (let ((o (get-order from)))
-          (if (= account (at 'maker-acct o))
-              (at 'h-m-n o)
-              (at 'h-t-n o))))
+        (bind (get-order from) {'maker-acct:=maker, 'h-m-n:=h-m-n, 'h-t-n:=h-t-n}
+          (if (= account maker) h-m-n h-t-n)))
   )
 
   ; -------------------------- PUBLIC FUNCTIONS  -------------------------------

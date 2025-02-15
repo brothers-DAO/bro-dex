@@ -28,6 +28,9 @@
 
   ; ------------------------ UTIl FUNCTION - -----------------------------------
   ; ----------------------------------------------------------------------------
+  (defun and-3:bool (a:bool b:bool c:bool)
+    (and a (and b c)))
+
   (defun --init-buy-accounts:string (account:string guard:guard amount:decimal)
     @doc "Do the common buying stuffs: \
        \   1 - Transfer QUOTE to the DEPOSIT account \
@@ -62,12 +65,12 @@
     @doc "Immediate buy iteration => Check if an order can be taken and do it if possible"
     (bind (first-ask) {'id:=id, 'amount:=amount, 'price:=price, 'state:=state}
       (bind iterator {'rem:=remaining, 'cnt:=prev-cnt}
-        (if (and (and (< 0.0 remaining) ; Do we have some remaining to buy
-                      (= state STATE-ACTIVE)) ;Is the ask order valid
-                      (<= price limit)) ; Is the price of the ask order less than the user limit
-            (with-capability (DEPOSIT-ACCOUNT-CAP)
-              (install-capability (__QUOTE_MOD__.TRANSFER DEPOSIT-ACCOUNT  (order-account id) (total-quote-with-fee price (min remaining amount))))
-              (__QUOTE_MOD__.transfer-create DEPOSIT-ACCOUNT (order-account id) (order-account-guard id) (total-quote-with-fee price (min remaining amount)))
+        (if (and-3 (< 0.0 remaining) ; Do we have some remaining to buy
+                   (= state STATE-ACTIVE) ;Is the ask order valid
+                   (<= price limit)) ; Is the price of the ask order less than the user limit
+          (do (install-capability (__QUOTE_MOD__.TRANSFER DEPOSIT-ACCOUNT  (order-account id) (total-quote-with-fee price (min remaining amount))))
+              (with-capability (DEPOSIT-ACCOUNT-CAP)
+                (__QUOTE_MOD__.transfer-create DEPOSIT-ACCOUNT (order-account id) (order-account-guard id) (total-quote-with-fee price (min remaining amount))))
               {'rem: (- remaining (take-order id taker (min remaining amount))), 'cnt:(++ prev-cnt)})
           iterator)))
   )
@@ -80,15 +83,14 @@
     @doc "Immediate sell iteration => Check if an order can be taken and do it if possible"
     (bind (first-bid) {'id:=id, 'amount:=amount, 'price:=price, 'state:=state}
       (bind iterator {'rem:=remaining, 'cnt:=prev-cnt}
-        (if (and (and (< 0.0 remaining) ; Do we have some remaining to sell
-                      (= state STATE-ACTIVE)) ;Is the bid order valid
-                      (>= price limit)) ; Is the price of the bid order higher than the user limit
-
-            (with-capability (DEPOSIT-ACCOUNT-CAP)
-              (install-capability (__BASE_MOD__.TRANSFER DEPOSIT-ACCOUNT  (order-account id) (base-with-fee (min remaining amount))))
-              (__BASE_MOD__.transfer-create DEPOSIT-ACCOUNT (order-account id) (order-account-guard id) (base-with-fee (min remaining amount)))
+        (if (and-3 (< 0.0 remaining) ; Do we have some remaining to sell
+                   (= state STATE-ACTIVE) ;Is the bid order valid
+                   (>= price limit)) ; Is the price of the bid order higher than the user limit
+          (do (install-capability (__BASE_MOD__.TRANSFER DEPOSIT-ACCOUNT  (order-account id) (base-with-fee (min remaining amount))))
+              (with-capability (DEPOSIT-ACCOUNT-CAP)
+                (__BASE_MOD__.transfer-create DEPOSIT-ACCOUNT (order-account id) (order-account-guard id) (base-with-fee (min remaining amount))))
               {'rem: (- remaining (take-order id taker (min remaining amount))), 'cnt:(++ prev-cnt)})
-            iterator)))
+          iterator)))
   )
 
   (defun fold-try-immediate-sell:object{imm-result} (taker:string limit:decimal amount:decimal)
@@ -103,7 +105,7 @@
       (if (> remaining-quote 0.0)
           (do (install-capability (mod::TRANSFER DEPOSIT-ACCOUNT account remaining-quote))
               (with-capability (DEPOSIT-ACCOUNT-CAP)
-              (mod::transfer DEPOSIT-ACCOUNT account remaining-quote)))
+                (mod::transfer DEPOSIT-ACCOUNT account remaining-quote)))
           RETURN-SUCCESS))
   )
 
@@ -138,7 +140,6 @@
       (enforce (= 0.0 remaining) "Order not immediately filled"))
     (transfer-back __BASE_MOD__ account)
   )
-
 
   (defun buy-gtc:string (account:string account-guard:guard amount:decimal limit:decimal)
     @doc "Buy using a GTC policy. Using an hint is recommended"
