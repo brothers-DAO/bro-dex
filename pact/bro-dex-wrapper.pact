@@ -101,11 +101,11 @@
   ; ----------------------------------------------------------------------------
   (defun transfer-back:string (mod:module{fungible-v2} account:string)
     @doc "Util function to transfer back remaining funds (cleaning) from the deposit account to the user"
-    (let ((remaining-quote (mod::get-balance DEPOSIT-ACCOUNT)))
-      (if (> remaining-quote 0.0)
-          (do (install-capability (mod::TRANSFER DEPOSIT-ACCOUNT account remaining-quote))
+    (let ((remaining (mod::get-balance DEPOSIT-ACCOUNT)))
+      (if (> remaining 0.0)
+          (do (install-capability (mod::TRANSFER DEPOSIT-ACCOUNT account remaining))
               (with-capability (DEPOSIT-ACCOUNT-CAP)
-                (mod::transfer DEPOSIT-ACCOUNT account remaining-quote)))
+                (mod::transfer DEPOSIT-ACCOUNT account remaining)))
           RETURN-SUCCESS))
   )
 
