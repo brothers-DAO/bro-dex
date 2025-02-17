@@ -303,7 +303,7 @@
     @doc "Low level function for taking an order in Full. Update history"
     (bind order {'maker-acct:=maker, 'id:=id, 'amount:=amount}
       (require-capability (TAKE-ORDER id))
-        ; Taking the order in full means = Removing it from the orderbook, and updatinf history's linked lists
+        ; Taking the order in full means = Removing it from the orderbook, and updating history's linked lists
       (remove-order (+ {'h-m-n: (swap-ptr (account-history-head maker) id), ; Push to maker history
                         'h-t-n: (swap-ptr (account-history-head taker) id), ; Push to taker history
                         'h-n: (swap-ptr GLOBAL-HISTORY id), ;Push to main history
@@ -313,6 +313,9 @@
 
   (defun take-order-partial:decimal (order:object{order-sch} taker:string amount:decimal)
     @doc "Low level function for takinga partial order, appends a dummy order in history and update amounts"
+    ; Taking partially an order is done by
+    ;   - Decrement the amount of the order => and Tag it as partial
+    ;   - Create a dummy-order for history purposes
     (bind order {'id:=id, 'amount:=prev-amount, 'maker-acct:=maker}
       (require-capability (TAKE-ORDER id))
       (update order-table (key id) {'amount:(- prev-amount amount), 'partial:true})
