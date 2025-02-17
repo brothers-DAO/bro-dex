@@ -26,31 +26,33 @@
 
   (defconst RETURN-SUCCESS "DEX Order successful")
 
-  ; ------------------------ UTIl FUNCTION - -----------------------------------
+  ; ------------------------ UTIL FUNCTIONS ------------------------------------
   ; ----------------------------------------------------------------------------
   (defun and-3:bool (a:bool b:bool c:bool)
     (and a (and b c)))
 
-  (defun --init-buy-accounts:string (account:string guard:guard amount:decimal)
+  (defun --create-account:bool (fungible:module{fungible-v2} account:string guard:guard)
+    @doc "Create an account if not exist"
+    (let ((bal (try -1.0 (fungible::get-balance account))))
+      (if (= bal -1.0)
+          (do (fungible::create-account account guard) true)
+          false))
+  )
+
+  (defun --init-buy-accounts:bool (account:string guard:guard amount:decimal)
     @doc "Do the common buying stuffs: \
        \   1 - Transfer QUOTE to the DEPOSIT account \
        \   2 - Create BASE user account"
     (__QUOTE_MOD__.transfer-create account DEPOSIT-ACCOUNT DEPOSIT-ACCOUNT-GUARD amount)
-    (let ((bal (try -1.0 (__BASE_MOD__.get-balance account))))
-      (if (= bal -1.0)
-          (__BASE_MOD__.create-account account guard)
-          ""))
+    (--create-account __BASE_MOD__ account guard)
   )
 
-  (defun --init-sell-accounts:string (account:string guard:guard amount:decimal)
+  (defun --init-sell-accounts:bool (account:string guard:guard amount:decimal)
     @doc "Do the common selling stuffs: \
        \   1 - Transfer BASE to the DEPOSIT account \
        \   2 - Create QUOTE user account"
     (__BASE_MOD__.transfer-create account DEPOSIT-ACCOUNT DEPOSIT-ACCOUNT-GUARD amount)
-    (let ((bal (try -1.0 (__QUOTE_MOD__.get-balance account))))
-      (if (= bal -1.0)
-          (__QUOTE_MOD__.create-account account guard)
-          ""))
+    (--create-account __QUOTE_MOD__ account guard)
   )
 
   ; ----------------- IMMEDIATE (TAKE) SALES ROUTINES --------------------------
