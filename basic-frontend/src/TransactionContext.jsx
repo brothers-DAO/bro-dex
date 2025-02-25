@@ -74,10 +74,10 @@ function TransactionContextProvider({children})
 
                     }, [poll_result, poll_error, submit_result])
 
-  return <TransactionContext.Provider value={{setTrx, trxCount}} >
+  return <TransactionContext value={{setTrx, trxCount}} >
           <Toast ref={toast} position="top-left"/>
           {children}
-         </TransactionContext.Provider>
+         </TransactionContext>
 
 }
 
