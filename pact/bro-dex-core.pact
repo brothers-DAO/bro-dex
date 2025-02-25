@@ -9,7 +9,7 @@
 
   ; --------------------------- CAPABILITIES -----------------------------------
   ; ----------------------------------------------------------------------------
-  (defcap MAKE-ORDER (id:integer)
+  (defcap MAKE-ORDER (id:integer amount:decimal price:decimal)
     @doc "Main cap acquired when creating an order"
     @event
     (compose-capability (INSERT-ORDER id))
@@ -17,7 +17,7 @@
     (compose-capability (UPDATE-TREE))
   )
 
-  (defcap TAKE-ORDER (id:integer)
+  (defcap TAKE-ORDER (id:integer amount:decimal)
     @doc "Main cap acquired when taking an order"
     @event
     (compose-capability (REMOVE-ORDER id))
@@ -302,7 +302,7 @@
   (defun take-order-full:decimal (order:object{order-sch} taker:string)
     @doc "Low level function for taking an order in Full. Update history"
     (bind order {'maker-acct:=maker, 'id:=id, 'amount:=amount}
-      (require-capability (TAKE-ORDER id))
+      (require-capability (TAKE-ORDER id amount))
         ; Taking the order in full means = Removing it from the orderbook, and updating history's linked lists
       (remove-order (+ {'h-m-n: (swap-ptr (account-history-head maker) id), ; Push to maker history
                         'h-t-n: (swap-ptr (account-history-head taker) id), ; Push to taker history
@@ -317,7 +317,7 @@
     ;   - Decrement the amount of the order => and Tag it as partial
     ;   - Create a dummy-order for history purposes
     (bind order {'id:=id, 'amount:=prev-amount, 'maker-acct:=maker}
-      (require-capability (TAKE-ORDER id))
+      (require-capability (TAKE-ORDER id amount))
       (update order-table (key id) {'amount:(- prev-amount amount), 'partial:true})
 
       (let ((dummy-id (gen-id)))
@@ -349,7 +349,7 @@
         (enforce (= state STATE-ACTIVE) "Order not in active state")
         (enforce (between QUANTUM-AMOUNT order-amount amount) "Amount out of bounds")
         (enforce-quantum amount)
-        (with-capability (TAKE-ORDER id)
+        (with-capability (TAKE-ORDER id amount)
           ; 1 Take care of the taker
           (--transfer-from-order id (primary-currency is-ask) taker (if is-ask amount (total-quote price amount)))
           ; 2 Take care of the maker
@@ -386,7 +386,7 @@
       (enforce (between MIN-PRICE MAX-PRICE price) "Price out of bounds")
       (enforce (between MIN-AMOUNT MAX-AMOUNT amount) "Amount out of bounds")
       (enforce-quantum amount)
-      (with-capability (MAKE-ORDER id)
+      (with-capability (MAKE-ORDER id amount price)
         (insert-order (+ {'id:id, 'state:STATE-ACTIVE, 'is-ask:is-ask,
                           'price:price, 'amount:amount, 'maker-acct:maker, 'guard:maker-guard} NIL-ORDER)))
       id)
