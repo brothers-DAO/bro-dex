@@ -138,20 +138,22 @@ function PairPanel({pair})
 {
   const [lastClickedOrder, setLastClickedOrder] = useState(null)
   return  <div className="flex flex-column max-w-max">
+            <title>{"BRO Dex: " + pair.display_name}</title>
             <PairInfoCard pair={pair} />
-          <div className="flex flex-row flex-wrap">
 
-          <div className="flex flex-column min-w-min">
-            <OrderBookCard pair={pair} onClick={x => setLastClickedOrder(x)}/>
-            <HistoryCard  pair={pair}/>
-          </div>
+            <div className="flex flex-row flex-wrap">
 
-          <div className="flex flex-column">
-            <TradingCard pair={pair} preSelectedOrder={lastClickedOrder}/>
-            <AccountCard pair={pair}/>
+              <div className="flex flex-column min-w-min">
+                <OrderBookCard pair={pair} onClick={x => setLastClickedOrder(x)}/>
+                <HistoryCard  pair={pair}/>
+              </div>
+
+              <div className="flex flex-column">
+                <TradingCard pair={pair} preSelectedOrder={lastClickedOrder}/>
+                <AccountCard pair={pair}/>
+              </div>
           </div>
         </div>
-      </div>
 }
 
 function GlobalDex()
