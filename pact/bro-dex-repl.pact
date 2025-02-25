@@ -20,7 +20,7 @@
   (defun format-order:string (order:object{order-sch})
     @doc "Format (to pretty string) an order object"
     (bind order {'id:=id, 'is-ask:=is-ask, 'amount:=amount, 'price:=price, 'partial:=partial}
-      (format "{} {} / {} - {}{}" [(if is-ask "--->" "<---"), (format-id id), amount, price, (if partial " (P)" "")]))
+      (format "{} {} / {} - {}{}" [(if is-ask "--A-->" "<--B--"), (format-id id), amount, price, (if partial " (P)" "")]))
   )
 
   (defun --format-title:string (x:string)
@@ -38,8 +38,8 @@
   (defun format-all-orders:string ()
     @doc "Fetch and format all orders of the orderbook"
     (join "\n" (+ [(format-title "ORDER-BOOK")]
-                  (+ (map (format-order) (reverse (get-orderbook false NIL ORDERS-COUNT)))
-                     (map (format-order) (get-orderbook true NIL ORDERS-COUNT)))))
+                  (+ (map (format-order) (reverse (get-orderbook true NIL ORDERS-COUNT)))
+                     (map (format-order) (get-orderbook false NIL ORDERS-COUNT)))))
   )
 
   (defun all-orders-for:string (account:string)
