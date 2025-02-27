@@ -1,5 +1,6 @@
 import {useState} from 'react';
 import {Decimal} from 'decimal.js';
+import { preload } from 'react-dom';
 
 import { TabView, TabPanel } from 'primereact/tabview';
 import { Panel } from 'primereact/panel';
@@ -20,6 +21,8 @@ import {TradingPanel} from './Trading';
 import {ModuleLink} from './Explorer';
 import _PAIRS from '../pairs.json';
 const PAIRS = _PAIRS.map(({orderbook_precision, ...rest}) => ({orderbook_precision:Decimal(orderbook_precision), ...rest}))
+
+import ChainWeaverIcon from './img/chainweaver-icon.png'
 
 import './App.css';
 
@@ -166,6 +169,8 @@ function GlobalDex()
 
 function App()
 {
+  // Preload wallet' images
+  preload(ChainWeaverIcon, {as:"image"})
   return  <AccountContextProvider>
             <TransactionContextProvider>
               <MainBar />
