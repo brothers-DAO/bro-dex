@@ -1,4 +1,4 @@
-import {createClient, Pact} from '@kadena/client'
+import {createClient, getHostUrl,Pact} from '@kadena/client'
 import useSWR from 'swr';
 import useSWRImmutable from 'swr/immutable'
 
@@ -6,7 +6,7 @@ const LOCAL_GAS_LIMIT = 150000
 
 
 
-const client = createClient()
+const client = createClient(getHostUrl(import.meta.env.VITE_ENDPOINT))
 
 function local_check(cmd, options)
 {
