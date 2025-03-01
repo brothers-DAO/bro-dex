@@ -369,11 +369,7 @@
         (enforce (= state STATE-ACTIVE) "Order not in active state")
         (with-capability (CANCEL-ORDER id)
           (enforce-guard guard)
-          (let ((currency:module{fungible-v2} (primary-currency is-ask))
-                (total-amount (if is-ask amount (total-quote price amount))))
-
-            (install-capability (currency::TRANSFER (order-account id) maker total-amount))
-            (currency::transfer  (order-account id) maker total-amount))
+          (--transfer-from-order id (primary-currency is-ask) maker  (if is-ask amount (total-quote price amount)))
           (--cancel-order order))))
   )
 
