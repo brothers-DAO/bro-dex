@@ -7,13 +7,15 @@ export const TransactionLink = ({trx}) => <a target="_blank" href={EXPLORER + "/
                                             <i className="pi pi-external-link" / >
                                           </a>
 
-export const AccountLink = ({account, fungible}) => <a target="_blank" href={`${EXPLORER}/account/${account}?token=${fungible}`}>
+export const AccountLink = ({account, fungible}) => (account && fungible)
+                                                    ?(<a target="_blank" href={`${EXPLORER}/account/${account}?token=${fungible}`}>
                                                       <i className="pi pi-external-link" / >
-                                                    </a>
+                                                    </a>):""
 
-export const AccountTransferLink = ({account, fungible}) => <a target="_blank" href={`${EXPLORER}/transfer/${account}?chain=${CHAIN}&token=${fungible}`}>
+export const AccountTransferLink = ({account, fungible}) => (account && fungible)
+                                                            ?(<a target="_blank" href={`${EXPLORER}/transfer/${account}?chain=${CHAIN}&token=${fungible}`}>
                                                               <i className="pi pi-external-link" / >
-                                                            </a>
+                                                            </a>):""
 
 export const ModuleLink = ({module}) => <a target="_blank" href={`${BALANCE_EXPLORER}/modules.html?server=${ENDPOINT}&module=${module}&chain=${CHAIN}`}>
                                               <i className="pi pi-external-link" / >
