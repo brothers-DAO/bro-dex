@@ -1,6 +1,6 @@
 .NiceOrderbook {
   background-color: #151825;
-  color: rgba(255, 255, 255, 0.6);
+  color: rgba(255, 255, 255, 0.9);
   display: inline-block;
   font-family: -apple-system, BlinkMacSystemFont, sans-serif;
   font-size: 13px;
@@ -69,11 +69,14 @@
 
 
 .NiceOrderbook__side--asks .NiceOrderbook__size:before {
-  background: linear-gradient(to left,  rgba(235,64,52, 1), red) 0% 0px / var(--ob-size) 100% no-repeat;
+
+  background: linear-gradient(to left, red, red) 0% 0px / var(--ob-size) 100% no-repeat,
+              linear-gradient(to left, var(--red-800), var(--red-400)) 0% 0px / var(--ob-cum-size) 100% no-repeat;
+
   content: '';
   height: 100%;
   left: 0;
-  opacity: 0.1;
+  opacity: 0.5;
   position: absolute;
   top: 0;
   width: 100%;
@@ -82,11 +85,12 @@
 
 
 .NiceOrderbook__side--bids .NiceOrderbook__size:before {
-  background: linear-gradient(to left,  rgba(0,216,101, 1),  green) 100% 0px / var(--ob-size) 100% no-repeat;
+  background: linear-gradient(to left, green, green) 100% 0px / var(--ob-size) 100% no-repeat,
+              linear-gradient(to left,  var(--green-800), var(--green-400)) 100% 0px / var(--ob-cum-size) 100% no-repeat;
   content: '';
   height: 100%;
   left: 0;
-  opacity: 0.1;
+  opacity: 0.5;
   position: absolute;
   top: 0;
   width: 100%;

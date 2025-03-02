@@ -14,10 +14,18 @@ function cum_percent(orders)
   return cumsum.map(x=> x.mul(HUNDRED).div(psum))
 }
 
-function OrderBookLine({price, amount, size, onClick})
+function orders_percent(orders)
+{
+  const amounts = orders.map(x => x.amount)
+  console.log(amounts)
+  const total = amounts.reduce( (x,y) => x.add(y), ZERO)
+  return orders.map(x => x.amount.mul(HUNDRED).div(total));
+}
+
+function OrderBookLine({price, amount, cumsize, size, onClick})
 {
 
-  return <li onClick={onClick} className="NiceOrderbook__list-item" style={{"--ob-size":size.toString()+"%"}}>
+  return <li onClick={onClick} className="NiceOrderbook__list-item" style={{"--ob-size":size.toString()+"%", "--ob-cum-size":cumsize.toString()+"%"}}>
           <span className="NiceOrderbook__price">{price}</span>
           <span className="NiceOrderbook__size">{amount.toString()}</span>
         </li>
@@ -67,6 +75,9 @@ function OrderBook({pair, onClick})
   const aggregated_asks = aggregate_orders(asks, true, precisionMult.mul(pair.orderbook_precision))
   const aggregated_bids = aggregate_orders(bids, false, precisionMult.mul(pair.orderbook_precision))
 
+  const asks_percent = orders_percent(aggregated_asks)
+  const bids_percent = orders_percent(aggregated_bids)
+
   const asks_cum_percent = cum_percent(aggregated_asks)
   const bids_cum_percent = cum_percent(aggregated_bids)
 
@@ -80,12 +91,12 @@ function OrderBook({pair, onClick})
           <div className="NiceOrderbook flex flex-column w-full">
             <div className="NiceOrderbook__side NiceOrderbook__side--asks">
               <ol style={{display:"flex", flexDirection:"column-reverse"}} className="NiceOrderbook__list">
-                {aggregated_asks.map((x,i) => (<OrderBookLine key={i} price={x.price.toString()} size={asks_cum_percent[i]} amount={x.amount} onClick={() =>onClick(x)} />))}
+                {aggregated_asks.map((x,i) => (<OrderBookLine key={i} price={x.price.toString()} cumsize={asks_cum_percent[i]} size={asks_percent[i]} amount={x.amount} onClick={() =>onClick(x)} />))}
               </ol>
             </div>
             <div className="NiceOrderbook__side NiceOrderbook__side--bids">
               <ol style={{display:"flex", flexDirection:"column"}} className="NiceOrderbook__list">
-                {aggregated_bids.map((x,i) => (<OrderBookLine key={i} price={x.price.toString()} size={bids_cum_percent[i]} amount={x.amount} onClick={() =>onClick(x)} />))}
+                {aggregated_bids.map((x,i) => (<OrderBookLine key={i} price={x.price.toString()} cumsize={bids_cum_percent[i]} size={bids_percent[i]} amount={x.amount} onClick={() =>onClick(x)} />))}
               </ol>
             </div>
           </div>
