@@ -21,7 +21,7 @@
     @doc "Main cap acquired when taking an order"
     @event
     (compose-capability (REMOVE-ORDER id))
-    (compose-capability (ORDER-ACCOUNT id))
+;    (compose-capability (ORDER-ACCOUNT id))
     (compose-capability (POINTER-SWAP))
     (compose-capability (UPDATE-TREE))
   )
@@ -30,7 +30,7 @@
     @doc "Main cap acquired when cancelling an order"
     @event
     (compose-capability (REMOVE-ORDER id))
-    (compose-capability (ORDER-ACCOUNT id))
+;    (compose-capability (ORDER-ACCOUNT id))
     (compose-capability (POINTER-SWAP))
     (compose-capability (UPDATE-TREE))
   )
@@ -332,6 +332,7 @@
   (defun --cancel-order:bool (order:object{order-sch})
     (bind order {'id:=id, 'guard:=order-guard, 'maker-acct:=maker}
       (require-capability (CANCEL-ORDER id))
+      ; Check the cancel guard under the scope of (CANCEL-ORDER)
       (enforce-guard order-guard)
       (remove-order (+ {'state:STATE-CANCELED,
                         'take-tx: (tx-hash),
@@ -349,28 +350,33 @@
         (enforce (= state STATE-ACTIVE) "Order not in active state")
         (enforce (between QUANTUM-AMOUNT order-amount amount) "Amount out of bounds")
         (enforce-quantum amount)
-        (with-capability (TAKE-ORDER id amount)
+        (with-capability (ORDER-ACCOUNT id)
           ; 1 Take care of the taker
           (--transfer-from-order id (primary-currency is-ask) taker (if is-ask amount (total-quote price amount)))
           ; 2 Take care of the maker
           (--transfer-from-order id (secondary-currency is-ask) maker (if is-ask (total-quote price amount) amount))
           ; 3 Pay the fees
-          (--transfer-from-order id (secondary-currency is-ask) FEE-ACCOUNT (if is-ask (total-quote-fee price amount) (base-fee amount)))
-          ; 4 Process the order
-          (if (< amount order-amount)
-              (take-order-partial order taker amount) ; => Partial
-              (take-order-full order taker))))) ; => Or full
+          (--transfer-from-order id (secondary-currency is-ask) FEE-ACCOUNT (if is-ask (total-quote-fee price amount) (base-fee amount))))
+
+      ; 4 Process the order
+      (with-capability (TAKE-ORDER id amount)
+        (if (< amount order-amount)
+            (take-order-partial order taker amount) ; => Partial
+            (take-order-full order taker))))) ; => Or full
   )
 
   (defun cancel-order:bool (id:integer)
     @doc "Main function for cancelling an order"
     (let ((order (get-order id)))
-      (bind order {'amount:=amount, 'state:=state, 'price:=price, 'maker-acct:=maker, 'guard:=guard, 'is-ask:=is-ask}
+      (bind order {'amount:=amount, 'state:=state, 'price:=price, 'maker-acct:=maker, 'is-ask:=is-ask}
         (enforce (= state STATE-ACTIVE) "Order not in active state")
+        ; 1 Refund the Maker
+        (with-capability (ORDER-ACCOUNT id)
+          (--transfer-from-order id (primary-currency is-ask) maker  (if is-ask amount (total-quote price amount))))
+        ; 2 Process the order (update its state and remove it from the tree
         (with-capability (CANCEL-ORDER id)
-          (enforce-guard guard)
-          (--transfer-from-order id (primary-currency is-ask) maker  (if is-ask amount (total-quote price amount)))
-          (--cancel-order order))))
+          (--cancel-order order))
+      ))
   )
 
   (defun create-order:integer (is-ask:bool maker:string maker-guard:guard amount:decimal price:decimal)
