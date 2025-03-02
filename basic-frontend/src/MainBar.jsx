@@ -64,5 +64,5 @@ function AccountMenu ()
 
 export function MainBar()
 {
-  return <Toolbar start={<AboutButton/>} center={<span className="font-bold text-3xl">Bro DEX</span>} end={<AccountMenu />} />
+  return <Toolbar start={<AboutButton/>} center={<div class="flex flex-column align-items-center -m-3"><div className="ribeye-regular text-center font-bold text-5xl -m-1">Bro deX</div> <div className=" text-center">The 1st Orderbook based DEX on Kadena</div></div>} end={<AccountMenu />} />
 }

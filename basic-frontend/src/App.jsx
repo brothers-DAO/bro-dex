@@ -141,7 +141,7 @@ function PairPanel({pair})
 {
   const [lastClickedOrder, setLastClickedOrder] = useState(null)
   return  <div className="flex flex-column max-w-max">
-            <title>{"BRO Dex: " + pair.display_name}</title>
+            <title>{"Bro deX:" + pair.display_name}</title>
             <PairInfoCard pair={pair} />
 
             <div className="flex flex-row flex-wrap">
