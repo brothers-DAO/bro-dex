@@ -16,7 +16,7 @@ export default function AboutButton() {
 
     return (
         <div className="card flex justify-content-center">
-            <Button rounded icon="pi pi-info-circle"  onClick={(e) => op.current.toggle(e)} />
+            <Button rounded icon="pi pi-info-circle" label="About" onClick={(e) => op.current.toggle(e)}/>
             <OverlayPanel ref={op}>
                 <ul className="line-height-2 m-0">
                   <li> <span className="font-bold">BRO-DEX Frontend version:</span> {version} </li>
