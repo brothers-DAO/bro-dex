@@ -100,8 +100,10 @@ function OrderBook({pair, onClick})
               </ol>
             </div>
           </div>
-          {medianPrice && <div className="m-2"> <span className="font-bold"> Median Price: </span> {medianPrice.toString()} </div> }
+          <div className="flex-row flex justify-content-between">
+          {medianPrice && <div className="m-2"> <span className="font-bold"> Median Price: </span> {medianPrice.toSignificantDigits(5).toString()} {pair.quote}/{pair.base} </div> }
           {spread && <div className="m-2"> <span className="font-bold"> Spread: </span>  {spread.toFixed(2)} % </div> }
+          </div>
         </>
 }
 
