@@ -18,17 +18,14 @@ export function useTokenBalance(account, token)
     return {balance:null, mutate, error}
 }
 
-export function useTokensBalance(account, tokenA, tokenB)
+export function useTokensBalance(account, ...tokens)
 {
-  const code = (account && tokenA && tokenB)?`[(try 0.0 (${tokenA}.get-balance "${account}")), (try 0.0 (${tokenB}.get-balance "${account}"))]`:null;
+  const code = (account && tokens)?`(map (lambda (x:module{fungible-v2}) (try 0.0 (x::get-balance "${account}"))) [${tokens.join(" ")}])`:null
   const {data, error, mutate} = useLocalPact(code, NETWORK, CHAIN, {refreshInterval: 61_000})
   if(data)
-  {
-    const [balance_a, balance_b] = data.map(to_decimal);
-    return {balance_a, balance_b, mutate}
-  }
+    return {balances:data.map(to_decimal), mutate}
   else
-    return {balance_a:null, balance_b:null, mutate, error}
+    return {balances:Array(tokens.length).fill(null), mutate, error}
 }
 
 export function useGuard(account)
