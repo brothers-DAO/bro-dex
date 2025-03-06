@@ -20,6 +20,6 @@
   "base_module":"n_5d119cc07ffd5efaef5c7feef9e878f34e3d4652.bro",
   "orderbook_precision":"10.0",
   "quote_decimals":1,
-  "base_decimals":2
+  "base_decimals":4
   }
 ]
