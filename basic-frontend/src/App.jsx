@@ -19,10 +19,12 @@ import {GlobalHistory, AccountHistory, AccountActiveOrders} from './GlobalHistor
 import {MainBar} from './MainBar';
 import {TradingPanel} from './Trading';
 import {ModuleLink} from './Explorer';
+import TestnetFaucet from './TestnetFaucet';
 import _PAIRS from '../pairs.json';
 const PAIRS = _PAIRS.map(({orderbook_precision, ...rest}) => ({orderbook_precision:Decimal(orderbook_precision), ...rest}))
 
 import ChainWeaverIcon from './img/chainweaver-icon.png'
+import FaucetIcon from './img/faucet.svg'
 
 import './App.css';
 
@@ -161,9 +163,11 @@ function PairPanel({pair})
 
 function GlobalDex()
 {
+  const enable_faucet = import.meta.env.VITE_ENABLE_FAUCET === "true" && import.meta.env.VITE_NETWORK === "testnet04"
   return <TabView>
           {PAIRS.map( (p)=><TabPanel key={p.name} header={<div className="flex flex-row align-items-center gap-1" > {p.display_name} <PairIcon pair={p} /></div>}><PairPanel pair={p}/></TabPanel>)}
-        </TabView>
+          {enable_faucet && <TabPanel header={<div className="flex flex-row align-items-center gap-1" > Faucet <img src={FaucetIcon}  className="w-2rem" /> </div>}><TestnetFaucet /> </TabPanel>}
+          </TabView>
 
 }
 
