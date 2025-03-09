@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="50mm"
+   height="50mm"
+   viewBox="0 0 50 50"
+   version="1.1"
+   id="svg5"
+   inkscape:version="1.1.2 (0a00cf5339, 2022-02-04)"
+   sodipodi:docname="unknown_token.svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview7"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:document-units="mm"
+     showgrid="false"
+     inkscape:zoom="2.5620932"
+     inkscape:cx="120.40936"
+     inkscape:cy="101.86983"
+     inkscape:window-width="1920"
+     inkscape:window-height="1043"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="layer1" />
+  <defs
+     id="defs2">
+    <rect
+       x="-51.348836"
+       y="-21.060449"
+       width="269.98845"
+       height="235.56519"
+       id="rect21422" />
+    <rect
+       x="130.99164"
+       y="371.98541"
+       width="159.91431"
+       height="142.38675"
+       id="rect2966" />
+  </defs>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <circle
+       style="opacity:1;fill:#808080;fill-opacity:1;fill-rule:nonzero;stroke:#999999;stroke-width:1;paint-order:fill markers stroke"
+       id="path846"
+       cx="25"
+       cy="25"
+       r="24.5" />
+    <text
+       xml:space="preserve"
+       transform="matrix(1.5525365,0,0,1.3118628,-195.17908,-487.98127)"
+       id="text2964"
+       style="font-size:37.0789px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;white-space:pre;shape-inside:url(#rect2966);fill:#ffffff;stroke-width:0.185395"><tspan
+         x="130.99219"
+         y="404.79246"
+         id="tspan22463"><tspan
+           style="font-weight:bold;-inkscape-font-specification:'sans-serif Bold'"
+           id="tspan22461">?</tspan></tspan></text>
+    <text
+       xml:space="preserve"
+       transform="scale(0.26458333)"
+       id="text21420"
+       style="font-size:16px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;white-space:pre;shape-inside:url(#rect21422)" />
+  </g>
+</svg>
