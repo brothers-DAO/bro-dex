@@ -27,7 +27,7 @@ function TransactionContextProvider({children})
   const [trxCount, setTrxCount] = useState(0)
   const {data:pf_result, error:pf_error} = usePreflight(trx);
   const {data:sig_result, error:sig_error} = useSWRImmutable((trx && pf_result!=null && !pf_error)?trx:null,
-                                                             (t)=> signer(t), {shouldRetryOnError:false})
+                                                             (t)=> t.sigs.length !=0?signer(t):Promise.resolve(t), {shouldRetryOnError:false})
 
   const {data:submit_result, error:submit_error} = useSubmitResult(sig_result);
   const {data:poll_result, error:poll_error} = useTrxStatusImmutable(submit_result, true);
