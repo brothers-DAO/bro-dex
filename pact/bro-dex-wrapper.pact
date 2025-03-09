@@ -31,6 +31,10 @@
   (defun and-3:bool (a:bool b:bool c:bool)
     (and a (and b c)))
 
+  (defun is-order-nil:bool (order:object{order-sch})
+    @doc "True if the order is NIL"
+    (= NIL (at 'id order)))
+
   (defun --create-account:bool (fungible:module{fungible-v2} account:string guard:guard)
     @doc "Create an account if not exist"
     (let ((bal (try -1.0 (fungible::get-balance account))))
@@ -173,8 +177,11 @@
   )
 
   (defun buy-post-only:string (account:string account-guard:guard amount:decimal limit:decimal)
+      ; To protect the user from obvious arbitrage, we check that:
+      ; either the orderbook is empty (first-ask is NIL), or we are lower than the first current ask
     (let ((f-ask (first-ask)))
-      (enforce (< limit (at 'price f-ask)) "Limit higher than market price"))
+      (enforce (or? (is-order-nil) (compose (at 'price) (< limit)) f-ask) "Limit higher than market price"))
+
     (--init-buy-accounts account account-guard (total-quote limit amount))
     (let ((id (next-id)))
       (install-capability (__QUOTE_MOD__.TRANSFER DEPOSIT-ACCOUNT (order-account id) (total-quote limit amount)))
@@ -186,8 +193,11 @@
   )
 
   (defun sell-post-only:string (account:string account-guard:guard amount:decimal limit:decimal)
+    ; To protect the user from obvious arbitrage, we check that:
+    ; either the orderbook is empty (first-bid is NIL), or we are higer than the first current bid
     (let ((f-bid (first-bid)))
-      (enforce (> limit (at 'price f-bid)) "Limit lower than market price"))
+      (enforce (or? (is-order-nil) (compose (at 'price) (> limit)) f-bid) "Limit lower than market price"))
+
     (--init-sell-accounts account account-guard amount)
     (let ((id (next-id)))
       (install-capability (__BASE_MOD__.TRANSFER DEPOSIT-ACCOUNT (order-account id) amount))
