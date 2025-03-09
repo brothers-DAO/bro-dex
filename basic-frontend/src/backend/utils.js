@@ -8,6 +8,7 @@ export const to_date = x=> x.time?new Date(x.time):new Date(x.timep)
 
 export const to_pact_int = x=> ({int:x.toString()})
 export const to_pact_decimal = x => ({decimal:x.toFixed(12)})
+export const to_module = ({refName:{namespace, name}}) => namespace?[namespace,name].join("."):name
 
 export const ONE = Decimal("1.0")
 export const ZERO  = Decimal("0.0")
