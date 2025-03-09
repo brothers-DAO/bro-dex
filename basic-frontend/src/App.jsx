@@ -163,7 +163,7 @@ function PairPanel({pair})
 
 function GlobalDex()
 {
-  const enable_faucet = import.meta.env.VITE_ENABLE_FAUCET === "true" && import.meta.env.VITE_NETWORK === "testnet04"
+  const enable_faucet = import.meta.env.VITE_ENABLE_FAUCET === "true" && (import.meta.env.VITE_NETWORK === "testnet04" ||  import.meta.env.VITE_NETWORK === "development")
   return <TabView>
           {PAIRS.map( (p)=><TabPanel key={p.name} header={<div className="flex flex-row align-items-center gap-1" > {p.display_name} <PairIcon pair={p} /></div>}><PairPanel pair={p}/></TabPanel>)}
           {enable_faucet && <TabPanel header={<div className="flex flex-row align-items-center gap-1" > Faucet <img src={FaucetIcon}  className="w-2rem" /> </div>}><TestnetFaucet /> </TabPanel>}
