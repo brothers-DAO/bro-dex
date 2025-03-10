@@ -48,7 +48,7 @@ function OrderDialog({pair, onClose, order, onCancel})
 {
   const {account} = useContext(AccountContext);
   const tx_date = useTrxDate(order.take_tx, NETWORK, CHAIN)
-  const {fee_ratio} = usePairConfig("BRO-KDA-R")
+  const {fee_ratio} = usePairConfig(pair.name);
   const fee = fee_ratio ? (order.is_ask?order.amount.mul(order.price).mul(fee_ratio):order.amount.mul(fee_ratio))
                         : ZERO;
   const order_account = (order.state!=4 || !order.partial)?make_order_account(pair.name, order.id):null;
