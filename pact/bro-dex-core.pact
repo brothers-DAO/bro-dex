@@ -65,8 +65,8 @@
     partial:bool ; Is this a partial (split order) => This field is for info only (UX)
     m-p:integer ; Previous in the live list for a specific maker
     m-n:integer ; Next in  the live list for a specific maker
-    h-m-n:integer ; Next in the history list of the maker
-    h-t-n:integer ; Next in the history list of the maker
+    h-m-n:integer ; Next in the history list of the makers
+    h-t-n:integer ; Next in the history list of the takers
     h-n:integer ; Next in global trades history
     price:decimal ; Price in QUOTE
     amount:decimal ; Amount price in BASE
