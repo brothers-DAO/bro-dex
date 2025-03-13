@@ -84,6 +84,9 @@ function OrderBook({pair, onClick})
   const medianPrice = (asks.length && bids.length)?asks[0].price.plus(bids[0].price).mul(ZERO_FIVE):null
   const spread = medianPrice?asks[0].price.minus(bids[0].price).mul(HUNDRED).div(medianPrice):null
 
+  const _price_precision = x => x.price.precision(true)
+  const best_precision = Math.max(...aggregated_asks.map(_price_precision), ...aggregated_bids.map(_price_precision))
+
   return  <>
           <div className="flex mb-1 justify-content-center">
             <SelectButton value={precisionMult} options={precision_options} optionLabel="name" allowEmpty={false} onChange={(e) => setPrecsionMult(e.value)}/>
@@ -91,12 +94,12 @@ function OrderBook({pair, onClick})
           <div className="NiceOrderbook flex flex-column w-full">
             <div className="NiceOrderbook__side NiceOrderbook__side--asks">
               <ol style={{display:"flex", flexDirection:"column-reverse"}} className="NiceOrderbook__list">
-                {aggregated_asks.map((x,i) => (<OrderBookLine key={i} price={x.price.toString()} cumsize={asks_cum_percent[i]} size={asks_percent[i]} amount={x.amount} onClick={() =>onClick(x)} />))}
+                {aggregated_asks.map((x,i) => (<OrderBookLine key={i} price={x.price.toPrecision(best_precision)} cumsize={asks_cum_percent[i]} size={asks_percent[i]} amount={x.amount} onClick={() =>onClick(x)} />))}
               </ol>
             </div>
             <div className="NiceOrderbook__side NiceOrderbook__side--bids">
               <ol style={{display:"flex", flexDirection:"column"}} className="NiceOrderbook__list">
-                {aggregated_bids.map((x,i) => (<OrderBookLine key={i} price={x.price.toString()} cumsize={bids_cum_percent[i]} size={bids_percent[i]} amount={x.amount} onClick={() =>onClick(x)} />))}
+                {aggregated_bids.map((x,i) => (<OrderBookLine key={i} price={x.price.toPrecision(best_precision)} cumsize={bids_cum_percent[i]} size={bids_percent[i]} amount={x.amount} onClick={() =>onClick(x)} />))}
               </ol>
             </div>
           </div>
