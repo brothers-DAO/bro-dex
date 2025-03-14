@@ -7,20 +7,19 @@ import { SelectButton } from 'primereact/selectbutton';
 
 import './Orderbook.css';
 
-function cum_percent(orders)
+
+const to_percent = (amounts, scale) => amounts.map( x => x.mul(HUNDRED).div(scale))
+
+const orders_sum = (orders) => orders.reduce( (acc,o) => acc.add(o.amount), ZERO)
+
+const to_amounts = (orders) => orders.map(o=> o.amount)
+
+function orders_cumsum(orders)
 {
   let psum = ZERO;
-  const cumsum = orders.map(x => {psum = psum.add(x.amount); return psum});
-  return cumsum.map(x=> x.mul(HUNDRED).div(psum))
+  return orders.map(x => {psum = psum.add(x.amount); return psum});
 }
 
-function orders_percent(orders)
-{
-  const amounts = orders.map(x => x.amount)
-  console.log(amounts)
-  const total = amounts.reduce( (x,y) => x.add(y), ZERO)
-  return orders.map(x => x.amount.mul(HUNDRED).div(total));
-}
 
 function OrderBookLine({price, amount, cumsize, size, onClick})
 {
@@ -75,11 +74,13 @@ function OrderBook({pair, onClick})
   const aggregated_asks = aggregate_orders(asks, true, precisionMult.mul(pair.orderbook_precision))
   const aggregated_bids = aggregate_orders(bids, false, precisionMult.mul(pair.orderbook_precision))
 
-  const asks_percent = orders_percent(aggregated_asks)
-  const bids_percent = orders_percent(aggregated_bids)
+  const max_amount = Decimal.max(orders_sum(aggregated_asks), orders_sum(aggregated_bids));
 
-  const asks_cum_percent = cum_percent(aggregated_asks)
-  const bids_cum_percent = cum_percent(aggregated_bids)
+  const asks_percent = to_percent(to_amounts(aggregated_asks), max_amount);
+  const bids_percent = to_percent(to_amounts(aggregated_bids), max_amount);
+
+  const asks_cum_percent = to_percent(orders_cumsum(aggregated_asks), max_amount);
+  const bids_cum_percent = to_percent(orders_cumsum(aggregated_bids), max_amount);
 
   const medianPrice = (asks.length && bids.length)?asks[0].price.plus(bids[0].price).mul(ZERO_FIVE):null
   const spread = medianPrice?asks[0].price.minus(bids[0].price).mul(HUNDRED).div(medianPrice):null
