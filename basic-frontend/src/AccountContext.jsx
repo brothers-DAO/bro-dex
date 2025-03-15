@@ -74,6 +74,26 @@ function useEckoWalletAccount(wallet, onFail)
 
 let clientInit = false;
 
+const LinxShim = {
+  get(target, prop, receiver)
+  {
+    if (prop === "request")
+    {
+      return async function (...args)
+      {
+        const result = await target[prop].apply(this, args);
+        if(result?.results)
+        {
+          console.warn("Linx Bug Workaround")
+          result.responses = result.results
+        }
+        return result;
+      };
+    }
+    return Reflect.get(target, prop, receiver);
+  }
+};
+
 function useWalletConnectClient(wallet)
 {
   const [client, setClient] = useState(null)
@@ -82,7 +102,7 @@ function useWalletConnectClient(wallet)
                     {
                       clientInit = true;
                       console.log("Init WC Client")
-                      SignClient.init(WALLET_CONNECT_META).then(setClient)
+                      SignClient.init(WALLET_CONNECT_META).then( x=> setClient(new Proxy(x, LinxShim)))
                     }}, [wallet])
 
   return wallet== WalletType.WALLET_CONNECT?client:null;
