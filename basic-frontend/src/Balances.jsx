@@ -19,7 +19,6 @@ function SocialLink({lnk})
 function TokenInfoIcon({module})
 {
   const {token_info} = useTokenInfo(module);
-  console.log(token_info)
   const op = useRef(null);
   return  <>
           {token_info && <img src={token_info.img} className="w-5rem cursor-pointer"  onClick={(e) =>op.current.toggle(e)}/> }
