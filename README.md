@@ -69,7 +69,7 @@ Each order is encoded in an object stored in the `order` table:
     m-p:integer ; Previous in the live list for a specific maker
     m-n:integer ; Next in  the live list for a specific maker
     h-m-n:integer ; Next in the history list of the maker
-    h-t-n:integer ; Next in the history list of the maker
+    h-t-n:integer ; Next in the history list of the taker
     h-n:integer ; Next in global trades history
     price:decimal ; Price in QUOTE
     amount:decimal ; Amount price in BASE
