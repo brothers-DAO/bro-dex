@@ -48,9 +48,13 @@ function TransactionContextProvider({children})
   useEffect( () => {if(sig_result)
                       toast.current.show(WALLET_SIGNATURE_OK_MSG);
                     else if(sig_error)
+                    {
+                      console.warn(sig_error)
                       toast.current.show(WALLET_SIGNATURE_ERROR_MSG);
-                    setTimeout(()=> toast.current.remove(WAITING_FOR_WALLET_MSG), 1000)
-                    }, [sig_result, sig_error])
+                    }
+                    setTimeout(()=> toast.current.remove(WAITING_FOR_WALLET_MSG), 500)
+
+                  }, [sig_result, sig_error])
 
   useEffect( () => {if(submit_result)
                       toast.current.show(transaction_submitted_msg(submit_result));
