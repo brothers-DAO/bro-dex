@@ -1,4 +1,4 @@
-import {useLocalPactImmutable, local_pact} from './pact';
+import {useLocalPactImmutable, local_pact, useLocalPact} from './pact';
 import useSWRInfinite from 'swr/infinite';
 import {to_decimal, to_int, to_big_int, ZERO_FIVE} from './utils.js';
 import {core_mod, wrapper_mod, view_mod} from './bro-dex-common';
@@ -37,6 +37,16 @@ const __getKey = (prefix, pageIndex, prev) =>
     return [...prefix, prev[SIZE_PER_REQUEST - 1].id]
   else
     return null;
+}
+
+export function useOrder(pair,oid)
+{
+  console.log(pair)
+  console.log(oid)
+  console.log((pair && oid)?`(${core_mod(pair)}.get-order ${oid.toString()})`:null)
+  const {data, error, mutate} = useLocalPact((pair && oid)?`(${core_mod(pair)}.get-order ${oid.toString()})`:null, NETWORK, CHAIN);
+  console.log(data)
+  return {data:(data && to_order(data)), error, mutate}
 }
 
 export function useOrderbook(pair, is_ask)
