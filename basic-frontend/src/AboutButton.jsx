@@ -33,11 +33,11 @@ export default function AboutButton() {
 
                   <li> <span className="font-bold">Kadena Endpoint:</span>  {import.meta.env.VITE_ENDPOINT} </li>
 
-                  <li> <span className="font-bold">Network:</span>  {import.meta.env.VITE_TOKENS_DB_NETWORK} </li>
+                  <li> <span className="font-bold">Network:</span>  {import.meta.env.VITE_NETWORK} </li>
 
                   <li> <span className="font-bold">Chain:</span>  {import.meta.env.VITE_CHAIN} </li>
 
-                  <li> <span className="font-bold">Main namespace:</span>{import.meta.env.VITE_NS} </li>
+                  <li> <span className="font-bold">Main namespace:</span> {import.meta.env.VITE_NS} </li>
 
                   <li> <span className="font-bold">Explorer:</span>  <InfoLink>{import.meta.env.VITE_EXPLORER}</InfoLink></li>
 
