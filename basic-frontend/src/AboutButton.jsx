@@ -2,6 +2,8 @@ import { useRef } from 'react';
 import { OverlayPanel } from 'primereact/overlaypanel';
 import { Button } from 'primereact/button';
 import {version} from'./version'
+import BroDexIcon from './img/bro_dex.svg';
+import BroDexPrompted from './img/Bro_dex_prompted_by_pact.jpg';
 
 const InfoLink = ({children}) => <> {children}
                                 <a className="mx-2" target="_blank" href={children}>
@@ -16,8 +18,12 @@ export default function AboutButton() {
 
     return (
         <div className="card flex justify-content-center">
-            <Button rounded icon="pi pi-info-circle" label="About" onClick={(e) => op.current.toggle(e)}/>
+            <img src={BroDexIcon} className="w-3rem cursor-pointer" onClick={(e) => op.current.toggle(e)}/>
             <OverlayPanel ref={op}>
+                <div className="flex flex-rows">
+                  <div>
+                    <img src={BroDexPrompted} className="w-12rem" />
+                  </div>
                 <ul className="line-height-2 m-0">
                   <li> <span className="font-bold">BRO-DEX Frontend version:</span> {version} </li>
 
@@ -38,6 +44,8 @@ export default function AboutButton() {
                   <li> <span className="font-bold">Tokens Database:</span> {import.meta.env.VITE_TOKENS_DB}</li>
 
                 </ul>
+
+                </div>
             </OverlayPanel>
         </div>
     );
