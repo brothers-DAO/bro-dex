@@ -73,7 +73,7 @@ function OrderDialog({pair, onClose, order, onCancel})
               </div>
               <div>
                 <label htmlFor="_id" className="font-bold block mb-1"> Order ID </label>
-                <InputText id="_id" readOnly value={_order.id.toString()} />
+                <InputText id="_id" size={22} readOnly value={_order.id.toString()} />
               </div>
               {order_account &&
                 <div>
