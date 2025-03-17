@@ -8,6 +8,16 @@ import EckoIcon from './img/ecko-wallet-icon.svg'
 import { ProgressSpinner } from 'primereact/progressspinner';
 import AboutButton from './AboutButton';
 
+const CHAIN = import.meta.env.VITE_CHAIN
+const NETWORK = import.meta.env.VITE_NETWORK;
+
+const NETWORK_STRINGS =
+{
+  "testnet04":"Testnet",
+  "mainnet01": "Mainnet",
+  "development": "Devnet",
+}
+
 const ICONS = {RO:'pi pi-eye',
                CW:<img style={{width: "1.25em", margin:"2px"}} src={ChainWeaverIcon} />,
                EW:<img style={{width: "1.25em", height:"1.25em", margin:"2px"}} src={EckoIcon} />,
@@ -64,5 +74,16 @@ function AccountMenu ()
 
 export function MainBar()
 {
-  return <Toolbar className="border-round-md shadow-1" start={<AboutButton/>} center={<div className="flex flex-column align-items-center -m-3"><div className="ribeye-regular text-center font-bold text-5xl -m-1">Bro deX</div> <div className=" text-center">The 1st Orderbook based DEX on Kadena</div></div>} end={<AccountMenu />} />
+  return <Toolbar className="border-round-md shadow-1"
+                  start={<AboutButton/>}
+                  center={<div className="flex flex-column align-items-center -m-3">
+                            <div className="ribeye-regular text-center font-bold text-5xl -m-1">Bro deX</div>
+                            <div className=" text-center">The 1st Orderbook based DEX on Kadena</div>
+                          </div>}
+                  end={<div>
+                          <div><AccountMenu /></div>
+                          <div className="mt-1 text-red-500 text-s"> Live on {NETWORK_STRINGS[NETWORK]} / Chain {CHAIN}</div>
+                        </div>
+                      }
+                      />
 }
