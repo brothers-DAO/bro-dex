@@ -14,10 +14,10 @@ const WALLET_SIGNATURE_ERROR_MSG = { severity: 'error', summary: 'Wallet', detai
 const TRANSACTION_SUBMIT_ERROR_MSG = { severity: 'error', summary: 'Submit', detail: 'TransactionSubmit Error', life:10000 }
 
 const pf_result_success_msg = (_pf_result) => ({ severity: 'success', summary: 'Preflight', detail: 'Preflight result:' + _pf_result?.toString(), life: 3000 })
-const pf_result_fail_msg = (_pf_error) => ({ severity: 'error', summary: 'Preflight', detail: 'Preflight result:' + _pf_error?.toString(), life: 3000 })
+const pf_result_fail_msg = (_pf_error) => ({ severity: 'error', summary: 'Preflight error', detail: 'Preflight result:' + _pf_error?.toString(), life: 3000 })
 const transaction_submitted_msg = (_submit_result) => ({ severity: 'success', summary: 'Submit', detail: 'Transaction submitted to the network: '+ _submit_result?.requestKey?.toString(), life:500000 })
-const transaction_confirmed_msg = (_poll_result) => ({ severity: 'success', summary: 'Submit', detail: 'Transaction confirmed: '+ _poll_result?.reqKey, life:500000 })
-const transaction_error_msg = (_poll_error) => ({ severity: 'success', summary: 'Submit', detail: 'Transaction error: '+ _poll_error?.toString(), life:500000 })
+const transaction_confirmed_msg = (_poll_result) => ({ severity: 'success', summary: 'Confirmation', detail: 'Transaction confirmed: '+ _poll_result?.reqKey, life:500000 })
+const transaction_error_msg = (_poll_error) => ({ severity: 'success', summary: 'Error', detail: 'Transaction error: '+ _poll_error?.toString(), life:500000 })
 
 function TransactionContextProvider({children})
 {
