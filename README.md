@@ -48,7 +48,7 @@ Module linked to the `core` module, which provides helper functions to retrieve 
 
 ### `wrapper` module
 
-Module intended to be used by end-user or frontends. It provides high level functions, like GTC, FOK, IOC, Post-Only. It manages properly the risks, and the
+Module intended to be used by end-user or frontends. It provides high level functions, like GTC, FOK, IOC, Post-Only. It schedules and organizes "core calls" according to the user's choices and limits (Order type, Price). It guarantees that the best possible choice are done at "mining time".
 
 ![Bro DEX Overview](/docs/bro-dex-overview.svg)
 
@@ -122,12 +122,13 @@ Only functions of the Layer 3 are externally callable.
 #### Linked lists / Self-Balanced Trees and Pointers table
 
 The module manages several data structures for ordering orders:
+- Orderbook Bids: Red-Black Tree
+- Orderbook Asks: Red-Black Tree
+- Maker active Orders: Double linked list
+- User History: Single linked list
+- Global history: Single linked list
 
-Orderbook Bids: Red-Black Tree
-Orderbook Asks: Red-Black Tree
-Maker active Orders: Double linked list
-User History: Single linked list
-Global history: Single linked list
+![Bro DEX Linked Lists](/docs/bro-dex-data-structures.svg)
 
 ### DoS and minimum amounts/prices considerations
 
@@ -140,14 +141,14 @@ An attacker could take partially an order and let minimal remaining, which could
 To prevent this, taking operations are allowed only to transact amounts in multiples of `QUANTUM-AMOUNT` defined by the constant `DECIMALS`, and `MIN-PRICE` applies for each order creation.
 
 The equations must hold for all deployed DEX modules:
-`QUANTUM-AMOUNT` = 10 ^ -`DECIMALS`
-`MIN-AMOUNT` >= `QUANTUM-AMOUNT` and `MIN-AMOUNT` is a multiple of `QUANTUM-AMOUNT`
-`QUANTUM-AMOUNT` * `MIN-PRICE` >= minimum transferable amount of the base token (usually 1e-12)
-`MIN-AMOUNT` * `MIN-PRICE` * `FEE-RATIO` >= minimum transferable amount for the quote token (usually 1e-12)
+- `QUANTUM-AMOUNT` = 10 ^ -`DECIMALS`
+- `MIN-AMOUNT` >= `QUANTUM-AMOUNT` and `MIN-AMOUNT` is a multiple of `QUANTUM-AMOUNT`
+- `QUANTUM-AMOUNT` * `MIN-PRICE` >= minimum transferable amount of the base token (usually 1e-12)
+- `MIN-AMOUNT` * `MIN-PRICE` * `FEE-RATIO` >= minimum transferable amount for the quote token (usually 1e-12)
 
 
 
-![Bro DEX Linked Lists](/docs/bro-dex-data-structures.svg)
+
 
 #### External API
 
