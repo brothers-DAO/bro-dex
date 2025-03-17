@@ -33,7 +33,7 @@ const DirectionIcon = ({order}) => dir_icon(order?.is_ask)
 
 function OrderDialog({pair, onClose, order, onCancel})
 {
-  const {account} = useContext(AccountContext);
+  const {account, key, signer} = useContext(AccountContext);
   const {trxCount} = useContext(TransactionContext);
   const {data:fresh_order, mutate} = useOrder(pair.name, order.id);
   const _order = fresh_order ?? order;
@@ -114,7 +114,7 @@ function OrderDialog({pair, onClose, order, onCancel})
                 </div>}
 
 
-              {_order.state== 1 && order.maker == account &&  <> <Divider /> <Button className="w-6" label="Cancel Order" onClick={()=>onCancel(order)}/></> }
+              {_order.state== 1 && order.maker == account && key && signer &&  <> <Divider /> <Button className="w-6" label="Cancel Order" onClick={()=>onCancel(order)}/></> }
               </div>}
           </Dialog>
 }
