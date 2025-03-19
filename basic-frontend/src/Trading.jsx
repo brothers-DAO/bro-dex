@@ -59,7 +59,7 @@ function FeeHelpIcon({pair})
 
 }
 
-function HalfTradingPanel({pair, fee, direction, onSubmit, preSelectedOrder})
+function HalfTradingPanel({pair, gross, fee, direction, onSubmit, preSelectedOrder})
 {
   const {account, key, signer} = useContext(AccountContext);
   const {min_amount, max_amount, min_price, max_price, decimals} = usePairConfig(pair.name);
@@ -76,6 +76,12 @@ function HalfTradingPanel({pair, fee, direction, onSubmit, preSelectedOrder})
   const _form_to_dec = x => x?Decimal(x):null;
 
   const _fee = fee(amount, price, type);
+  const _gross = gross(amount, price, type)
+  const _net_total = (_fee!=null && _gross!=null)?_gross.plus(_fee):null;
+
+  const LocalCurrency = () => (<Currency name={direction=="BUY"?pair.quote:pair.base} />)
+
+  const details_decimals =  (direction=="BUY"?pair.quote_decimals_details:pair.base_decimals_details) || 8;
 
   return  <div className="flex flex-column w-full gap-3" >
             {direction=="BUY" &&<span className="font-bold text-primary text-center"> Buy {pair.base} from {pair.quote} </span>}
@@ -101,7 +107,28 @@ function HalfTradingPanel({pair, fee, direction, onSubmit, preSelectedOrder})
                 <label htmlFor="_form_type" className="font-bold"> Order type: <OrderTypeHelpIcon /> </label>
                 <Dropdown id="_form_type" value={type} onChange={(e) => setType(e.value)} options={TYPES} optionLabel="name" className="w-full md:w-14rem" />
               </div>
-              {_fee!=null && <span className="text-sm"> Max fee: {_fee.toFixed(8)} <Currency name={direction=="BUY"?pair.quote:pair.base} /> <FeeHelpIcon pair={pair}/> </span>}
+              {_net_total!=null &&
+                <div className="text-sm flex flex-row">
+                    <div className="flex flex-column">
+                      <div> Gross: </div>
+                      <div> Max Fee:</div>
+                      <div className="border-top-1 pr-3 pt-1"> Net Total:</div>
+                    </div>
+
+                    <div className="flex flex-column justify-content-end text-right" style={{fontFamily: "monospace"}}>
+                      <div> {_gross.toFixed(details_decimals)}  </div>
+                      <div> {_fee.toFixed(details_decimals)} </div>
+                      <div className="border-top-1 pt-1"> {_net_total.toFixed(details_decimals)} </div>
+                    </div>
+
+                    <div className="flex flex-column ml-1">
+                      <div>&nbsp;</div>
+                      <FeeHelpIcon pair={pair}/>
+                      <div className="pt-1"> <LocalCurrency /></div>
+                    </div>
+
+                </div>
+              }
               <Button className="w-8" disabled={!amount || !price || !account || !key || !signer} label="Execute order" onClick={() => onSubmit(amount, price, type)}/>
           </div>
 }
@@ -116,6 +143,9 @@ function TradingPanel({pair, preSelectedOrder})
   const median_price = useOrderbookMedian(pair.name);
 
   const type_to_fee = x => x=="Post-Only"?ZERO:fee_ratio;
+
+  const compute_buy_gross = (amount, price, type) => (amount && price)? amount.mul(price):null;
+  const compute_sell_gross = (amount, price, type) => (amount && price)? amount:null;
 
   const compute_buy_fees = (amount, price, type) => (amount && price)? type_to_fee(type).mul(amount).mul(price):null;
   const compute_sell_fees = (amount, price, type) => (amount && price)? type_to_fee(type).mul(amount):null;
@@ -152,9 +182,9 @@ function TradingPanel({pair, preSelectedOrder})
   return  <>
             <ConfirmPopup />
             <div className="flex flex-row m-2 mt-4">
-              <HalfTradingPanel pair={pair} fee={compute_buy_fees} direction="BUY" preSelectedOrder={preSelectedOrder?.is_ask?preSelectedOrder:null} onSubmit={onBuy}/>
+              <HalfTradingPanel pair={pair} gross={compute_buy_gross} fee={compute_buy_fees} direction="BUY" preSelectedOrder={preSelectedOrder?.is_ask?preSelectedOrder:null} onSubmit={onBuy}/>
               <Divider layout="vertical"/>
-              <HalfTradingPanel pair={pair} fee={compute_sell_fees} direction="SELL" preSelectedOrder={!preSelectedOrder?.is_ask?preSelectedOrder:null} onSubmit={onSell}/>
+              <HalfTradingPanel pair={pair} gross={compute_sell_gross} fee={compute_sell_fees} direction="SELL" preSelectedOrder={!preSelectedOrder?.is_ask?preSelectedOrder:null} onSubmit={onSell}/>
             </div>
           </>
 }
