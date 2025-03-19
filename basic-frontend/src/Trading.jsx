@@ -109,22 +109,22 @@ function HalfTradingPanel({pair, gross, fee, direction, onSubmit, preSelectedOrd
               </div>
               {_net_total!=null &&
                 <div className="text-sm flex flex-row">
-                    <div className="flex flex-column">
+                    <div className="flex flex-column align-self-end">
                       <div> Gross: </div>
                       <div> Max Fee:</div>
-                      <div className="border-top-1 pr-3 pt-1"> Net Total:</div>
+                      <div className="border-top-1 pr-3 pt-1 h-1rem"> Net Total:</div>
                     </div>
 
-                    <div className="flex flex-column justify-content-end text-right" style={{fontFamily: "monospace"}}>
+                    <div className="flex flex-column justify-content-end text-right align-self-end" style={{fontFamily: "monospace"}}>
                       <div> {_gross.toFixed(details_decimals)}  </div>
                       <div> {_fee.toFixed(details_decimals)} </div>
-                      <div className="border-top-1 pt-1"> {_net_total.toFixed(details_decimals)} </div>
+                      <div className="border-top-1 pt-1 h-1rem"> {_net_total.toFixed(details_decimals)} </div>
                     </div>
 
-                    <div className="flex flex-column ml-1">
+                    <div className="flex flex-column ml-1 align-self-end">
                       <div>&nbsp;</div>
                       <FeeHelpIcon pair={pair}/>
-                      <div className="pt-1"> <LocalCurrency /></div>
+                      <div className="pt-1 h-1rem"> <LocalCurrency /></div>
                     </div>
 
                 </div>
