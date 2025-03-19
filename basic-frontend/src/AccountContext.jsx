@@ -26,7 +26,7 @@ const WALLET_CONNECT_META = {projectId: '58f7e24f7649cb4dcdc9184466eaf033',
                             metadata: { name: 'BRO DEX',
                                         description: "An orderbook based DEX",
                                         url: DEPLOYED_URL,
-                                        icons: ['https://walletconnect.com/walletconnect-logo.png']
+                                        icons: [DEPLOYED_URL+'/favicon.png']
                                       }
                             }
 
