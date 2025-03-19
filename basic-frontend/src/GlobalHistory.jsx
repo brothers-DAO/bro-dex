@@ -37,7 +37,7 @@ function OrderDate({order})
 {
   const tx_date = useTrxDate(order?.take_tx, NETWORK, CHAIN);
   const limit = sub(Date.now(), {days:1})
-  const date_str = tx_date? (isAfter(tx_date, limit)?format(tx_date, "KK:mm aaa"):formatDistanceToNow(tx_date))
+  const date_str = tx_date? (isAfter(tx_date, limit)?format(tx_date, "hh:mm aaa"):formatDistanceToNow(tx_date))
                           :"~"
 
   return <>{date_str}</>
