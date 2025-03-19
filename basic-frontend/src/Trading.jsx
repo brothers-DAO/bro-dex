@@ -48,7 +48,7 @@ function FeeHelpIcon({pair})
   return  <>
             <span className="pi pi-question-circle cursor-pointer text-lg vertical-align-middle"  onClick={(e) => op.current.toggle(e)}/>
             <OverlayPanel className="max-w-30rem" ref={op}>
-              <ul>
+              <ul className="pl-3 mt-0">
                 <li className="my-2"> <span className="font-bold">Taker: {fee_ratio?fee_ratio.mul(HUNDRED).toString():"Unknown"} %</span> </li>
                 <li className="my-2"> <span className="font-bold">Maker: 0 %</span> </li>
 
