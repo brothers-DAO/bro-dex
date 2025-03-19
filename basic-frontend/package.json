@@ -8,6 +8,9 @@
   "private": false,
   "scripts": {
     "dev": "vite",
+    "devnet": "ln -sf pairs_dev.json pairs.json; ln -sf env_dev .env",
+    "mainnet": "ln -sf pairs_mainnet.json pairs.json; ln -sf env_mainnet .env",
+    "testnet": "ln -sf pairs_testnet.json pairs.json; ln -sf env_testnet .env",
     "build": "yarn run gv && vite build",
     "lint": "eslint . --ext js,jsx --report-unused-disable-directives --max-warnings 0",
     "gv": "genversion -e src/version.js",

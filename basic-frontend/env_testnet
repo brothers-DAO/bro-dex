@@ -3,10 +3,15 @@ VITE_CHAIN=18
 
 VITE_EXPLORER=https://explorer.chainweb.com/testnet
 VITE_BALANCE_EXPLORER=https://balance.chainweb.com
-
 VITE_NS=n_966932c40a83cebb2fb0aece0d80c5155e148778
 
 VITE_ENDPOINT=https://api.testnet.chainweb.com
+
 VITE_TOKENS_DB=https://raw.githubusercontent.com/CryptoPascal31/kadena_tokens/refs/heads/testnet
 VITE_TOKENS_DB_NETWORK=testnet
-VITE_DEPLOYED_URL=https://bro-dex-demo.surge.sh
+VITE_DEPLOYED_URL=https://dex-testnet.bro.pink
+
+# Faucet stuffs
+VITE_ENABLE_FAUCET=true
+VITE_FAUCET_MODULE=n_ff0f76ee90735fba124eba93a1c49423c75654b1.multi-faucet
+VITE_FAUCET_ID=bro-dex-test

@@ -1,0 +1,18 @@
+VITE_NETWORK=mainnet01
+VITE_CHAIN=1
+
+VITE_EXPLORER=https://explorer.chainweb.com/mainnet
+VITE_BALANCE_EXPLORER=https://balance.chainweb.com
+
+##### TBD
+VITE_NS=n_966932c40a83cebb2fb0aece0d80c5155e148778
+######
+
+VITE_ENDPOINT=https://api.chainweb.com
+
+VITE_TOKENS_DB=https://raw.githubusercontent.com/CryptoPascal31/kadena_tokens/refs/heads/main
+VITE_TOKENS_DB_NETWORK=mainnet
+VITE_DEPLOYED_URL=https://dex.bro.pink
+
+# Faucet stuffs
+VITE_ENABLE_FAUCET=false

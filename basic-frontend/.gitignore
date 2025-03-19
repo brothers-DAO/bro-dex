@@ -1,5 +1,6 @@
 node_modules
 dist
 .env
+env_dev
 yarn-error.log
 deploy.sh

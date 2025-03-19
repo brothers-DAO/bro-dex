@@ -8,7 +8,9 @@
   "base_module":"n_5d119cc07ffd5efaef5c7feef9e878f34e3d4652.bro",
   "orderbook_precision":"1.0",
   "quote_decimals":1,
-  "base_decimals":4
+  "quote_decimals_details":6,
+  "base_decimals":4,
+  "base_decimals_details":8
  },
  {
   "name":"BRO-ABC-R",
@@ -20,7 +22,9 @@
   "base_module":"n_5d119cc07ffd5efaef5c7feef9e878f34e3d4652.bro",
   "orderbook_precision":"10.0",
   "quote_decimals":1,
-  "base_decimals":4
+  "quote_decimals_details":6,
+  "base_decimals":4,
+  "base_decimals_details":8
   },
   {
   "name":"BRO-DEF-R",
@@ -32,6 +36,8 @@
   "base_module":"n_5d119cc07ffd5efaef5c7feef9e878f34e3d4652.bro",
   "orderbook_precision":"10.0",
   "quote_decimals":1,
-  "base_decimals":4
+  "quote_decimals_details":4,
+  "base_decimals":4,
+  "base_decimals_details":8
   }
 ]
