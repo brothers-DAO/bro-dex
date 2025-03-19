@@ -1,5 +1,7 @@
 import { useState, useContext, useEffect } from 'react';
+import {useTrxDate} from './backend/pact';
 import { Decimal } from 'decimal.js';
+import { formatDistanceToNow, sub , isAfter, format} from 'date-fns';
 
 import {useHistory, useAccountHistory, useActiveMakerTransactions} from './backend/bro-dex-react'
 import {make_cancel_order} from './backend/bro-dex-transactions';
@@ -10,6 +12,8 @@ import {TransactionContext} from './TransactionContext';
 import {AccountContext} from './AccountContext';
 import OrderDialog from './OrderDialog'
 
+const NETWORK = import.meta.env.VITE_NETWORK
+const CHAIN = import.meta.env.VITE_CHAIN
 
 const short_id = x => x.toString().substring(0,5)+ "..."
 
@@ -29,6 +33,15 @@ const Price = ({pair, val}) => <> {val.toFixed(pair.quote_decimals)} <Currency n
 
 const Amount = ({pair, val}) => <> {val.toFixed(pair.base_decimals, Decimal.ROUND_UP)} <Currency name={pair.base} /> </>
 
+function OrderDate({order})
+{
+  const tx_date = useTrxDate(order?.take_tx, NETWORK, CHAIN);
+  const limit = sub(Date.now(), {days:1})
+  const date_str = tx_date? (isAfter(tx_date, limit)?format(tx_date, "KK:mm aaa"):formatDistanceToNow(tx_date))
+                          :"~"
+
+  return <>{date_str}</>
+}
 
 
 function GlobalHistory({pair})
@@ -47,7 +60,7 @@ function GlobalHistory({pair})
   return <> {clickedOrder && <OrderDialog pair={pair} order={clickedOrder} onClose={() => setClickedOrder(null)} />}
             <DataTable className="w-30rem" lazy totalRecords={totalSize} value={data.slice(first)} first={first} onPage={onPage} paginator rows={10} emptyMessage="No data" dataKey="id"  stripedRows selectionMode="single" onRowClick={x=> setClickedOrder(x.data)} >
               <Column header="" body={x=>dir_icon(x.is_ask)} />
-              <Column header="ID" body={x=> short_id(x.id)} />
+              <Column header="Time" body={x=> (<OrderDate order={x} />)} />
 
 
               <Column header="Price" body={x=> <Price pair={pair} val={x.price}/>} />
@@ -73,7 +86,7 @@ function AccountHistory({pair})
   return <> {clickedOrder && <OrderDialog pair={pair} order={clickedOrder} onClose={() => setClickedOrder(null)} />}
             <DataTable className="w-30rem" lazy totalRecords={totalSize} value={data.slice(first)} first={first} onPage={onPage} paginator rows={10} emptyMessage="No data" dataKey="id"  stripedRows selectionMode="single" onRowClick={x=> setClickedOrder(x.data)} >
               <Column header="" body={x=>dir_icon(x.is_ask, x.state==3)} />
-              <Column header="ID" body={x=> short_id(x.id)} />
+              <Column header="Time" body={x=> (<OrderDate order={x} />)} />
               <Column header="Price" body={x=> <Price pair={pair} val={x.price}/>} />
               <Column header="Amount" body={x=> <Amount pair={pair} val={x.amount}/>} />
             </DataTable>

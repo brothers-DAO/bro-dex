@@ -17,6 +17,7 @@
     "@kadena/client": "^1.17.1",
     "@walletconnect/modal": "^2.7.0",
     "@walletconnect/sign-client": "^2.18.1",
+    "date-fns": "^4.1.0",
     "decimal.js": "^10.5.0",
     "genversion": "^3.2.0",
     "primeflex": "^3.3.1",
