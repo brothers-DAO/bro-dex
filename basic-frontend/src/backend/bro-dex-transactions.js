@@ -1,5 +1,5 @@
 import {Pact} from '@kadena/client';
-import {to_pact_int, to_pact_decimal} from './utils';
+import {to_pact_int, to_pact_decimal, gen_nonce} from './utils';
 import {core_mod, wrapper_mod} from './bro-dex-common'
 
 /* Modules refs */
@@ -12,6 +12,7 @@ const make_cancel_order = (pair, account, key, order) =>
               .setNetworkId(NETWORK)
               .addSigner(key, (signFor) => [signFor("coin.GAS")])
               .addSigner(key, (signFor) => [signFor(`${core_mod(pair.name)}.CANCEL-ORDER`, to_pact_int(order.id))])
+              .setNonce(gen_nonce)
               .createTransaction();
 
 const make_order = (direction, type, pair, account, key, deposit, amount, limit, total) =>
@@ -21,6 +22,7 @@ const make_order = (direction, type, pair, account, key, deposit, amount, limit,
                 .addData("k",{pred:"keys-all", keys:[key]})
                 .addSigner(key, (signFor) => [signFor("coin.GAS")])
                 .addSigner(key, (signFor) => [signFor(`${direction=="buy"?pair.quote_module:pair.base_module}.TRANSFER`, account, deposit, to_pact_decimal(total))])
+                .setNonce(gen_nonce)
                 .createTransaction();
 
 
