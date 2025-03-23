@@ -1,3 +1,16 @@
 [
-
+  {
+    "name":"BRO-KDA-R",
+    "code": "BRO-KDA",
+    "display_name":"BRO/KDA",
+    "quote":"KDA",
+    "quote_module":"coin",
+    "base":"$BRO",
+    "base_module":"n_582fed11af00dc626812cd7890bb88e72067f28c.bro",
+    "orderbook_precision":"1.0",
+    "quote_decimals":1,
+    "quote_decimals_details":6,
+    "base_decimals":4,
+    "base_decimals_details":7
+  }
 ]

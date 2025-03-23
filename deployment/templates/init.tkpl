@@ -4,7 +4,7 @@ code: |
   (define-keyset "{{ns}}.bro-dex-admin" (read-keyset 'admin-ks))
   (define-keyset "{{ns}}.rb-tree-admin" (read-keyset 'admin-ks))
   (define-keyset "{{ns}}.rb-tree-create" (read-keyset 'admin-ks))
-  (define-keyset "{{ns}}.fees" (read-keyset 'fee-ks))
+  (define-keyset "{{ns}}.fees-collector" (read-keyset 'fee-ks))
 
 publicMeta:
   chainId: "{{chain}}"

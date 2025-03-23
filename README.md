@@ -6,6 +6,32 @@
  - Test and Deployement scripts (tests and deployment directories) released under "Modified BSD License"
  - Frontend is released under "Modified BSD License"
 
+## Deployment
+
+### mainnet01 / chain 2
+
+
+#### Frontend
+https://dex.bro.pink
+
+#### Namespace
+
+``n_f6aa9328b19b8bf7e788603bd669dcf549e07575``
+
+#### Pairs
+**$BRO / KDA:**
+  - Core: ``n_f6aa9328b19b8bf7e788603bd669dcf549e07575.bro-dex-core-BRO-KDA-M``
+  - View: ``n_f6aa9328b19b8bf7e788603bd669dcf549e07575.bro-dex-view-BRO-KDA-M``
+  - Wrapper: ``n_f6aa9328b19b8bf7e788603bd669dcf549e07575.bro-dex-wrapper-BRO-KDA-M``
+  - Wrapper deposit account: *TBD*
+
+
+**$BRO / zUSD:**
+  Coming soon
+
+**$BRO / HERON:**
+  Coming soon
+
 ## Pairs and Modules
 Each pair requires the deployment of 3 linked modules:
   - core
