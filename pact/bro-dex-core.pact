@@ -21,7 +21,6 @@
     @doc "Main cap acquired when taking an order"
     @event
     (compose-capability (REMOVE-ORDER id))
-;    (compose-capability (ORDER-ACCOUNT id))
     (compose-capability (POINTER-SWAP))
     (compose-capability (UPDATE-TREE))
   )
@@ -30,7 +29,6 @@
     @doc "Main cap acquired when cancelling an order"
     @event
     (compose-capability (REMOVE-ORDER id))
-;    (compose-capability (ORDER-ACCOUNT id))
     (compose-capability (POINTER-SWAP))
     (compose-capability (UPDATE-TREE))
   )
