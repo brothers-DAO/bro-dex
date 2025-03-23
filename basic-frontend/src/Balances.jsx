@@ -33,7 +33,7 @@ function TokenInfoIcon({module})
                                 <div> <span className="font-bold vertical-align-middle">Module:</span> <span className="text-xs vertical-align-middle"> {module}</span></div>
                                 {token_info?.totalSupply && <div> <span className="font-bold">Total supply:</span> {token_info.totalSupply.toString()}</div>}
                                 {token_info?.circulatingSupply && <div> <span className="font-bold">Circulating supply:</span> {token_info.circulatingSupply.toString()}</div>}
-                                {token_info?.links && <div className="flex flex-row gap-2"> <span className="font-bold">Links:</span>  {token_info.socials.map(x => <SocialLink lnk={x}/>)} </div>}
+                                {token_info?.socials && <div className="flex flex-row gap-2"> <span className="font-bold">Links:</span>  {token_info.socials.map( (x,i) => <SocialLink key={i} lnk={x}/>)} </div>}
                               </div>
                             </div>
 
