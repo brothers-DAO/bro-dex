@@ -108,7 +108,7 @@ function AccountActiveOrders({pair})
     {setTrx(make_cancel_order(pair, account, key, order))}
 
   return <> {clickedOrder && <OrderDialog pair={pair} order={clickedOrder} onCancel={onCancel} onClose={() => setClickedOrder(null)} />}
-            <DataTable emptyMessage="No active orders" dataKey="id" value={data} stripedRows selectionMode="single" onRowClick={x=> setClickedOrder(x.data)} >
+            <DataTable className="w-30rem" emptyMessage="No active orders" dataKey="id" value={data} stripedRows selectionMode="single" onRowClick={x=> setClickedOrder(x.data)} >
               <Column header="ID" body={x=> short_id(x.id)} />
               <Column header="Type" body={x => x.is_ask?"Sell":"Buy"} />
               <Column header="Price" body={x=> <Price pair={pair} val={x.price}/>} />
