@@ -48,7 +48,9 @@ function Balances({pair})
   const {trxCount} = useContext(TransactionContext);
   const {balances:[balance_a, balance_b], mutate} = useTokensBalance(account, pair.quote_module, pair.base_module);
 
-  useEffect(() => {if(trxCount){console.log("Trigger mutation");mutate()}}, [trxCount, mutate])
+  useEffect(() => {if(trxCount)
+                    mutate();},
+           [trxCount, mutate]);
 
   return <>
           <div className="font-bold text-primary text-center mb-1"> Balances </div>

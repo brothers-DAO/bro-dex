@@ -41,11 +41,7 @@ const __getKey = (prefix, pageIndex, prev) =>
 
 export function useOrder(pair,oid)
 {
-  console.log(pair)
-  console.log(oid)
-  console.log((pair && oid)?`(${core_mod(pair)}.get-order ${oid.toString()})`:null)
   const {data, error, mutate} = useLocalPact((pair && oid)?`(${core_mod(pair)}.get-order ${oid.toString()})`:null, NETWORK, CHAIN);
-  console.log(data)
   return {data:(data && to_order(data)), error, mutate}
 }
 

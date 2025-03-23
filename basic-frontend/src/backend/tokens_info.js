@@ -22,6 +22,6 @@ export function useTokenInfo(token_mod)
 {
   const {data, error} = useTokenDb();
   if(error)
-    console.log(error)
+    console.error(error)
   return {token_info:(data?.[token_mod] ?? DEFAULT), error};
 }

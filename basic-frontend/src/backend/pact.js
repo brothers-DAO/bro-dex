@@ -19,7 +19,6 @@ function local_check(cmd, options)
 
 function check_res(resp)
 {
-  console.log(resp)
   if(resp?.result?.status !== 'success')
     {console.warn(resp); throw Error(`Tx error:${resp?.result?.error?.message}`);}
   else
