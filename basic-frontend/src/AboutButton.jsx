@@ -1,6 +1,5 @@
 import { useRef } from 'react';
 import { OverlayPanel } from 'primereact/overlaypanel';
-import { Button } from 'primereact/button';
 import {version} from'./version'
 import BroDexIcon from './img/bro_dex.svg';
 import BroDexPrompted from './img/Bro_dex_prompted_by_pact.jpg';

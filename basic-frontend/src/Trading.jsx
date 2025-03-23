@@ -32,7 +32,7 @@ function OrderTypeHelpIcon()
             <OverlayPanel className="max-w-30rem" ref={op}>
               <ul>
                 <li className="my-2"> <span className="font-bold">GTC:</span> Good Till Canceled ⇒ Attempt to take 10 existing active offers (Taker) at most and creates a Maker order with the remaining amount if possible. </li>
-                <li className="my-2"> <span className="font-bold">IOC:</span> Immediate Or Cancel ⇒ Attempt to take 10 existing active offers (Taker) at most. Don't create a Maker order. Unused funds are refunded.</li>
+                <li className="my-2"> <span className="font-bold">IOC:</span> Immediate Or Cancel ⇒ Attempt to take 10 existing active offers (Taker) at most. Don&lsquo;t create a Maker order. Unused funds are refunded.</li>
                 <li className="my-2"> <span className="font-bold">FOK:</span> Fill Or Kill ⇒ Attempt to take 10 existing active offers (Taker) at most, but reverts the transaction if the order is not fully filled. </li>
                 <li className="my-2"> <span className="font-bold">Post-Only:</span> Create a Maker order only if possible. Guarantee a zero fee order.</li>
               </ul>
@@ -150,11 +150,11 @@ function TradingPanel({pair, preSelectedOrder})
 
   const type_to_fee = x => x=="Post-Only"?ZERO:fee_ratio;
 
-  const compute_buy_expected = (amount, price, type) => (amount && price)?amount:null;
-  const compute_sell_expected = (amount, price, type) => (amount && price)?amount.mul(price):null
+  const compute_buy_expected = (amount, price, _) => (amount && price)?amount:null;
+  const compute_sell_expected = (amount, price,_) => (amount && price)?amount.mul(price):null
 
-  const compute_buy_gross = (amount, price, type) => (amount && price)? amount.mul(price):null;
-  const compute_sell_gross = (amount, price, type) => (amount && price)? amount:null;
+  const compute_buy_gross = (amount, price, _) => (amount && price)? amount.mul(price):null;
+  const compute_sell_gross = (amount, price, _) => (amount && price)? amount:null;
 
   const compute_buy_fees = (amount, price, type) => (amount && price)? type_to_fee(type).mul(amount).mul(price):null;
   const compute_sell_fees = (amount, price, type) => (amount && price)? type_to_fee(type).mul(amount):null;
