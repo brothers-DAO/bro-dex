@@ -23,6 +23,7 @@ import _PAIRS from '../pairs.json';
 const PAIRS = _PAIRS.map(({orderbook_precision, ...rest}) => ({orderbook_precision:Decimal(orderbook_precision), ...rest}))
 
 import ChainWeaverIcon from './img/chainweaver-icon.png'
+import ComingSoonImg from './img/coming_soon.svg'
 
 import './App.css';
 
@@ -33,6 +34,17 @@ function CommonCard({title, toggleable=false, onToggle=()=>{}, children})
                 content:{className:"border-round-bottom-2xl py-3"}}}>
             {children}
           </Panel>
+}
+
+function CommingSoonCard({pair})
+{
+  return <div  className="flex justify-content-center" >
+          <Panel header={pair.display_name + " : Coming Soon"} className="w-10  shadow-3 m-2 border-round-top-md border-round-bottom-2xl">
+            <div className="flex justify-content-center" style={{maxHeight:"60vh"}}>
+              <img src={ComingSoonImg} className="w-9" />
+            </div>
+          </Panel>
+        </div>
 }
 
 function OrderBookCard({pair, onClick})
@@ -142,20 +154,22 @@ function PairPanel({pair})
   const [lastClickedOrder, setLastClickedOrder] = useState(null)
   return  <div className="flex flex-column max-w-max">
             <title>{"Bro deX:" + pair.display_name}</title>
-            <PairInfoCard pair={pair} />
+            {pair.coming && <CommingSoonCard pair={pair}/>}
+            {!pair.coming && <>
+              <PairInfoCard pair={pair} />
 
-            <div className="flex flex-row flex-wrap">
+              <div className="flex flex-row flex-wrap">
 
-              <div className="flex flex-column min-w-min">
-                <OrderBookCard pair={pair} onClick={x => setLastClickedOrder(x)}/>
-                <HistoryCard  pair={pair}/>
-              </div>
+                <div className="flex flex-column min-w-min">
+                  <OrderBookCard pair={pair} onClick={x => setLastClickedOrder(x)}/>
+                  <HistoryCard  pair={pair}/>
+                </div>
 
-              <div className="flex flex-column">
-                <TradingCard pair={pair} preSelectedOrder={lastClickedOrder}/>
-                <AccountCard pair={pair}/>
-              </div>
-          </div>
+                <div className="flex flex-column">
+                  <TradingCard pair={pair} preSelectedOrder={lastClickedOrder}/>
+                  <AccountCard pair={pair}/>
+                </div>
+              </div></>}
         </div>
 }
 
