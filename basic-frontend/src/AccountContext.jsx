@@ -49,7 +49,7 @@ function AccountDialog({visible, onHide, onConfirm})
   return <Dialog header="Set Account" visible={visible} closable onShow={() => _setAccount("")} onHide={onHide}>
         Enter your Kadena account (usually starts with k:)
         <FloatLabel className="my-4">
-          <InputText id="__acount" value={_account} onChange={(e) => _setAccount(e.target.value)} size={60}/>
+          <InputText id="__acount" value={_account} onChange={(e) => _setAccount(e.target.value)} size={64}/>
           <label htmlFor="__acount">Account</label>
         </FloatLabel>
         <Button label="OK" icon="pi pi-check" onClick={()=>onConfirm(_account)} />
