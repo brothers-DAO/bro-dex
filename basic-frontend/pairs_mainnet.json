@@ -1,6 +1,6 @@
 [
   {
-    "name":"BRO-KDA-R",
+    "name":"BRO-KDA-M",
     "code": "BRO-KDA",
     "display_name":"BRO/KDA",
     "quote":"KDA",
@@ -11,6 +11,40 @@
     "quote_decimals":1,
     "quote_decimals_details":6,
     "base_decimals":4,
-    "base_decimals_details":7
+    "base_decimals_details":7,
+    "coming": false
+
+  },
+
+  {
+    "name":"BRO-zUSD-M",
+    "code": "BRO-zUSD",
+    "display_name":"BRO/zUSD",
+    "quote":"zUSD",
+    "quote_module":"n_b742b4e9c600892af545afb408326e82a6c0c6ed.zUSD",
+    "base":"$BRO",
+    "base_module":"n_582fed11af00dc626812cd7890bb88e72067f28c.bro",
+    "orderbook_precision":"1.0",
+    "quote_decimals":1,
+    "quote_decimals_details":6,
+    "base_decimals":4,
+    "base_decimals_details":7,
+    "coming":true
+  },
+
+  {
+    "name":"BRO-HERON-M",
+    "code": "BRO-HERON",
+    "display_name":"BRO/HERON",
+    "quote":"HERON",
+    "quote_module":"n_e309f0fa7cf3a13f93a8da5325cdad32790d2070.heron",
+    "base":"$BRO",
+    "base_module":"n_582fed11af00dc626812cd7890bb88e72067f28c.bro",
+    "orderbook_precision":"100.0",
+    "quote_decimals":0,
+    "quote_decimals_details":1,
+    "base_decimals":4,
+    "base_decimals_details":7,
+    "coming":true
   }
 ]
