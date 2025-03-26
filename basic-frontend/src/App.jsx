@@ -38,12 +38,12 @@ function CommonCard({title, toggleable=false, onToggle=()=>{}, children})
 
 function CommingSoonCard({pair})
 {
-  return <div  className="flex justify-content-center" >
-          <Panel header={pair.display_name + " : Coming Soon"} className="w-10  shadow-3 m-2 border-round-top-md border-round-bottom-2xl">
-            <div className="flex justify-content-center" style={{maxHeight:"60vh"}}>
-              <img src={ComingSoonImg} className="w-9" />
+  return <div className="flex justify-content-center min-w-screen"  >
+          <CommonCard title={pair.display_name + " : Coming Soon"}>
+            <div className="flex justify-content-center " style={{width:"70vw", aspectRatio:"2 / 1"}} >
+              <img src={ComingSoonImg} />
             </div>
-          </Panel>
+          </CommonCard>
         </div>
 }
 
@@ -185,6 +185,7 @@ function App()
 {
   // Preload wallet' images
   preload(ChainWeaverIcon, {as:"image"})
+  preload(ComingSoonImg, {as:"image"})
   return  <AccountContextProvider>
             <TransactionContextProvider>
               <MainBar />
