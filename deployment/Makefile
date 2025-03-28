@@ -1,22 +1,23 @@
-#PAIR=BRO-KDA-R
-PAIR=BRO-ABC-R
-NS=n_966932c40a83cebb2fb0aece0d80c5155e148778
+PAIR=BRO-zUSD-M
+NS=n_f6aa9328b19b8bf7e788603bd669dcf549e07575
 
 #Comment to disable Init
-INIT= -D__INIT__
+#INIT= -D__INIT__
 
 # Dont forget to set the pair modules here
 MACROS= -D__NAMESPACE__=${NS} \
         -DPAIR=${PAIR} \
-        -D__QUOTE_MOD__=n_ff0f76ee90735fba124eba93a1c49423c75654b1.abc \
-        -D__BASE_MOD__=n_5d119cc07ffd5efaef5c7feef9e878f34e3d4652.bro \
+        -D__QUOTE_MOD__=n_b742b4e9c600892af545afb408326e82a6c0c6ed.zUSD \
+        -D__BASE_MOD__=n_582fed11af00dc626812cd7890bb88e72067f28c.bro \
         -D__MIN_AMOUNT__=0.001 \
         -D__MIN_PRICE__=1.0 \
         -D__DECIMALS__=6 \
-        -D__FEE_ACOUNT__=r:${NS}.fees \
+        -D__FEE_ACOUNT__=r:${NS}.fees-collector \
         -DRB_TREE_NS=${NS} \
 
-DATA_FILE=testnet.yaml
+KEYS_DIR=keys/mainnet
+
+DATA_FILE=mainnet.yaml
 
 _DATA_FILE = $(basename ${DATA_FILE})_${PAIR}.yaml
 
@@ -44,9 +45,9 @@ tx-init.yaml: templates/init.tkpl ${_DATA_FILE}
 	kda gen -t $< -o $@ -d ${_DATA_FILE}
 
 %.json: %.yaml
-	kda sign $< -k keys/testnet/gas.key
-	kda sign $< -k keys/testnet/admin.key
-	kda sign $< -k keys/testnet/ns.key
+	kda sign $< -k ${KEYS_DIR}/gas.yaml
+	kda sign $< -k ${KEYS_DIR}/admin.yaml
+	kda sign $< -k ${KEYS_DIR}/ns.yaml
 
 json: tx-bro-dex-core-${PAIR}.json tx-bro-dex-view-${PAIR}.json tx-bro-dex-wrapper-${PAIR}.json tx-rb-tree.json tx-init.json
 

@@ -23,11 +23,14 @@ https://dex.bro.pink
   - Core: ``n_f6aa9328b19b8bf7e788603bd669dcf549e07575.bro-dex-core-BRO-KDA-M``
   - View: ``n_f6aa9328b19b8bf7e788603bd669dcf549e07575.bro-dex-view-BRO-KDA-M``
   - Wrapper: ``n_f6aa9328b19b8bf7e788603bd669dcf549e07575.bro-dex-wrapper-BRO-KDA-M``
-  - Wrapper deposit account: *TBD*
+  - Wrapper deposit account: ``c:d4JKSygtIEXiObK0Q7rrn78O4yIp9lQYxDoFIXV7b3o``
 
 
 **$BRO / zUSD:**
-  Coming soon
+  - Core: ``n_f6aa9328b19b8bf7e788603bd669dcf549e07575.bro-dex-core-BRO-zUSD-M``
+  - View: ``n_f6aa9328b19b8bf7e788603bd669dcf549e07575.bro-dex-view-BRO-zUSD-M``
+  - Wrapper: ``n_f6aa9328b19b8bf7e788603bd669dcf549e07575.bro-dex-wrapper-BRO-zUSD-M``
+  - Wrapper deposit account: ``c:jDTPscjEcdDjRMIPinQfgpwBBBlKaDoNd-f90xvqUB8``
 
 **$BRO / HERON:**
   Coming soon
