@@ -33,7 +33,10 @@ https://dex.bro.pink
   - Wrapper deposit account: ``c:jDTPscjEcdDjRMIPinQfgpwBBBlKaDoNd-f90xvqUB8``
 
 **$BRO / HERON:**
-  Coming soon
+  - Core: ``n_f6aa9328b19b8bf7e788603bd669dcf549e07575.bro-dex-core-BRO-HERON-M``
+  - View: ``n_f6aa9328b19b8bf7e788603bd669dcf549e07575.bro-dex-view-BRO-HERON-M``
+  - Wrapper: ``n_f6aa9328b19b8bf7e788603bd669dcf549e07575.bro-dex-wrapper-BRO-HERON-M``
+  - Wrapper deposit account: ``c:mkyNffpMpr9v8szdrAsn-fFK20NTuR-KwwNozenj134``
 
 ## Pairs and Modules
 Each pair requires the deployment of 3 linked modules:
