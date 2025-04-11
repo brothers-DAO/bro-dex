@@ -8,7 +8,7 @@ VITE_NS=n_f6aa9328b19b8bf7e788603bd669dcf549e07575
 
 VITE_ENDPOINT=https://api.chainweb.com
 
-VITE_TOKENS_DB=https://raw.githubusercontent.com/CryptoPascal31/kadena_tokens/refs/heads/main
+VITE_TOKENS_DB=https://raw.githubusercontent.com/Mercatus-Kadena/kadena_tokens/refs/heads/main
 VITE_TOKENS_DB_NETWORK=mainnet
 VITE_DEPLOYED_URL=https://dex.bro.pink
 
