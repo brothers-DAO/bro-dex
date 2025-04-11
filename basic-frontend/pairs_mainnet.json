@@ -46,5 +46,21 @@
     "base_decimals":4,
     "base_decimals_details":7,
     "coming":false
+  },
+
+  {
+    "name":"KDA-zUSD-M",
+    "code": "KDA-zUSD",
+    "display_name":"KDA/zUSD",
+    "quote":"zUSD",
+    "quote_module":"n_b742b4e9c600892af545afb408326e82a6c0c6ed.zUSD",
+    "base":"KDA",
+    "base_module":"coin",
+    "orderbook_precision":"10.0",
+    "quote_decimals":4,
+    "quote_decimals_details":7,
+    "base_decimals":4,
+    "base_decimals_details":7,
+    "coming":true
   }
 ]
