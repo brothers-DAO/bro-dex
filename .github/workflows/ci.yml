@@ -1,0 +1,59 @@
+name: BRO - DEX CO
+
+on:
+  push:
+
+  workflow_dispatch:
+
+jobs:
+  test-pact:
+    name: Unit test Pact Smart contracts
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          submodules: true
+
+      - name: Install Pact
+        run: |
+          PACT_VERSION="5.4ce"
+          PACT_HASH="b769"
+          curl -fLsS -O https://github.com/kda-community/pact-5/releases/download/$PACT_VERSION/pact-$PACT_VERSION-$PACT_HASH-ubuntu-22.04.tar.gz
+          mkdir -p .bin
+          tar -xvzf pact-$PACT_VERSION-$PACT_HASH-ubuntu-22.04.tar.gz -C .bin pact
+          chmod +x .bin/pact
+      - name: Add Pact to PATH
+        run: echo "$GITHUB_WORKSPACE/.bin" >> $GITHUB_PATH
+
+      - name: Run tests
+        run: make tests
+
+  test-tx-generate:
+    name: Test Transaction generation
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          submodules: true
+
+      - name: Install KDA tool
+        run: |
+          curl -fLsS O https://github.com/kda-community/kda-tool/releases/download/1.2/kda-tool-1.2-ubuntu-22.04.tar.gz
+          mkdir -p .bin
+          tar -xvzf kda-tool-1.2-ubuntu-22.04.tar.gz
+          cp kda-tool-1.2/kda .bin
+
+      - name: Add KDA to PATH
+        run: echo "$GITHUB_WORKSPACE/.bin" >> $GITHUB_PATH
+
+      - name: Generate Transactions
+        run: |
+          cd deployment
+          make BRO-HERON-M
+          make BRO-kbUSDC-M
+          make BRO-KDA-M
+          make BRO-zUSD-M
+          make FLUX-kbUSDC
+          make KDA-kbUSDC-M
