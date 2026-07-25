@@ -1,4 +1,4 @@
-name: BRO - DEX CO
+name: BRO - DEX CI
 
 on:
   push:
@@ -81,4 +81,6 @@ jobs:
 
       - name: Build
         working-directory: basic-frontend
-        run: npm run build
+        run: |
+          npm run mainnet
+          npm run build
