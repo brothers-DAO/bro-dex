@@ -40,7 +40,7 @@ jobs:
 
       - name: Install KDA tool
         run: |
-          curl -fLsS O https://github.com/kda-community/kda-tool/releases/download/1.2/kda-tool-1.2-ubuntu-22.04.tar.gz
+          curl -fLsS -O https://github.com/kda-community/kda-tool/releases/download/1.2/kda-tool-1.2-ubuntu-22.04.tar.gz
           mkdir -p .bin
           tar -xvzf kda-tool-1.2-ubuntu-22.04.tar.gz
           cp kda-tool-1.2/kda .bin
@@ -57,3 +57,28 @@ jobs:
           make BRO-zUSD-M
           make FLUX-kbUSDC
           make KDA-kbUSDC-M
+
+  build-frontend:
+    name: Build Vite frontend
+    runs-on: ubuntu-22.04
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          submodules: true
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: basic-frontend/package-lock.json
+
+      - name: Install dependencies
+        working-directory: basic-frontend
+        run: npm ci
+
+      - name: Build
+        working-directory: basic-frontend
+        run: npm run build
