@@ -1,8 +1,8 @@
-(module bro-dex-wrapper-PAIR GOVERNANCE
+(module bro-dex-wrapper-__PAIR__ GOVERNANCE
   ;SPDX-License-Identifier: BUSL-1.1
   ; => https://github.com/brothers-DAO/bro-dex/blob/main/LICENSE
   (use free.util-math)
-  (use bro-dex-core-PAIR)
+  (use bro-dex-core-__PAIR__)
 
   (defcap GOVERNANCE ()
     (enforce-keyset "__NAMESPACE__.bro-dex-admin"))

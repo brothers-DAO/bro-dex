@@ -1,4 +1,4 @@
-codeFile: .pact/bro-dex-wrapper-{{pair}}.pact
+codeFile: .pact/bro-dex-wrapper-__PAIR__.pact
 publicMeta:
   chainId: "{{chain}}"
   sender: {{gas-payer}}

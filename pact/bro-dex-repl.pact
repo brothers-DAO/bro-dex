@@ -1,9 +1,9 @@
-(module bro-dex-repl-PAIR G
+(module bro-dex-repl-__PAIR__ G
   @doc "BRO DEX utils for being used in REPL"
   ;SPDX-License-Identifier: BUSL-1.1
   ; => https://github.com/brothers-DAO/bro-dex/blob/main/LICENSE
-  (use bro-dex-core-PAIR)
-  (use bro-dex-view-PAIR)
+  (use bro-dex-core-__PAIR__)
+  (use bro-dex-view-__PAIR__)
   (use free.util-strings)
   (use free.util-lists)
 
@@ -33,7 +33,7 @@
 
   (defun format-title:string (x:string)
     @doc "Format a title"
-    (--format-title (+ "PAIR / " x)))
+    (--format-title (+ "__PAIR__ / " x)))
 
   (defun format-all-orders:string ()
     @doc "Fetch and format all orders of the orderbook"

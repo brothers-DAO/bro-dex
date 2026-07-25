@@ -5,3 +5,4 @@ test:
 
 clean:
 		${MAKE} -C tests clean
+		${MAKE} -C deployment clean

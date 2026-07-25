@@ -1,5 +1,8 @@
 (namespace "__NAMESPACE__")
-include(`../pact/bro-dex-core.pact')dnl
+
+changequote([[, ]])dnl
+include([[../pact/bro-dex-core.pact]])dnl
+changequote(`, ')dnl
 
 ifdef(`__INIT__',dnl
 (create-table seed-table)

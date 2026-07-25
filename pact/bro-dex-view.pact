@@ -1,15 +1,15 @@
-(module bro-dex-view-PAIR GOVERNANCE
+(module bro-dex-view-__PAIR__ GOVERNANCE
   ;SPDX-License-Identifier: BUSL-1.1
   ; => https://github.com/brothers-DAO/bro-dex/blob/main/LICENSE
   (use free.util-lists)
   (use free.util-math)
-  (use bro-dex-core-PAIR)
+  (use bro-dex-core-__PAIR__)
   (use rb-tree)
 
   (defcap GOVERNANCE ()
     (enforce-keyset "__NAMESPACE__.bro-dex-admin"))
 
-  (defconst NIL bro-dex-core-PAIR.NIL)
+  (defconst NIL bro-dex-core-__PAIR__.NIL)
 
   ; -------------------------- INTERNAL FUNCTIONS  -----------------------------
   ; ----------------------------------------------------------------------------

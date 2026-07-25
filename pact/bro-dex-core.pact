@@ -1,4 +1,4 @@
-(module bro-dex-core-PAIR GOVERNANCE
+(module bro-dex-core-__PAIR__ GOVERNANCE
   ;SPDX-License-Identifier: BUSL-1.1
   ; => https://github.com/brothers-DAO/bro-dex/blob/main/LICENSE
   (use free.util-lists)
@@ -87,8 +87,8 @@
   (deftable order-table:{order-sch})
 
   (defconst NIL 0)
-  (defconst ASK_TREE (+ "PAIR" "_ask"))
-  (defconst BID_TREE (+ "PAIR" "_bid"))
+  (defconst ASK_TREE (+ "__PAIR__" "_ask"))
+  (defconst BID_TREE (+ "__PAIR__" "_bid"))
 
   (defun get-tree:string (is-ask:bool)
     (if is-ask ASK_TREE BID_TREE))
@@ -174,10 +174,10 @@
   ; -----------------FINANCIAL RELATED FUNCTIONS -------------------------------
   ; ----------------------------------------------------------------------------
   (defconst MIN-PRICE __MIN_PRICE__)
-  (defconst MAX-PRICE 1000000000000.0)
+  (defconst MAX-PRICE __MAX_PRICE__)
 
   (defconst MIN-AMOUNT __MIN_AMOUNT__)
-  (defconst MAX-AMOUNT 100.0)
+  (defconst MAX-AMOUNT __MAX_AMOUNT__)
 
   (defconst DECIMALS __DECIMALS__)
   (defconst QUANTUM-AMOUNT (pow10 (- DECIMALS)))

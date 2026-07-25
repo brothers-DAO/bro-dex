@@ -6,5 +6,4 @@ admin-key: b60aa6c34f407578d88df4aec909acbbcb11b6793adaa4f3af2285c30f119a6d
 gas-payer: k:aad1bc74e7f94c0d95c6330534faa9d597d587ac5385a9759d97f140d0d69793
 gas-payer-key: aad1bc74e7f94c0d95c6330534faa9d597d587ac5385a9759d97f140d0d69793
 network: mainnet01
-pair: PAIR
-ns: __NAMESPACE__
+ns: n_f6aa9328b19b8bf7e788603bd669dcf549e07575
